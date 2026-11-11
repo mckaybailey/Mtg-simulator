@@ -1,0 +1,29 @@
+Deck
+4 Momo, Friendly Flier
+4 Sarkhan, Dragon Ascendant
+4 Smaug the Magnificent
+4 Multiversal Passage
+4 Sacred Foundry
+4 Clarion Conqueror
+4 Magmatic Hellkite
+4 Nova Hellkite
+4 Sunbillow Verge
+4 Inspiring Vantage
+4 Burst Lightning
+4 Voice of Victory
+3 Maelstrom of the Spirit Dragon
+3 Cavern of Souls
+2 Erode
+2 Twinmaw Stormbrood
+1 Mountain
+1 Plains
+
+Sideboard
+4 Seam Rip
+3 Rest in Peace
+2 Get Lost
+2 Boros Charm
+1 Dragonhawk, Fate's Tempest
+1 The Legend of Roku
+1 Split Up
+1 Desolation of Smaug

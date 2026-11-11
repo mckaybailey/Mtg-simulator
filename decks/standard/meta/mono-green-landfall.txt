@@ -1,0 +1,29 @@
+Deck
+4 Carnivorous Cultivator
+4 Icetill Explorer
+4 Llanowar Elves
+4 Mossborn Hydra
+4 Sazh's Chocobo
+3 Mightform Harmonizer
+2 Keen-Eyed Curator
+1 Hard-Hitting Question
+4 Earthbender Ascension
+3 Sapling Nursery
+13 Forest
+4 Elven Passage
+4 Fabled Passage
+3 Ba Sing Se
+1 Demolition Field
+1 Escape Tunnel
+1 Pit of Offerings
+
+Sideboard
+3 Hard-Hitting Question
+2 Sandman, Shifting Scoundrel
+2 Surrak, Elusive Hunter
+2 Torpor Orb
+2 Warg Tactics
+1 Mightform Harmonizer
+1 Mole Man, Moloid Master
+1 Pick Your Poison
+1 Sapling Nursery

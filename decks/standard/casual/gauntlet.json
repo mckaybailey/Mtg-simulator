@@ -1,0 +1,11 @@
+{
+ "format": "Standard",
+ "description": "Five simple one-colour decks built only from Foundations commons and uncommons, to stand in for kitchen-table opponents. Written for mtgsim; they are not tournament lists and carry no metagame share.",
+ "decks": [
+  {"file": "mono-red-burn.txt", "name": "Casual Mono-Red Burn", "category": "aggro"},
+  {"file": "mono-green-stompy.txt", "name": "Casual Mono-Green Stompy", "category": "midrange"},
+  {"file": "mono-white-lifegain.txt", "name": "Casual Mono-White Lifegain", "category": "aggro"},
+  {"file": "mono-black-vampires.txt", "name": "Casual Mono-Black Vampires", "category": "midrange"},
+  {"file": "mono-blue-skies.txt", "name": "Casual Mono-Blue Skies", "category": "tempo"}
+ ]
+}

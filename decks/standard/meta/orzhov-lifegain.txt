@@ -1,0 +1,33 @@
+Deck
+4 Enlightened Confidant
+4 Amalia Benavides Aguirre
+4 Haliya, Guided by Light
+4 Moseo, Vein's New Dean
+4 Hinterland Sanctifier
+3 Starscape Cleric
+3 Lunar Convocation
+2 Aunt May
+2 Deep-Cavern Bat
+2 Liliana the Faultless
+2 Erode
+4 Case of the Uneaten Feast
+4 Concealed Courtyard
+4 Starting Town
+4 Multiversal Passage
+4 Plains
+4 Godless Shrine
+1 Dalkovan Encampment
+1 Great Arashin City
+
+Sideboard
+2 Duress
+2 Pyrrhic Strike
+2 Seam Rip
+2 Shattered Acolyte
+1 Deep-Cavern Bat
+1 Ghost Vacuum
+1 Lunar Convocation
+1 Phyrexian Arena
+1 Space-Time Anomaly
+1 Strategic Betrayal
+1 Vicious Rivalry

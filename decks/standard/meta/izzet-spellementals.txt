@@ -1,0 +1,34 @@
+Deck
+6 Island
+4 Sunderflock
+4 Eddymurk Crab
+4 Opt
+4 Prismari Charm
+4 Steam Vents
+4 Spirebluff Canal
+4 Sleight of Hand
+4 Riverpyre Verge
+4 Hearth Elemental
+3 Burst Lightning
+3 Traumatic Critique
+2 Spell Snare
+2 Get Out
+2 Impractical Joke
+2 Winternight Stories
+1 Spell Pierce
+1 Stormcarved Coast
+1 Multiversal Passage
+1 Flow State
+
+Sideboard
+3 Colorstorm Stallion
+2 Hydro-Man, Fluid Felon
+2 Sunspine Lynx
+1 Disdainful Stroke
+1 Spell Snare
+1 Annul
+1 Broadside Barrage
+1 Flashfreeze
+1 Ghost Vacuum
+1 Fire Magic
+1 Avengers Disassembled

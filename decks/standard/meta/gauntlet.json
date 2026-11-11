@@ -1,0 +1,117 @@
+{
+ "format": "Standard",
+ "snapshot": "2026-11-05",
+ "description": "Most-played Standard archetypes from the Magic.gg Metagame Mentor table of 2026-11-05 (Arena Championship 13 and Magic Spotlight: Fracture events, about 1,810 decklists). meta_share is the percentage of that field. See README.md in this folder for how the lists were gathered and their limits.",
+ "decks": [
+  {
+   "file": "mono-green-landfall.txt",
+   "name": "Mono-Green Landfall",
+   "category": "aggro",
+   "meta_share": 12.7,
+   "list_type": "tournament list",
+   "pilot": "Jeff Lin, 2nd place (12-1 per MTGGoldfish snippet) at Arena Championship 13",
+   "source_url": "https://melee.gg/Decklist/View/a2eca677-626f-4322-9d84-b4e7010629fc",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "dimir-midrange.txt",
+   "name": "Dimir Midrange",
+   "category": "midrange",
+   "meta_share": 8.9,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "dimir-uldaros.txt",
+   "name": "Dimir Uldaros",
+   "category": "midrange",
+   "meta_share": 8.3,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "izzet-spellementals.txt",
+   "name": "Izzet Spellementals",
+   "category": "tempo",
+   "meta_share": 7.5,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "jund-sacrifice.txt",
+   "name": "Jund Sacrifice",
+   "category": "midrange",
+   "meta_share": 7.4,
+   "list_type": "tournament list",
+   "pilot": "Alexander von Stange, 1st place (14-2-1) at Magic Spotlight: Fracture, SCG CON Hartford (event ran 2026-10-23/24; exact day of the list not confirmed)",
+   "source_url": "https://melee.gg/Decklist/View/5e81449d-aa58-4409-b137-b4ed0006ea1c",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "orzhov-lifegain.txt",
+   "name": "Orzhov Lifegain",
+   "category": "midrange",
+   "meta_share": 6.9,
+   "list_type": "tournament list",
+   "pilot": "Gage Fevold, 1st place (11-2) at Arena Championship 13",
+   "source_url": "https://melee.gg/Decklist/View/423954dd-0eac-429c-94c9-b4e3014be08b",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "azorius-control.txt",
+   "name": "Azorius Control",
+   "category": "control",
+   "meta_share": 5.9,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "boros-dragons.txt",
+   "name": "Boros Dragons",
+   "category": "ramp",
+   "meta_share": 3.6,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "azorius-artifacts.txt",
+   "name": "Azorius Artifacts",
+   "category": "control",
+   "meta_share": 3.5,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "boros-dwarves.txt",
+   "name": "Boros Dwarves",
+   "category": "aggro",
+   "meta_share": 2.3,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  },
+  {
+   "file": "azorius-momo.txt",
+   "name": "Azorius Momo",
+   "category": "tempo",
+   "meta_share": 2.1,
+   "list_type": "aggregate list",
+   "pilot": null,
+   "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
+   "source_date": "2026-11-05"
+  }
+ ]
+}

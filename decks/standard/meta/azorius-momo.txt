@@ -1,0 +1,30 @@
+Deck
+8 Plains
+4 Momo, Friendly Flier
+4 Floodfarm Verge
+4 Hallowed Fountain
+4 Springleaf Drum
+4 Starfield Shepherd
+4 Daydream
+4 Sage of the Skies
+4 Quantum Riddler
+4 Steamcore Scholar
+3 Erode
+3 Practiced Offense
+3 Gleaming Bastion
+2 Nurturing Pixie
+1 Guiding Hydra
+1 Abandoned Air Temple
+1 Island
+1 Seam Rip
+1 Mockingbird
+
+Sideboard
+3 Clarion Conqueror
+3 Seam Rip
+2 Spider-Sense
+2 Rest in Peace
+2 Disdainful Stroke
+1 Curious Farm Animals
+1 The Wondrous Wasp
+1 Get Lost

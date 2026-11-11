@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mtgsim"
+version = "0.1.0"
+description = "Test Magic: The Gathering decks by playing them against each other on the Forge engine"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+mtgsim = "mtgsim.cli:main"
+
+[tool.setuptools]
+packages = ["mtgsim"]
+
+[tool.setuptools.package-data]
+mtgsim = ["bridge/*.java"]

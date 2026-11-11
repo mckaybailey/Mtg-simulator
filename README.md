@@ -1,0 +1,174 @@
+# mtgsim
+
+Test Magic: The Gathering decks by playing them against each other, hundreds of games at a
+time, and get win rates you can actually compare.
+
+mtgsim is a harness around [Forge](https://github.com/Card-Forge/forge), the open-source
+MTG rules engine (about 34,000 cards implemented, with a built-in AI). Forge plays the
+games; mtgsim imports decklists, checks them, runs seeded AI-vs-AI games in parallel and
+turns the results into statistics and an HTML report.
+
+What you can do with it:
+
+- **`gauntlet`** – run a brew against a field of opponents (a Standard meta gauntlet and a
+  casual gauntlet are included) and see win rates with 95% intervals, play/draw splits and
+  how fast games end.
+- **`ab`** – compare two versions of a deck against the same field and find out whether the
+  difference is real or just luck.
+- **`match`** / **`matrix`** – one matchup in depth, or every deck against every other.
+- **`goldfish`** – instant solo analysis with no engine: mana screw and flood rates,
+  land-drop odds, whether your colours cast your spells on curve. Add `--clock` to measure
+  the deck's unopposed kill turn on the real engine.
+- **`check`** – validate a list: card names, deck size, copy limits, format legality.
+- **Card-level stats** in every report: how the deck does when each card is seen, in the
+  opening hand, and how often it actually gets played.
+
+## Read this before trusting a number
+
+- **The pilot is Forge's AI.** Forge's own documentation rates it best with aggro and
+  midrange decks, "poor to OK" with control and "pretty bad" with most combo decks. Decks
+  that need careful sequencing are understated, on both sides of the table. Use the results
+  to compare similar decks and to spot weak cards and bad mana, not to predict tournament
+  win rates.
+- **Games are best-of-one with no sideboarding.** Sideboards are read and checked but never
+  played.
+- **Sample size matters.** At 100 games a win rate is only known to about ±10 points, at 400
+  games about ±5. Every number in the report comes with an interval; a matchup is only
+  clearly good or bad when the whole interval is on one side of 50%.
+
+## Setup
+
+You need Python 3.9+ and a JDK 17 or newer (a full JDK, not just a runtime). mtgsim itself
+has no Python dependencies.
+
+Build the supported Forge version from source (also needs `git` and Maven; about 1 GB of
+disk and a few minutes):
+
+```
+python -m mtgsim setup --build
+python -m mtgsim doctor
+```
+
+Or point mtgsim at a Forge you already have (an unpacked release or a built source
+checkout):
+
+```
+python -m mtgsim setup --forge-dir /path/to/forge
+```
+
+mtgsim compiles a small Java driver against whichever Forge it is given. It is developed and
+tested against one specific Forge commit (the one `--build` fetches); other versions work
+as long as the driver still compiles against them, and `setup` tells you if it does not.
+
+Everything mtgsim stores lives in `~/.mtgsim` (override with `MTGSIM_HOME`), including a
+private profile directory for Forge, so simulations never read or change the settings of a
+Forge you use for playing.
+
+## Quick start
+
+```
+# Is my list legal and spelled right?
+python -m mtgsim check mydeck.txt
+
+# How consistent is the mana? (instant, no engine)
+python -m mtgsim goldfish mydeck.txt
+
+# How does it do against the Standard field? (100 games per opponent)
+python -m mtgsim gauntlet mydeck.txt
+
+# ...or against casual decks, with more games
+python -m mtgsim gauntlet mydeck.txt --vs decks/standard/casual -n 200
+
+# Did swapping those four cards help?
+python -m mtgsim ab mydeck.txt mydeck-v2.txt -n 200
+
+# One matchup in depth
+python -m mtgsim match mydeck.txt decks/standard/meta/dimir-midrange.txt -n 300
+```
+
+Each run prints a summary and writes a folder under `runs/` containing `report.html` (open
+it in a browser), `summary.json` (the analysed numbers) and `games.jsonl` (one line per
+game). An interrupted run can be continued with `--resume RUN_DIR`.
+
+### Decklists
+
+Paste lists straight from Arena, MTGO, MTGGoldfish or Moxfield exports, or use Forge `.dck`
+files:
+
+```
+Deck
+4 Llanowar Elves
+20 Forest
+...
+
+Sideboard
+2 Negate
+```
+
+Set codes and collector numbers are ignored. Unknown names are reported with suggestions.
+Legality is checked against `--format standard` by default (`pioneer`, `modern`, `legacy`,
+`vintage`, `pauper` and `casual` for no restrictions are also available); format problems
+are warnings unless you pass `--strict`.
+
+### Useful options
+
+| Option | Meaning |
+|---|---|
+| `-n 200` | games per pairing (default 100) |
+| `-j 4` | parallel Forge processes (default: one per CPU core, up to 8; each uses about 1 GB of memory) |
+| `--vs PATH...` | opponent decklists or folders (default `decks/standard/meta`) |
+| `--seed 7` | base random seed; the same seed and decks replay exactly the same games |
+| `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished |
+| `--ai-profile Reckless` | Forge AI personality for both players (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`) |
+| `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting): slower, and because it thinks against a clock the same seed no longer replays the same game |
+| `--save-logs` | keep Forge's full play-by-play log of every game |
+
+### How long it takes
+
+Speed depends on the decks: creature decks finish a game in 1–3 seconds of engine time,
+slow control and artifact decks can take 15 seconds or more. On a 4-core machine expect
+roughly 20–60 games per minute, so 100 games against each of the eleven meta decks is in
+the region of half an hour to an hour.
+
+## How results are produced
+
+- Every game is its own fresh match with its own seed and its own coin flip for who goes
+  first. (Forge's built-in simulator lets the previous loser go first, which drags measured
+  win rates towards 50%.)
+- Seeds depend on the decks' contents, not their file names, so re-running a matchup
+  replays the same games and editing a deck gives it new ones.
+- Win rates use decided games only; draws, timeouts and engine failures are counted and
+  shown separately.
+- Intervals are 95% Wilson intervals. A/B comparisons use a stratified comparison across
+  the shared opponents. When a `gauntlet.json` supplies metagame shares, a meta-weighted
+  win rate is reported alongside the equal-weight one.
+- Card statistics ("win rate when seen" versus "when not seen") are correlations. Long
+  games see more cards, which flatters late-game cards; compare cards that fill the same
+  role rather than reading the numbers as each card's worth.
+
+## Included decks
+
+- `decks/standard/meta/` – eleven of the most-played Standard archetypes as of early
+  November 2026, with metagame shares. See the README in that folder for sources and limits.
+- `decks/standard/casual/` – five simple one-colour decks built from Foundations commons and
+  uncommons, as kitchen-table opponents.
+
+## Running in a Claude cloud session
+
+Ask Claude to test a deck in a session attached to this repository; `CLAUDE.md` tells it
+how to set Forge up and run the commands above, and it can hand back the HTML report.
+
+## Tests
+
+```
+python -m unittest discover -s tests
+```
+
+The unit tests need neither Forge nor Java. `tests/test_integration.py` plays real games
+and is skipped automatically when Forge has not been set up.
+
+## Licensing note
+
+Forge is licensed under GPL-3.0. mtgsim does not include Forge; it fetches or uses a copy
+you provide. The Java driver in `mtgsim/bridge/` links against Forge's classes, so GPL-3.0
+terms apply to that driver if you distribute it.
