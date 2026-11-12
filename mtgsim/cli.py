@@ -357,8 +357,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     import tempfile
     from .decks import deck_from_text
 
-    red = deck_from_text("24 Mountain\n36 Hill Giant\n", "doctor-red", ctx.db)
-    green = deck_from_text("24 Forest\n36 Grizzly Bears\n", "doctor-green", ctx.db)
+    red = deck_from_text("20 Mountain\n40 Raging Goblin\n", "doctor-red", ctx.db)
+    green = deck_from_text("20 Forest\n40 Grizzly Bears\n", "doctor-green", ctx.db)
     entrants = [Entrant("doctor-red", red), Entrant("doctor-green", green)]
     with tempfile.TemporaryDirectory() as tmp:
         records = experiment.execute(install, Path(tmp), entrants, [(entrants[0], entrants[1])],

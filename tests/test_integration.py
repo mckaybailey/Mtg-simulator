@@ -2,7 +2,7 @@
 
 They are skipped unless a Forge installation is configured (``mtgsim setup`` or
 ``MTGSIM_FORGE_DIR``) and Java is available, so the rest of the suite stays fast and
-dependency-free. They use very simple decks so each game takes a second or two.
+dependency-free. They use two simple creature decks that cannot stall each other, so games always finish.
 """
 
 import shutil
@@ -39,8 +39,8 @@ class ForgeIntegrationTest(unittest.TestCase):
         shutil.rmtree(cls.tmp, ignore_errors=True)
 
     def _entrants(self):
-        bears = deck_from_text("24 Forest\n36 Grizzly Bears\n", "bears", self.db)
-        giants = deck_from_text("24 Mountain\n36 Hill Giant\n", "giants", self.db)
+        bears = deck_from_text("20 Forest\n40 Grizzly Bears\n", "bears", self.db)
+        giants = deck_from_text("20 Mountain\n40 Raging Goblin\n", "giants", self.db)
         self.assertEqual([], bears.errors + giants.errors)
         return [Entrant("bears", bears), Entrant("giants", giants)]
 
@@ -63,7 +63,7 @@ class ForgeIntegrationTest(unittest.TestCase):
             for seat, player in enumerate(record["players"]):
                 self.assertEqual(60, player["mainCount"])
                 self.assertEqual(7 - player["mulligans"], sum(player["opening"].values()))
-                expected = {"bears": {"Forest", "Grizzly Bears"}, "giants": {"Mountain", "Hill Giant"}}
+                expected = {"bears": {"Forest", "Grizzly Bears"}, "giants": {"Mountain", "Raging Goblin"}}
                 self.assertLessEqual(set(player["opening"]) | set(player["drawn"]) | set(player["played"]),
                                      expected[record["seats"][seat]])
         summary = analysis.summarize_pairing(records, "bears", "giants")

@@ -174,6 +174,9 @@ python -m unittest discover -s tests
 The unit tests need neither Forge nor Java. `tests/test_integration.py` plays real games
 and is skipped automatically when Forge has not been set up.
 
+`VALIDATION.md` records what was checked before release (reproducibility, mirror matches,
+A/B sensitivity, simulated versus real win rates, speed) and the results.
+
 ## Licensing note
 
 Forge is licensed under GPL-3.0. mtgsim does not include Forge; it fetches or uses a copy
