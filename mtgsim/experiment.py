@@ -39,6 +39,7 @@ class Entrant:
     role: str = "opponent"  # "hero", "variant" or "opponent"
     weight: Optional[float] = None  # share of the metagame, used to weight gauntlet results
     category: str = ""
+    pilot: str = ""  # how well the AI plays this deck compared with people: "weak", "fair", "strong" or unknown
     dck_path: str = ""
 
     def describe(self) -> dict:
@@ -48,6 +49,7 @@ class Entrant:
             "role": self.role,
             "weight": self.weight,
             "category": self.category,
+            "ai_pilot": self.pilot,
             "source": str(self.deck.path) if self.deck.path else None,
             "fingerprint": self.deck.fingerprint(),
             "main_count": self.deck.main_count,
@@ -81,12 +83,16 @@ def slug(text: str) -> str:
 
 def unique_keys(names: Iterable[str]) -> List[str]:
     """Turn deck names into distinct, filesystem-safe keys."""
-    seen: Dict[str, int] = {}
+    used: set = set()
     keys = []
     for name in names:
         base = slug(name)
-        seen[base] = seen.get(base, 0) + 1
-        keys.append(base if seen[base] == 1 else f"{base}-{seen[base]}")
+        key, n = base, 1
+        while key in used:
+            n += 1
+            key = f"{base}-{n}"
+        used.add(key)
+        keys.append(key)
     return keys
 
 

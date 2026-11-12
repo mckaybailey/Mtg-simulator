@@ -220,7 +220,9 @@ def _matchup_chart(pairings: List[dict], names: Dict[str, str]) -> str:
 
 def _matchup_table(pairings: List[dict], names: Dict[str, str], entrants: dict) -> str:
     unfinished = any(p["draws"] + p["timeouts"] + p["errors"] for p in pairings)
-    head = ("<tr><th>Opponent</th><th>Type</th><th>Meta share</th><th>Games</th><th>W–L</th><th>Win rate</th>"
+    piloted = any(entrants.get(p["b"], {}).get("ai_pilot") for p in pairings)
+    head = ("<tr><th>Opponent</th><th>Type</th>" + ("<th>AI pilots it</th>" if piloted else "")
+            + "<th>Meta share</th><th>Games</th><th>W–L</th><th>Win rate</th>"
             "<th>95% interval</th><th>On play</th><th>On draw</th><th>Wins on turn</th><th>Loses on turn</th>"
             "<th>Mulligans</th>" + ("<th>Unfinished</th>" if unfinished else "") + "</tr>")
     body = []
@@ -229,7 +231,8 @@ def _matchup_table(pairings: List[dict], names: Dict[str, str], entrants: dict) 
         share = info.get("weight")
         body.append(
             f'<tr><td class="name">{esc(names.get(p["b"], p["b"]))}</td><td>{esc(info.get("category") or "–")}</td>'
-            f'<td class="n">{"–" if not share else f"{share:g}%"}</td><td class="n">{p["games"]}</td>'
+            + (f'<td>{esc(PILOT_WORDS.get(info.get("ai_pilot"), "–"))}</td>' if piloted else "")
+            + f'<td class="n">{"–" if not share else f"{share:g}%"}</td><td class="n">{p["games"]}</td>'
             f'<td class="n">{p["wins"]}–{p["losses"]}</td><td class="n"><b>{pct(p["win_rate"])}</b></td>'
             f'<td class="n">{ci_text(p["ci"])}</td><td class="n">{pct(p["on_play"]["win_rate"], 0)}</td>'
             f'<td class="n">{pct(p["on_draw"]["win_rate"], 0)}</td><td class="n">{num(p["avg_turn_a_wins"])}</td>'
@@ -237,6 +240,19 @@ def _matchup_table(pairings: List[dict], names: Dict[str, str], entrants: dict) 
             + (f'<td class="n">{p["draws"] + p["timeouts"] + p["errors"]}</td>' if unfinished else "") + "</tr>"
         )
     return f'<div class="scroll"><table><thead>{head}</thead><tbody>{"".join(body)}</tbody></table></div>'
+
+
+PILOT_WORDS = {"weak": "poorly", "fair": "fairly", "strong": "well"}
+
+
+def _pilot_warning(pairings: List[dict], names: Dict[str, str], entrants: dict) -> List[str]:
+    """Name the opponents the AI plays far below their real strength, when the gauntlet says so."""
+    weak = [names.get(p["b"], p["b"]) for p in pairings if entrants.get(p["b"], {}).get("ai_pilot") == "weak"]
+    if not weak:
+        return []
+    return ["Discount the results against " + ", ".join(weak) + ": Forge's AI plays "
+            + ("that deck" if len(weak) == 1 else "those decks")
+            + " far below real strength, so beating " + ("it" if len(weak) == 1 else "them") + " here says little."]
 
 
 def _classify(pairings: List[dict], names: Dict[str, str]) -> List[str]:
@@ -283,7 +299,8 @@ def _section_gauntlet(summary: dict, names: Dict[str, str]) -> str:
            _hero(pct(field["mean"]["rate"]), "Win rate against the field, every opponent counted equally",
                  f"95% interval {ci_text(field['mean']['ci'], 1)} over {field['decided']} decided games"),
            '<div class="tiles">' + "".join(tiles) + "</div></div>",
-           _takeaways(_classify(pairings, names)), "</section>"]
+           _takeaways(_classify(pairings, names) + _pilot_warning(pairings, names, summary["entrants"])),
+           "</section>"]
     out += ['<section class="card"><h2>Matchups</h2>',
             f'<p class="note">Win rate of {esc(names.get(hero, hero))} against each opponent. The line through each '
             "dot is the 95% interval: a matchup is only clearly good or bad when the whole line sits on one side of 50%.</p>",
@@ -454,6 +471,9 @@ def _section_cards(summary: dict, names: Dict[str, str]) -> str:
         for c in cards:
             low = c["seen"]["games"] < 20 or c["not_seen"]["games"] < 20
             iwd = c["iwd"]
+            lo, hi = (c.get("iwd_ci") or [None, None])[:2]
+            clear = lo is not None and (lo > 0 or hi < 0)  # the interval excludes "no difference"
+            interval = "–" if lo is None else f"{pts(lo, 0)} to {pts(hi, 0)}"
             bar = ""
             if iwd is not None:
                 width = min(abs(iwd) / 0.20, 1.0) * 50
@@ -463,7 +483,8 @@ def _section_cards(summary: dict, names: Dict[str, str]) -> str:
                 f'<tr class="{"low" if low else ""}"><td class="name">{c["copies"]} {esc(c["card"])}</td>'
                 f'<td class="n">{pct(c["seen"]["win_rate"])} <span class="note">({c["seen"]["games"]})</span></td>'
                 f'<td class="n">{pct(c["not_seen"]["win_rate"])} <span class="note">({c["not_seen"]["games"]})</span></td>'
-                f'<td class="n">{bar} <b>{pts(iwd)}</b></td>'
+                f'<td class="n">{bar} {"<b>" if clear else ""}{pts(iwd)}{"</b>" if clear else ""}</td>'
+                f'<td class="n">{interval}</td>'
                 f'<td class="n">{pct(c["opening"]["win_rate"])} <span class="note">({c["opening"]["games"]})</span></td>'
                 f'<td class="n">{pct(c["play_rate"], 0)}</td></tr>')
         title = "Card performance" + (f": {esc(names.get(key, key))}" if len(summary.get("cards") or {}) > 1 else "")
@@ -472,10 +493,12 @@ def _section_cards(summary: dict, names: Dict[str, str]) -> str:
             f'<p class="note">Across {data["games"]} decided games ({pct(data["win_rate"])} won). '
             "“Seen” means the card was in the opening hand or drawn; the bar is the win rate when seen minus when "
             "not seen, in points (full width = 20). These are correlations: long games see more cards, which flatters "
-            "late-game cards and understates cheap ones. “Played when seen” flags cards that often sit in hand. "
+            "late-game cards and understates cheap ones. They are also noisy: in a 400-game test of two identical "
+            "decks the same card came out 20 points apart, so only differences shown in bold (interval clear of zero) "
+            "deserve attention. “Played when seen” flags cards that often sit in hand. "
             "Greyed rows have fewer than 20 games on one side.</p>"
             '<div class="scroll"><table><thead><tr><th>Card</th><th>Win rate when seen</th><th>When not seen</th>'
-            "<th>Difference (pts)</th><th>In opening hand</th><th>Played when seen</th></tr></thead>"
+            "<th>Difference (pts)</th><th>95% interval</th><th>In opening hand</th><th>Played when seen</th></tr></thead>"
             f'<tbody>{"".join(rows)}</tbody></table></div></section>')
     return "".join(out)
 

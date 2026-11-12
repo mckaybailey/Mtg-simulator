@@ -30,6 +30,12 @@ What you can do with it:
   that need careful sequencing are understated, on both sides of the table. Use the results
   to compare similar decks and to spot weak cards and bad mana, not to predict tournament
   win rates.
+- **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,650-game
+  round robin of the eleven included meta decks, simulated win rates barely tracked the
+  decks' real tournament win rates (rank correlation about 0.24): creature decks came out
+  on top and the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
+  therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
+  Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
 - **Games are best-of-one with no sideboarding.** Sideboards are read and checked but never
   played.
 - **Sample size matters.** At 100 games a win rate is only known to about ±10 points, at 400
@@ -125,10 +131,9 @@ are warnings unless you pass `--strict`.
 
 ### How long it takes
 
-Speed depends on the decks: creature decks finish a game in 1–3 seconds of engine time,
-slow control and artifact decks can take 15 seconds or more. On a 4-core machine expect
-roughly 20–60 games per minute, so 100 games against each of the eleven meta decks is in
-the region of half an hour to an hour.
+Most games take 2–4 seconds of engine time; slow control and artifact decks take longer.
+On a 4-core machine the meta decks ran at about 85 games per minute, so 100 games against
+each of the eleven meta decks takes roughly a quarter of an hour.
 
 ## How results are produced
 
@@ -144,7 +149,9 @@ the region of half an hour to an hour.
   win rate is reported alongside the equal-weight one.
 - Card statistics ("win rate when seen" versus "when not seen") are correlations. Long
   games see more cards, which flatters late-game cards; compare cards that fill the same
-  role rather than reading the numbers as each card's worth.
+  role rather than reading the numbers as each card's worth. They are also noisy: in a
+  400-game test of two identical decks, the same card came out 20 points apart. Reports
+  mark the differences whose 95% interval excludes zero; ignore the rest.
 
 ## Included decks
 

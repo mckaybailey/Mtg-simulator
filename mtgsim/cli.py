@@ -166,6 +166,7 @@ def _entrants(ctx: Context, groups: Sequence[Tuple[Sequence[str], str]]) -> Tupl
             key=key, deck=deck, role=role,
             weight=float(share) if isinstance(share, (int, float)) and share > 0 else None,
             category=str(info.get("category") or ""),
+            pilot=str(info.get("ai_pilot") or ""),
         ))
         if deck.name in notes_by_name:
             notes[key] = notes_by_name[deck.name]
@@ -274,6 +275,13 @@ def _print_pairing_rows(rows: List[dict], names: Dict[str, str], label: str = "O
     ))
 
 
+def _print_pilot_note(opponents: List[Entrant]) -> None:
+    weak = [o.deck.name for o in opponents if o.pilot == "weak"]
+    if weak:
+        print("\nDiscount results against " + ", ".join(weak) + ": Forge's AI plays "
+              + ("that deck" if len(weak) == 1 else "those decks") + " far below real strength.")
+
+
 def _print_field(field: dict) -> None:
     print(f"\nOverall: {field['wins']}-{field['losses']} in {field['decided']} decided games")
     print(f"  Raw record            {_pct(field['pooled']['win_rate'])}  (95% CI {_ci(field['pooled']['ci'])})")
@@ -289,7 +297,8 @@ def _print_cards(stats_for_deck: dict, name: str, limit: int = 6) -> None:
     cards = [c for c in stats_for_deck["cards"] if c["seen"]["games"] >= 20 and c["not_seen"]["games"] >= 20]
     if len(cards) < 2:
         return
-    print(f"\nCards in {name} (win rate when seen minus when not seen; correlation, not proof):")
+    print(f"\nCards in {name}: win rate when seen minus when not seen, in points (* = clearly not zero; "
+          "the rest may be noise):")
     rows = []
     picks = cards[:limit] + ([None] if len(cards) > 2 * limit else []) + cards[-limit:] if len(cards) > limit else cards
     seen = set()
@@ -300,8 +309,10 @@ def _print_cards(stats_for_deck: dict, name: str, limit: int = 6) -> None:
         if c["card"] in seen:
             continue
         seen.add(c["card"])
+        lo, hi = (c.get("iwd_ci") or [None, None])[:2]
+        clear = lo is not None and (lo > 0 or hi < 0)
         rows.append([
-            f"{c['copies']} {c['card']}", f"{c['iwd'] * 100:+.1f}", _pct(c["seen"]["win_rate"], 0),
+            f"{c['copies']} {c['card']}", f"{c['iwd'] * 100:+.1f}{'*' if clear else ' '}", _pct(c["seen"]["win_rate"], 0),
             _pct(c["not_seen"]["win_rate"], 0), _pct(c["opening"]["win_rate"], 0), _pct(c["play_rate"], 0),
         ])
     print(_table(["Card", "IWD pts", "Seen", "Not seen", "In opener", "Played when seen"], rows, right=(1, 2, 3, 4, 5)))
@@ -398,7 +409,8 @@ def cmd_match(args: argparse.Namespace) -> int:
     _print_pairing_rows([pairing], names, label=f"{a.deck.name} vs")
     if pairing["p_even"] is not None:
         even = pairing["p_even"]
-        print("\n" + ("This is a real edge: a 50/50 matchup would rarely produce this result "
+        ahead = a.deck.name if (pairing["win_rate"] or 0) > 0.5 else b.deck.name
+        print("\n" + (f"A real edge for {ahead}: an even matchup would rarely produce this result "
                       if even < 0.05 else "This is consistent with an even matchup ") + f"(p = {even:.3f}).")
     cards = _card_tables(entrants, records, ("hero",))
     if a.key != b.key:
@@ -435,6 +447,7 @@ def cmd_gauntlet(args: argparse.Namespace) -> int:
     names = {e.key: e.deck.name for e in entrants}
     print()
     _print_pairing_rows(sorted(pairings, key=lambda p: -(p["win_rate"] or 0)), names)
+    _print_pilot_note(opponents)
     _print_field(field)
     cards = _card_tables(entrants, records, ("hero",))
     _print_cards(cards[hero.key], hero.deck.name)
@@ -491,6 +504,7 @@ def cmd_ab(args: argparse.Namespace) -> int:
         w = result["overall_weighted"]
         print(f"Weighted by meta share: A-B = {w['diff'] * 100:+.1f} points, "
               f"95% CI {w['ci'][0] * 100:+.1f} to {w['ci'][1] * 100:+.1f}")
+    _print_pilot_note(opponents)
     if result["head_to_head"]:
         h = result["head_to_head"]
         print(f"Head to head: A won {h['wins']} of {h['decided']} ({_pct(h['win_rate'])}, 95% CI {_ci(h['ci'])})")

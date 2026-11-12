@@ -28,6 +28,42 @@ author's algorithm from tournament lists), not one player's 75. Source links and
 every list are in `gauntlet.json`. The archetype types are a judgement call in a few cases
 (Dimir Uldaros, Azorius Artifacts, Boros Dragons).
 
+## How well the AI plays each deck
+
+Results against this gauntlet depend heavily on how well Forge's AI pilots each opponent.
+To measure that, all eleven decks were played against each other in the simulator (1,650
+games, 30 per pairing) and each deck's simulated win rate was set beside its real-world
+match win rate from the same Magic.gg table:
+
+| Deck | Real win rate | Simulated | Gap | AI pilot |
+|---|---|---|---|---|
+| Boros Dwarves | 50.2% | 74.7% | +24.5 | strong |
+| Boros Dragons | 45.0% | 68.3% | +23.3 | strong |
+| Orzhov Lifegain | 53.6% | 66.3% | +12.7 | strong |
+| Dimir Midrange | 54.5% | 61.3% | +6.8 | fair |
+| Azorius Artifacts | 54.8% | 52.7% | −2.1 | fair |
+| Mono-Green Landfall | 53.4% | 52.0% | −1.4 | fair |
+| Azorius Momo | 48.8% | 45.0% | −3.8 | fair |
+| Izzet Spellementals | 44.3% | 37.7% | −6.6 | fair |
+| Jund Sacrifice | 57.6% | 41.0% | −16.6 | weak |
+| Dimir Uldaros | 49.2% | 31.3% | −17.9 | weak |
+| Azorius Control | 46.6% | 19.7% | −26.9 | weak |
+
+The two columns barely agree (rank correlation about 0.24). The AI wins with decks that
+turn creatures sideways and loses with decks that need planning: Jund Sacrifice, the best
+deck in the real field, comes out fourth from the bottom, and Azorius Control wins one game
+in five. The comparison is rough (the real figures are best-of-three matches with
+sideboards against the whole field, played by people of varying skill), but gaps of 17 to
+27 points are far outside its error.
+
+What this means in practice:
+
+- A good result against a deck marked **weak** tells you little: you beat a badly piloted
+  deck. Reports flag these opponents and `gauntlet.json` records the rating as `ai_pilot`.
+- Decks marked **strong** are honest, even harsh, tests for a creature deck.
+- The meta-weighted win rate is a win rate against these decks as the AI plays them, not a
+  forecast of a tournament result.
+
 ## How far to trust these lists
 
 - The lists were transcribed from web search results of the source pages; the pages

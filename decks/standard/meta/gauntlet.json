@@ -11,7 +11,10 @@
    "list_type": "tournament list",
    "pilot": "Jeff Lin, 2nd place (12-1 per MTGGoldfish snippet) at Arena Championship 13",
    "source_url": "https://melee.gg/Decklist/View/a2eca677-626f-4322-9d84-b4e7010629fc",
-   "source_date": "2026-10-24"
+   "source_date": "2026-10-24",
+   "real_win_rate": 53.4,
+   "sim_win_rate": 52.0,
+   "ai_pilot": "fair"
   },
   {
    "file": "dimir-midrange.txt",
@@ -21,7 +24,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 54.5,
+   "sim_win_rate": 61.3,
+   "ai_pilot": "fair"
   },
   {
    "file": "dimir-uldaros.txt",
@@ -31,7 +37,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 49.2,
+   "sim_win_rate": 31.3,
+   "ai_pilot": "weak"
   },
   {
    "file": "izzet-spellementals.txt",
@@ -41,7 +50,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 44.3,
+   "sim_win_rate": 37.7,
+   "ai_pilot": "fair"
   },
   {
    "file": "jund-sacrifice.txt",
@@ -51,7 +63,10 @@
    "list_type": "tournament list",
    "pilot": "Alexander von Stange, 1st place (14-2-1) at Magic Spotlight: Fracture, SCG CON Hartford (event ran 2026-10-23/24; exact day of the list not confirmed)",
    "source_url": "https://melee.gg/Decklist/View/5e81449d-aa58-4409-b137-b4ed0006ea1c",
-   "source_date": "2026-10-24"
+   "source_date": "2026-10-24",
+   "real_win_rate": 57.6,
+   "sim_win_rate": 41.0,
+   "ai_pilot": "weak"
   },
   {
    "file": "orzhov-lifegain.txt",
@@ -61,7 +76,10 @@
    "list_type": "tournament list",
    "pilot": "Gage Fevold, 1st place (11-2) at Arena Championship 13",
    "source_url": "https://melee.gg/Decklist/View/423954dd-0eac-429c-94c9-b4e3014be08b",
-   "source_date": "2026-10-24"
+   "source_date": "2026-10-24",
+   "real_win_rate": 53.6,
+   "sim_win_rate": 66.3,
+   "ai_pilot": "strong"
   },
   {
    "file": "azorius-control.txt",
@@ -71,7 +89,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 46.6,
+   "sim_win_rate": 19.7,
+   "ai_pilot": "weak"
   },
   {
    "file": "boros-dragons.txt",
@@ -81,7 +102,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 45.0,
+   "sim_win_rate": 68.3,
+   "ai_pilot": "strong"
   },
   {
    "file": "azorius-artifacts.txt",
@@ -91,7 +115,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 54.8,
+   "sim_win_rate": 52.7,
+   "ai_pilot": "fair"
   },
   {
    "file": "boros-dwarves.txt",
@@ -101,7 +128,10 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 50.2,
+   "sim_win_rate": 74.7,
+   "ai_pilot": "strong"
   },
   {
    "file": "azorius-momo.txt",
@@ -111,7 +141,11 @@
    "list_type": "aggregate list",
    "pilot": null,
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
-   "source_date": "2026-11-05"
+   "source_date": "2026-11-05",
+   "real_win_rate": 48.8,
+   "sim_win_rate": 45.0,
+   "ai_pilot": "fair"
   }
- ]
+ ],
+ "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05. sim_win_rate is its average win rate against the other ten decks in a 1,650-game mtgsim round robin (30 games per pairing, Forge AI on both sides, Forge commit 7db198d72e). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
 }

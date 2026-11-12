@@ -21,7 +21,7 @@ from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 
 from .forge import ForgeInstall, home_dir
 
-CACHE_VERSION = 4
+CACHE_VERSION = 5
 COLORS = "WUBRG"
 BASIC_LAND_COLORS = {"Plains": "W", "Island": "U", "Swamp": "B", "Mountain": "R", "Forest": "G"}
 CARD_TYPES = {
@@ -283,7 +283,7 @@ def parse_card_script(text: str) -> Optional[Card]:
 
 
 def _mana_production(face: Face, abilities: Iterable[str]) -> Tuple[set, bool, bool]:
-    """Colours a card can produce, whether it does so for just tapping, and whether it fetches a basic land."""
+    """Colours a card can produce, whether it does so for just tapping, and whether it fetches a tapped basic."""
     made: set = set()
     free_tap = False
     fetches = False
@@ -309,7 +309,9 @@ def _mana_production(face: Face, abilities: Iterable[str]) -> Tuple[set, bool, b
             and params.get("Destination") == "Battlefield"
         ):
             made.update(COLORS)  # Evolving Wilds and friends: any basic the deck plays
-            fetches = True
+            # Only fetches that put the land onto the battlefield tapped cost a turn of mana;
+            # Prismatic Vista's basic arrives untapped.
+            fetches = fetches or params.get("Tapped") == "True"
     return made, free_tap, fetches
 
 

@@ -22,6 +22,9 @@ Always pass on the limits with the numbers: the pilot is Forge's AI (fine with a
 midrange, poor with control, bad with combo), games are best-of-one without sideboards, and
 a result is only meaningful when its 95% interval excludes 50% (or, for `ab`, when the
 verdict says the difference is reliable). Do not present a 54% from 100 games as an edge.
+Wins against opponents the output marks as poorly piloted (`ai_pilot: weak` in the
+gauntlet) say little; `VALIDATION.md` has the measurements behind that, and they are worth
+quoting when the user asks how far to trust a result.
 
 ## Working on the code
 
@@ -37,4 +40,6 @@ verdict says the difference is reliable). Do not present a 54% from 100 games as
   planning, seeds, storage, resume), `analysis.py` and `stats.py` (results), `goldfish.py`
   (engine-free consistency model), `report.py` (HTML), `cli.py`.
 - The meta gauntlet in `decks/standard/meta/` is a dated snapshot; its README says where it
-  came from and what was and was not verified.
+  came from and what was and was not verified. When the lists are replaced, re-run
+  `python3 -m mtgsim matrix decks/standard/meta -n 30` and update `sim_win_rate` and
+  `ai_pilot` in `gauntlet.json` from the result.
