@@ -713,9 +713,13 @@ def cmd_misplays(args: argparse.Namespace) -> int:
     for key in keys:
         if key in result["decks"]:
             _print_misplays(result["decks"][key], str(entrants[key].get("name", key)), args.top)
-    print("\nHit/100 = games (per 100 of the deck) in which the card was castable in a free window and never cast, "
-          "left in hand after being castable, aimed at a poor target, or let a big spell resolve; "
-          "Hit-not = win rate in those games minus the other games it was seen in (* = interval clear of zero).")
+    if signals:
+        print("\nHit/100 = games (per 100 of the deck) in which the card was castable in a free window and never "
+              "cast, left in hand after being castable, aimed at a poor target, or let a big spell resolve; "
+              "Hit-not = win rate in those games minus the other games it was seen in (* = interval clear of zero).")
+    else:
+        print("\nNever cast/100 = games (per 100 of the deck) in which the card was seen but never cast; the last "
+              "column is the win rate in those games minus the games it was cast (* = interval clear of zero).")
     print(misplay.CAVEAT)
     if args.json:
         Path(args.json).write_text(json.dumps(result, indent=1), encoding="utf-8")

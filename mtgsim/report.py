@@ -87,7 +87,8 @@ th,td{padding:6px 10px;text-align:right;white-space:nowrap;border-bottom:1px sol
 th{color:var(--ink2);font-weight:600;font-size:12.5px}
 th:first-child,td:first-child{text-align:left}
 td.name{white-space:normal;min-width:150px}
-td.why{white-space:normal;min-width:240px;text-align:left;color:var(--ink2);font-size:12.5px}
+td.why{white-space:normal;min-width:380px;text-align:left;color:var(--ink2);font-size:12.5px}
+.mv{display:inline-block;min-width:2em;text-align:right}
 td.n,th.n{font-variant-numeric:tabular-nums}
 tr.low td{color:var(--muted)}
 tbody tr:hover td{background:var(--wash)}
@@ -508,8 +509,14 @@ MISPLAY_ROWS = 15
 
 
 def _misplay_meter(score: Optional[float]) -> str:
+    """Games hit per 100 as a bar on a fixed 0-100 scale, then the number (fixed width, so bars line up)."""
     width = 0.0 if score is None else max(0.0, min(100.0, score))
-    return f'<span class="meter"><i style="width:{width:.1f}%"></i></span>'
+    return f'<span class="meter"><i style="width:{width:.1f}%"></i></span><span class="mv">{num(score, 0)}</span>'
+
+
+def _whole_pts(value: float) -> str:
+    rounded = round(value * 100)
+    return "0" if rounded == 0 else f"{rounded:+d}"
 
 
 def _misplay_compare(c: dict) -> str:
@@ -520,7 +527,7 @@ def _misplay_compare(c: dict) -> str:
     bold = c.get("significant")
     return (f'<td class="n">{"<b>" if bold else ""}{pts(c["diff"])}{"</b>" if bold else ""} '
             f'<span class="note">({c["games"]} vs {c["other_games"]})</span></td>'
-            f'<td class="n">{pts(lo, 0)} to {pts(hi, 0)}</td>')
+            f'<td class="n">{_whole_pts(lo)} to {_whole_pts(hi)}</td>')
 
 
 def _misplay_table(deck: dict) -> str:
@@ -544,7 +551,7 @@ def _misplay_table(deck: dict) -> str:
                      if idle["castable_games"] else "–")
             body.append(
                 f'<tr><td class="name">{r["copies"]} {esc(r["card"])}</td>'
-                f'<td class="n">{_misplay_meter(r["score"])}{num(r["score"], 0)}</td>'
+                f'<td class="n">{_misplay_meter(r["score"])}</td>'
                 f'<td class="n">{r["seen"]}</td><td class="n">{pct(r["cast_rate"], 0)}</td>'
                 f'<td class="n">{num(idle["per_game"])}</td><td class="n">{never}</td>'
                 f'<td class="n">{pct(stranded["rate"], 0)}</td><td class="n">{poor}</td><td class="n">{passed}</td>'
@@ -556,7 +563,7 @@ def _misplay_table(deck: dict) -> str:
         for r in rows:
             body.append(
                 f'<tr><td class="name">{r["copies"]} {esc(r["card"])}</td>'
-                f'<td class="n">{_misplay_meter(r["score"])}{num(r["score"], 0)}</td>'
+                f'<td class="n">{_misplay_meter(r["score"])}</td>'
                 f'<td class="n">{r["seen"]}</td><td class="n">{pct(r["cast_rate"], 0)}</td>'
                 + _misplay_compare(r["compare"]) + "</tr>")
     return f'<div class="scroll"><table><thead>{head}</thead><tbody>{"".join(body)}</tbody></table></div>'

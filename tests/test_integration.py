@@ -66,9 +66,25 @@ class ForgeIntegrationTest(unittest.TestCase):
                 expected = {"bears": {"Forest", "Grizzly Bears"}, "giants": {"Mountain", "Raging Goblin"}}
                 self.assertLessEqual(set(player["opening"]) | set(player["drawn"]) | set(player["played"]),
                                      expected[record["seats"][seat]])
+                # Misplay fields: these decks have no instants, counterspells or removal.
+                spells = expected[record["seats"][seat]] - {"Forest", "Mountain"}
+                self.assertIsInstance(player["endHandLands"], int)
+                self.assertLessEqual(set(player["endHand"]) | set(player["idleOwn"]), spells)
+                self.assertEqual({}, player["idleOpp"])
+                self.assertEqual({}, player["counter"])
+                self.assertEqual({}, player["removal"])
+                self.assertLessEqual(set(player["opening"]) | set(player["drawn"]), set(player["roles"]))
+                for name, tags in player["roles"].items():
+                    self.assertEqual(["creature"] if name in spells else ["land"], tags, name)
         summary = analysis.summarize_pairing(records, "bears", "giants")
         self.assertEqual(6, summary["decided"])
         self.assertEqual(6, summary["on_play"]["games"] + summary["on_draw"]["games"])
+        from mtgsim import misplay
+
+        misplays = misplay.analyze(records, {e.key: e.describe() for e in self._entrants()})
+        self.assertTrue(misplays["signals"])
+        self.assertEqual({"bears", "giants"}, set(misplays["decks"]))
+        self.assertEqual("flagged", misplays["decks"]["bears"]["basis"])
 
     def test_same_seed_replays_the_same_games(self):
         first = self._play("replay-a", seed=9, workers=2)

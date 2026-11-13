@@ -22,6 +22,9 @@ What you can do with it:
 - **`check`** – validate a list: card names, deck size, copy limits, format legality.
 - **Card-level stats** in every report: how the deck does when each card is seen, in the
   opening hand, and how often it actually gets played.
+- **`misplays`** – which cards Forge's AI seems to mishandle: cards it could have cast but kept
+  in hand, counterspells it never used, removal aimed at the wrong target. Also a section of
+  every `match`, `gauntlet` and `matrix` report.
 
 ## Read this before trusting a number
 
@@ -99,6 +102,9 @@ python -m mtgsim ab mydeck.txt mydeck-v2.txt -n 200
 
 # One matchup in depth
 python -m mtgsim match mydeck.txt decks/standard/meta/dimir-midrange.txt -n 300
+
+# Which cards did the AI mishandle in that run?
+python -m mtgsim misplays runs/<the run folder>
 ```
 
 Each run prints a summary and writes a folder under `runs/` containing `report.html` (open
@@ -161,6 +167,47 @@ each of the eleven meta decks takes roughly a quarter of an hour.
   role rather than reading the numbers as each card's worth. They are also noisy: in a
   400-game test of two identical decks, the same card came out 20 points apart. Reports
   mark the differences whose 95% interval excludes zero; ignore the rest.
+
+## Finding AI misplays
+
+Forge's AI loses games a person would not, and some cards suffer more than others. The
+engine driver watches every game for signs of that, without changing how it is played, and
+`misplays` ranks each deck's cards by how many games they touched:
+
+```
+python -m mtgsim misplays RUN_DIR                    # every deck in the run
+python -m mtgsim misplays RUN_DIR --deck "Azorius Control" --top 15 --json misplays.json
+```
+
+The same tables are in the report of every `match`, `gauntlet` and `matrix` run, under
+"Likely AI misplays". Per card, over decided games:
+
+| Column | Meaning |
+|---|---|
+| Hit/100 | games, per 100 games of the deck, in which at least one of the problems below happened with this card; the ranking |
+| Seen, Cast | games the card was in the opening hand or drawn; share of those in which it was cast |
+| Idle/game | turns per game seen on which the card sat in hand while the untapped lands could pay for it and it had a legal target. Sorcery-speed cards are checked at the end of their owner's turns, instants and flash cards at the end of the opponent's turns (holding an instant through your own turn is normal) |
+| Castable, never cast | of the games with at least one such turn, the share in which the card was never cast |
+| In hand at end | share of games the card was still in hand when the game ended |
+| Poor targets | removal casts that hit the caster's own permanent, or whose target was worth less than two thirds of the best opposing target the spell could have killed (by Forge's own creature evaluation) |
+| Counter passed | opponents' spells a counterspell in hand could have countered but that resolved; "big" counts the games where one cost 3 or more |
+| Hit-not pts | win rate in the flagged games minus the other games the card was seen in, with a `*` (bold in reports) when its 95% interval excludes zero |
+
+How to read it:
+
+- **These are pointers, not verdicts.** A card high on the list is one whose Forge AI logic is
+  worth reading; whether holding it was wrong depends on the game. "Hit-not" is a correlation
+  that moves for reasons unrelated to the card: losing games end with more cards in hand,
+  long games give a card more turns to be flagged, and mana-flooded or screwed games look like
+  holding cards.
+- The mana check is deliberately simple: lands and other free mana sources that are untapped,
+  printed costs (cost reductions are ignored, so a cheaper-than-printed spell may be missed),
+  X = 1. Two copies of a legendary card are not counted as castable while one is in play.
+- Removal is rarely flagged for poor targets, because Forge chooses targets with the same
+  evaluation the check uses; the column is there to catch cards whose own AI logic aims
+  elsewhere.
+- Runs made before this version have no signals; `misplays` then ranks cards by games in which
+  they were seen but never cast, and says so.
 
 ## Included decks
 
