@@ -265,6 +265,16 @@ def _card_tables(entrants: List[Entrant], records: List[dict], roles: Sequence[s
     }
 
 
+def _add_misplays(summary: dict, ctx: Context, entrants: List[Entrant], records: List[dict], run_dir: Path) -> None:
+    """Put every deck's misplay table into the summary and point at the command that prints it."""
+    from . import misplay
+
+    lands = {name for e in entrants for name in e.deck.main
+             if ctx.db.get(name) is not None and ctx.db.get(name).is_land}
+    summary["misplays"] = misplay.analyze(records, {e.key: e.describe() for e in entrants}, lands=lands)
+    print(f"\nLikely AI misplays, card by card:  python -m mtgsim misplays {run_dir}")
+
+
 def _goldfish_for(ctx: Context, entrants: List[Entrant], roles: Sequence[str]) -> dict:
     """Engine-free consistency numbers for the decks under test (fast enough to always include)."""
     try:
@@ -446,6 +456,7 @@ def cmd_match(args: argparse.Namespace) -> int:
             _print_cards(cards[e.key], e.deck.name)
     summary = _base_summary("match", f"{a.deck.name} vs {b.deck.name}", ctx, run_dir, entrants, records, notes)
     summary.update({"pairings": [pairing], "cards": cards, "goldfish": _goldfish_for(ctx, entrants, ("hero",))})
+    _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
 
@@ -482,6 +493,7 @@ def cmd_gauntlet(args: argparse.Namespace) -> int:
     summary = _base_summary("gauntlet", f"{hero.deck.name} vs the field", ctx, run_dir, entrants, records, notes)
     summary.update({"hero": hero.key, "pairings": pairings, "field": {hero.key: field}, "cards": cards,
                     "goldfish": _goldfish_for(ctx, entrants, ("hero",))})
+    _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
 
@@ -576,6 +588,7 @@ def cmd_matrix(args: argparse.Namespace) -> int:
     print(_table(["#", "Deck", "Avg win rate", "95% CI", "W-L"], rows, right=(0, 2, 3, 4)))
     summary = _base_summary("matrix", f"Round robin of {len(entrants)} decks", ctx, run_dir, entrants, records, notes)
     summary.update({"pairings": pairings, "matrix": matrix, "cards": _card_tables(entrants, records, ("hero",))})
+    _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
 
@@ -637,6 +650,103 @@ def cmd_tune(args: argparse.Namespace) -> int:
         run_dir = Path(args.out).expanduser() if args.out else \
             Path("runs") / f"{time.strftime('%Y%m%d-%H%M%S')}-tune-{len(entrants)}-decks"
     return tune.command(ctx.install, run_dir, entrants, real, args, stored)
+
+
+def _misplay_lands(args: argparse.Namespace, entrants: Dict[str, dict]) -> Optional[set]:
+    """Land names from the card database, when Forge is set up; None otherwise (basics are still known)."""
+    try:
+        db = Context(args).db
+    except (ForgeError, UserError, OSError, ValueError):
+        return None
+    return {name for info in entrants.values() for name in (info.get("main") or {})
+            if db.get(name) is not None and db.get(name).is_land}
+
+
+def _print_misplays(deck: dict, name: str, top: int) -> None:
+    from . import misplay
+
+    rows = misplay.top_cards(deck, top)
+    lands = deck.get("lands_left_in_hand")
+    print(f"\n{name}: {deck['games']} decided games"
+          + (f", {lands:.1f} lands left in hand at the end on average" if lands is not None else ""))
+    if not rows:
+        print("  No card was flagged.")
+        return
+
+    def compare(c: dict) -> str:
+        if c.get("diff") is None:
+            return "-"
+        return f"{c['diff'] * 100:+.1f}{'*' if c.get('significant') else ' '}"
+
+    table = []
+    if deck.get("basis") == "flagged":
+        for r in rows:
+            idle, stranded, removal, counter = r["idle"], r["stranded"], r.get("removal"), r.get("counter")
+            table.append([
+                f"{r['copies']} {r['card']}", f"{r['score']:.0f}", str(r["seen"]), _pct(r["cast_rate"], 0),
+                _num(idle["per_game"]),
+                f"{_pct(idle['never_cast_share'], 0)} of {idle['castable_games']}" if idle["castable_games"] else "-",
+                _pct(stranded["rate"], 0),
+                f"{removal['poor']} of {removal['casts']}" if removal and removal["casts"] else "-",
+                f"{counter['passed']} ({counter['big_passed_games']} big)" if counter else "-",
+                compare(r["compare"]),
+            ])
+        print(_table(["Card", "Hit/100", "Seen", "Cast", "Idle/game", "Castable, never cast", "In hand at end",
+                      "Poor targets", "Counter passed", "Hit-not pts"], table, right=range(1, 10)))
+        for r in rows:
+            if r["reasons"]:
+                print(f"  {r['card']}: " + "; ".join(r["reasons"]))
+    else:
+        for r in rows:
+            table.append([f"{r['copies']} {r['card']}", f"{r['score']:.0f}", str(r["seen"]),
+                          _pct(r["cast_rate"], 0), compare(r["compare"])])
+        print(_table(["Card", "Never cast/100", "Seen", "Cast when seen", "Never-cast minus cast pts"],
+                     table, right=range(1, 5)))
+
+
+def cmd_misplays(args: argparse.Namespace) -> int:
+    """Rank each deck's cards by how many games a likely AI misplay touched (see misplay.py)."""
+    from . import misplay
+
+    run_dir = Path(args.run_dir).expanduser()
+    info_path = run_dir / "run.json"
+    if not info_path.is_file():
+        raise UserError(f"{run_dir} is not a run directory (no run.json)")
+    info = json.loads(info_path.read_text(encoding="utf-8"))
+    entrants = {e["key"]: e for e in info.get("entrants", []) if isinstance(e, dict) and "key" in e}
+    records = experiment.read_games(run_dir)
+    if not records:
+        raise UserError(f"{run_dir} has no recorded games")
+    keys = list(entrants)
+    if args.deck:
+        wanted = args.deck.casefold()
+        keys = [k for k in entrants if wanted in (k.casefold(), str(entrants[k].get("name", "")).casefold())]
+        keys = keys or [k for k in entrants if wanted in str(entrants[k].get("name", "")).casefold()]
+        if not keys:
+            raise UserError(f"no deck called \"{args.deck}\" in this run. Decks: "
+                            + ", ".join(str(e.get("name", k)) for k, e in entrants.items()))
+    signals = misplay.has_signals(records)
+    result = misplay.analyze(records, entrants, keys, lands=None if signals else _misplay_lands(args, entrants))
+    if args.top < 1:
+        raise UserError("--top must be at least 1")
+    if not signals:
+        print("These games were recorded before mtgsim tracked misplay signals: only cards seen but never cast "
+              "can be ranked. Re-run the command with this version for the full analysis.")
+    for key in keys:
+        if key in result["decks"]:
+            _print_misplays(result["decks"][key], str(entrants[key].get("name", key)), args.top)
+    if signals:
+        print("\nHit/100 = games (per 100 of the deck) in which the card was castable in a free window and never "
+              "cast, left in hand after being castable, aimed at a poor target, or let a big spell resolve; "
+              "Hit-not = win rate in those games minus the other games it was seen in (* = interval clear of zero).")
+    else:
+        print("\nNever cast/100 = games (per 100 of the deck) in which the card was seen but never cast; the last "
+              "column is the win rate in those games minus the games it was cast (* = interval clear of zero).")
+    print(misplay.CAVEAT)
+    if args.json:
+        Path(args.json).write_text(json.dumps(result, indent=1), encoding="utf-8")
+        print(f"\nSaved to {args.json}")
+    return 0
 
 
 def cmd_report(args: argparse.Namespace) -> int:
@@ -774,6 +884,14 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("report", help="rebuild report.html for an existing run directory")
     p.add_argument("run_dir")
     p.set_defaults(func=cmd_report)
+
+    p = sub.add_parser("misplays", help="rank each deck's cards by likely AI misplays in an existing run")
+    p.add_argument("run_dir")
+    p.add_argument("--deck", help="only this deck (its name or key)")
+    p.add_argument("--top", type=int, default=10, help="cards to list per deck (default 10)")
+    p.add_argument("--json", metavar="FILE", help="also save the full tables as JSON")
+    p.add_argument("--forge-dir", help="Forge installation, used to tell lands apart in runs from older versions")
+    p.set_defaults(func=cmd_misplays)
     return parser
 
 

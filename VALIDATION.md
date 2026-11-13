@@ -8,7 +8,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 257 pass |
+| Unit tests (no Forge needed) | 273 pass |
 | Integration tests (real games) | 6 pass |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
@@ -19,6 +19,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
+| Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical; see below |
 
 ## The pipeline behaves correctly
 
@@ -169,6 +170,40 @@ the 4-core machine.
 card scripts and the marker file. The unit tests in `tests/test_forge_patches.py` cover the same
 cases on a miniature git repository (plus interrupted applies, a damaged marker, patches that
 create or delete files, and moving to another Forge commit).
+
+## Misplay tracking
+
+The driver's tracker gained the misplay fields (`mtgsim/bridge/AGENTS.md`) on 13 November 2026.
+It runs inside the game thread, so the check that matters is that it does not change games:
+three matchups were played with seed 1, 20 games each, first with the original driver and then
+with the new one, and every game compared field by field (status, winner, turns, who went
+first, seats, seed, and for each player the opening hand, draws, cards played, mulligans,
+turns, life and loss reason).
+
+| Driver | Azorius Control vs Jund Sacrifice | Dimir Uldaros vs Izzet Spellementals | Dimir Midrange vs Boros Dwarves |
+|---|---|---|---|
+| First version | 20 of 20 identical | 20 of 20 identical | 20 of 20 identical |
+| Shipped version (refinements below) | 20 of 20 identical | 20 of 20 identical | 20 of 20 identical |
+
+No tracker errors appeared in the worker logs. The first version's data showed false positives
+that the shipped version removes: a second copy of a legendary card counted as castable while
+the first was in play, X spells were checked at X = 0, "up to one target" removal counted as
+castable with no target, and bouncing your own creatures to save them (Get Out) counted as
+removal hitting your own permanent. Charms with a counter mode now get counter windows too.
+
+What the signals showed in those 60 games (first version):
+
+- Azorius Control's Countersculpt was seen in 18 games and never cast, while 48 opponent spells
+  it could have countered resolved; No More Lies let 45 through and was cast 11 times. Jace's
+  Machinations was never cast in the 15 games it was seen.
+- Dimir Uldaros never cast Requiting Hex, Seasoned Cryomancer or Uldaros Theorix in the games
+  they were seen (17, 17 and 11), although they were castable on some of those turns.
+- No removal cast was flagged for a poor target: Forge chooses targets with the same creature
+  evaluation the check uses, so that column only catches cards whose own AI logic aims
+  elsewhere.
+
+These are pointers for reading card scripts and AI code, not measured misplays. No experiment
+has yet shown that fixing one of them changes a win rate.
 
 ## The goldfish model
 

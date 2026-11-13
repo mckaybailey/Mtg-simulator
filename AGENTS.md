@@ -48,13 +48,16 @@ Always pass on the limits with the numbers:
   A/B gap needs ~1,500 games per version. Never present a 54% from 100 games as an edge.
 - Card statistics are noisy correlations; only differences whose interval excludes zero
   (bold in reports, `*` in the terminal) deserve attention.
+- The misplay ranking (`python3 -m mtgsim misplays RUN_DIR`, and the "Likely AI misplays"
+  report section) is a heuristic pointer to cards whose Forge AI logic is worth reading, not
+  proof that the AI misplayed them.
 - `--mc on|max` (Monte Carlo search) plays better but ~6x slower, and its games are not
   reproducible from the seed.
 
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (263 tests, ~2 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (279 tests, ~2 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match
