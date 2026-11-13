@@ -32,40 +32,26 @@ Spearman 0.236 (noise 0.12–0.35), Pearson 0.228 (0.14–0.32), mean abs gap 13
 Tool: `python3 wip/tools/calib.py RUN_DIR`. Vs the unverified matchup data
 (`wip/tools/matchcheck.py RUN_DIR wip/real-matchups.json`): 24 pairings, Pearson 0.20, Spearman 0.11.
 
-## Running now (started ~19:40 UTC; all resume from recorded games if killed)
+## Done since (all pushed)
 
-1. **Measurement of patches 0001/0002** — `SP=$SP wip/tools/fix-arms.sh`, log
-   `$SP/fix-arms.log`. Azorius Control vs the other 10 meta decks, 100 games each, seed 1, on a
-   private Forge copy (`$SP/fixhome`): arm0 no patches (DONE), arm1 = 0001 (in progress, ~300/1000),
-   arm2 = 0001+0002, then a 200-game AC mirror. Results: `runs/fix-arm{0,1,2}`, `runs/fix-mirror-ac`.
-   **arm0: 22.4% (20–25), 224–776; Countersculpt seen 865 / cast 0; Jace's Machinations seen 791 /
-   cast 0; No More Lies seen 764 / cast 524.** **arm1 (0001 only): 39.9% (37–43), 399–601; +17.5 points
-   vs arm0 (unpaired CI +13.5..+21.4, paired CI +14.7..+20.3; loss→win 203, win→loss 28); Countersculpt
-   cast in 666 of 868 games seen; Machinations still 0 of 799 (needs 0002).** Compare: `python3 wip/tools/arms.py azorius-control
-   runs/fix-arm0 runs/fix-arm1 runs/fix-arm2 --cards "Countersculpt,Jace's Machinations,No More Lies"`.
-   While it runs, the script copies 0001/0002 into `mtgsim/forge_patches/` (excluded locally in
-   `.git/info/exclude`; the sources are in `forge_patches/pending/`). Don't commit those copies
-   until measured.
-2. **New-driver round robin on the unpatched shared Forge** (queued behind 1) —
-   `matrix decks/standard/meta -n 30 --seed 1 --out runs/rr-newdriver-n30-s1`, log
-   `$SP/rr-newdriver.log`. Purpose: (a) check all 1,650 games identical to the baseline with
-   `python3 wip/agents/misplay-baseline/compare.py runs/baseline-rr-n30-s1 runs/rr-newdriver-n30-s1`;
-   (b) full misplay report before any fix: `python3 -m mtgsim misplays runs/rr-newdriver-n30-s1`.
-   (It warns that patches are "out of date" because of the temporary copies; the shared Forge
-   really is unpatched, and run.json records that.)
-3. **Dead-card patches 0003–0008: DONE, measured, merged (d6ac13d)**, still in
-   `mtgsim/forge_patches/pending/` with numbers in each `Measured:` line. Causes: 0003 Springleaf
-   Drum (`AI:RemoveDeck:All` filtered by the default AI), 0004 Practiced Offense (forge-ai ignores
-   KWChoice → Pump refused; `AILogic$ ContinuousBonus`), 0005 Nurturing Pixie and 0006 Uldaros
-   Theorix (ETB refused by `AiController.checkETBEffects`; `OptionalDecider$ You`), 0007 Seasoned
-   Cryomancer (`AILogic$ Always` on the ImmediateTrigger), 0008 Java: `PumpEffect` crash when a
-   KWChoice target is removed in response (5/1,000 Momo games crashed once Practiced Offense was cast).
-   Gauntlet vs the other 10, 100 each, seed 1: **Azorius Momo 44.9% (42–48) → 54.2% (51–57), +9.3
-   (CI +4.9..+13.6, p<0.001), mirror 50.0% (43–57); Dimir Uldaros 30.1% (27–33) → 33.9% (31–37),
-   +3.8 (CI −0.3..+7.9, p=0.07, not reliable), mirror 51.0% (44–58).** Cast when seen, before →
-   after: Drum 0/749 → 655/728, Practiced Offense 0/613 → 579/629, Pixie 14/522 → 417/483,
-   Theorix 13/616 → 326/632, Cryomancer 13/695 → 478/679. Each deck's patches were measured
-   together (individual shares unknown). 0001 and 0008 are Java (Maven rebuild ~1 min).
+- Patches 0001/0002 measured (Azorius Control vs the other 10, 100 each, seed 1): none 22.4%
+  (20–25) → 0001 39.9% (37–43) → 0001+0002 47.8% (45–51); +25.4 total (CI +21.3..+29.4), 0002 alone
+  +7.9 (CI +3.6..+12.2); AC mirror 54.0% (47–61). Countersculpt cast 0/865 → 690/874, Machinations
+  0/791 → 600/799.
+- Dead-card patches 0003–0008 measured (numbers in their headers; Momo +9.3 reliable, Uldaros +3.8 not).
+- All eight shipped in `mtgsim/forge_patches/` (commit 7003888), README table added.
+- New-driver round robin on the unpatched engine (`runs/rr-newdriver-n30-s1`): **1,650/1,650 games
+  identical to the baseline**; `misplays` ranks every patched card at the top of its deck
+  (Countersculpt 56, Machinations 56, Springleaf Drum 71, Pixie 46, Practiced Offense 30,
+  Cryomancer 39, Theorix 18 hits/100). Unpatched candidates it also flags: Pinnacle Starcage
+  (Artifacts 22), Nova Hellkite (Dragons 21), Torch the Tower (Jund 17), Seam Rip (AC 15).
+
+## Running now
+
+`$SP/patched-rr.sh` (log `$SP/patched-rr.log`): `setup --build` on the shared Forge (installs the
+8 patches, Maven rebuild), `doctor`, `matrix ... --out runs/rr-patched-n30-s1`, then the full test
+suite (log `$SP/fullsuite-patched.log`). If killed: re-run the script (setup is idempotent, the
+matrix resumes).
 
 ## Next steps, in order
 
