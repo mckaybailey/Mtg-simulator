@@ -8,7 +8,11 @@ not installed and must not be required.
   `carddb.parse_card_script`, or use `helpers.make_db()`.
 - **`helpers.py`**: `make_db()` (a dozen cards with set printings, for legality tests) and
   `game(a, b, index, winner=…, first=…, status=…)`, which builds a stored game record with the
-  correct seat alternation. Use it rather than hand-writing records.
+  correct seat alternation. Use it rather than hand-writing records. `signals(...)` builds a
+  player's fields as a driver with misplay tracking records them; pass it as `a_extra=`.
+- `test_misplay.py` covers every misplay signal on synthetic records, old runs without the
+  fields, the report section's escaping and the `misplays` command (with `MTGSIM_HOME` pointed
+  at an empty directory, so no Forge is involved).
 - Anything that touches `MTGSIM_HOME` must point it at a temporary directory.
 - `test_experiment.py` replaces `experiment.run_jobs` with a fake to test planning, storage and
   resume without Java.

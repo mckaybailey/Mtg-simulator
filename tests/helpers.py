@@ -32,6 +32,14 @@ def make_db() -> CardDatabase:
     return CardDatabase(cards)
 
 
+def signals(opening=None, drawn=None, played=None, end_hand=None, lands_in_hand=0, idle_own=None, idle_opp=None,
+            counter=None, removal=None, roles=None):
+    """Player fields as a driver with misplay tracking records them; pass as ``a_extra``/``b_extra`` to ``game``."""
+    return {"opening": opening or {}, "drawn": drawn or {}, "played": played or {},
+            "endHand": end_hand or {}, "endHandLands": lands_in_hand, "idleOwn": idle_own or {},
+            "idleOpp": idle_opp or {}, "counter": counter or {}, "removal": removal or {}, "roles": roles or {}}
+
+
 def game(a, b, index, winner=None, first="a", status="ok", turns=6, a_extra=None, b_extra=None):
     """A stored game record for pairing (a, b). ``winner``/``first`` are "a", "b" or None."""
     seat_a = 0 if index % 2 == 0 else 1

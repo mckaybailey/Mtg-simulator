@@ -11,6 +11,7 @@
 | `runner.py` | pool of long-lived Forge JVMs (one game at a time each), fed jobs over stdin |
 | `experiment.py` | plan pairings, per-game seeds, write `games.jsonl`, resume |
 | `analysis.py`, `stats.py` | win rates, Wilson intervals, A/B tests, matrix, card stats, clock |
+| `misplay.py` | likely AI misplays per card (cards left in hand, castable but never cast, poor removal targets, unused counterspell windows, rarely cast) from the driver's misplay fields; its docstring defines every signal and the ranking score; old runs fall back to "seen but never cast" |
 | `goldfish.py` | engine-free mana/curve Monte Carlo; its docstring defines the result schema exactly |
 | `report.py`, `goldfish_report.py` | render `summary.json` as one self-contained HTML page |
 | `cli.py` | commands; assembles `summary.json` (`_base_summary` plus per-command keys) |
@@ -33,11 +34,16 @@
   `force_profile` / `force_monte_carlo` and override them for every seat.
 - If `Card` fields or their parsing change, bump `CACHE_VERSION` in `carddb.py` so stale caches
   are rebuilt.
+- **The driver's tracker only reads game state** (see `bridge/AGENTS.md`); a tracker that calls
+  something with side effects silently changes every game. `misplay.POOR_TARGET` must match
+  `Tracker.POOR_TARGET` in the driver.
 
 ## Reports
 
 `report.py` reads only `summary.json`, so `python3 -m mtgsim report RUN_DIR` can re-render old
-runs. The page loads nothing external. Escape every name with `esc()`; the tooltip script builds
+runs. `match`, `gauntlet` and `matrix` summaries carry a `misplays` key (`misplay.analyze` over
+every entrant), rendered as the "Likely AI misplays" section; `python3 -m mtgsim misplays RUN_DIR`
+recomputes it from `run.json` and `games.jsonl`. The page loads nothing external. Escape every name with `esc()`; the tooltip script builds
 its DOM with `textContent` from a `data-tip` JSON attribute, never `innerHTML`. Colours are CSS
 variables with light and dark values, checked with the dataviz palette validator; every chart is
 followed by a table with the same numbers. After changing layout, screenshot a report with
