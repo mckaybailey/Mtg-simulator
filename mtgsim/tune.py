@@ -65,7 +65,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
 
-from . import ai_profiles, experiment, runner, stats
+from . import ai_profiles, experiment, forge, runner, stats
 from .experiment import Entrant, RunError
 from .forge import ForgeInstall
 from .runner import Job
@@ -500,12 +500,22 @@ def data_needed(train_n: int, r: Optional[float], deck_count: int, matchups_give
 # ===================================================================== the cache
 
 
+def engine_identity(install: ForgeInstall, patches: Mapping) -> str:
+    """What counts as "the same engine" for the cache: the Forge build and the Forge patch set applied
+    to it. A game played on a patched Forge (a fixed card script, a changed AI rule) is a different
+    game; a card-script patch changes neither the jar nor the folder timestamps, so the patch set
+    is named explicitly here even though the fingerprint also folds it in."""
+    return f"{install.fingerprint()}|patches={patches.get('combined_sha256') or 'none'}"
+
+
 def pairing_key(engine: str, seed: int, a: Entrant, b: Entrant, hash_a: str, hash_b: str,
                 mc: str, timeout: int) -> str:
     """Everything that decides a pairing's games except the game index.
 
-    Deck names are included because Forge reads them (a deck whose name contains "Control" is
-    piloted as a non-aggro deck); profiles enter by their effective settings, not their names.
+    ``engine`` is ``engine_identity`` (Forge build plus applied patch set). Deck names are included
+    because Forge reads them (a deck whose name contains "Control" is piloted as a non-aggro deck);
+    profiles enter by their effective settings, not their names (Forge's own profiles are copied
+    from the patched checkout, so a patch to them changes their hash too).
     """
     payload = [CACHE_VERSION, engine, seed, GAME_FORMAT, mc, timeout,
                a.deck.fingerprint(), a.deck.name, hash_a, b.deck.fingerprint(), b.deck.name, hash_b]
@@ -682,11 +692,17 @@ class Tuner:
     def __init__(self, install: ForgeInstall, run_dir: Path, decks: List[TuneDeck], space: Space,
                  settings: dict, profiles: Dict[str, dict], candidates: List[dict],
                  matchups: Optional[List[Matchup]] = None, engine_id: Optional[str] = None,
-                 say: Callable[[str], None] = print, workers: Optional[int] = None, heap: str = "2g"):
+                 say: Callable[[str], None] = print, workers: Optional[int] = None, heap: str = "2g",
+                 patches: Optional[dict] = None):
         self.install, self.run_dir, self.decks, self.space = install, Path(run_dir), decks, space
         self.settings, self.profiles, self.candidates = settings, profiles, candidates
         self.matchups = matchups or []
-        self.engine_id = engine_id if engine_id is not None else install.fingerprint()
+        # The Forge patch set (as run.json records it) and the engine identity the cache keys use.
+        self.patches = patches if patches is not None else (
+            {"state": "not-managed", "applied": [], "combined_sha256": ""} if engine_id is not None
+            else forge.patch_status(install).record())
+        self.engine_id = engine_id if engine_id is not None else engine_identity(install, self.patches)
+        self.build_fingerprint = engine_id if engine_id is not None else install.fingerprint()
         self.say, self.workers, self.heap = say, workers, heap
         self.by_key = {d.key: d for d in decks}
         self.index = {d.key: i for i, d in enumerate(decks)}
@@ -950,8 +966,18 @@ class Tuner:
         if (opts.get("monte_carlo") or "off") != self.settings["mc"]:
             problems.append(f"Monte Carlo {opts.get('monte_carlo')}")
         forge_info = info.get("forge", {})
+        ours = self.patches.get("combined_sha256") or ""
+        recorded_patches = forge_info.get("patches")
+        if isinstance(recorded_patches, dict):
+            if (recorded_patches.get("combined_sha256") or "") != ours:
+                problems.append(f"Forge patch set {(recorded_patches.get('combined_sha256') or 'none')[:12]} "
+                                f"(this Forge: {(ours or 'none')[:12]})")
+        elif ours:
+            # A run from before patches were recorded was played on an unpatched Forge. A card-script
+            # patch leaves the jar and its timestamp alone, so the checks below would not notice.
+            problems.append(f"an unpatched Forge (this Forge has patch set {ours[:12]})")
         if forge_info.get("fingerprint"):
-            if forge_info["fingerprint"] != self.engine_id:
+            if forge_info["fingerprint"] != self.build_fingerprint:
                 problems.append("a different Forge build")
         elif forge_info.get("path") != str(self.install.root) or forge_info.get("version") != self.install.version:
             problems.append("a different Forge installation")
@@ -960,7 +986,7 @@ class Tuner:
             try:
                 stamp = time.mktime(time.strptime(created, "%Y-%m-%d %H:%M:%S"))
                 if self.install.jar.stat().st_mtime > stamp:
-                    problems.append("a Forge build older than the current one")
+                    problems.append("a Forge build that has since been rebuilt")
             except (TypeError, ValueError, OSError):
                 problems.append("no record of which Forge build played it")
         if problems:
@@ -1158,6 +1184,8 @@ class Tuner:
     def describe(self) -> dict:
         return {
             "version": TUNE_VERSION, "settings": self.settings, "engine": self.engine_id,
+            "forge": {"version": self.install.version, "path": str(self.install.root),
+                      "fingerprint": self.build_fingerprint, "patches": self.patches},
             "decks": [{"key": d.key, "name": d.name,
                        "file": str(Path(d.entrant.deck.path).resolve()) if d.entrant.deck.path else None,
                        "fingerprint": d.entrant.deck.fingerprint(), "category": d.entrant.category, "group": d.group,
@@ -1361,8 +1389,14 @@ def command(install: ForgeInstall, run_dir: Path, entrants: List[Entrant], real_
 
         scratch = tempfile.TemporaryDirectory(prefix="mtgsim-tune-plan-")  # a plan writes nothing to keep
         run_dir = Path(scratch.name)
+    status = forge.patch_status(install)
+    if status.warning():
+        say(status.warning())
     tuner = Tuner(install, run_dir, decks, space, settings, profiles, candidates, matchups, say=say,
-                  workers=getattr(args, "workers", None), heap=getattr(args, "heap", "2g"))
+                  workers=getattr(args, "workers", None), heap=getattr(args, "heap", "2g"), patches=status.record())
+    if stored and stored.get("engine") and stored["engine"] != tuner.engine_id:
+        say("warning: Forge or its patch set changed since this tuning run started; games cached on the earlier "
+            "engine do not count for this one and will be replayed.")
     try:
         return _start(tuner, decks, tuned, present, candidates, profiles, args, dry_run, say)
     finally:

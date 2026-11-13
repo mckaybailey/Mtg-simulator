@@ -638,10 +638,41 @@ class SearchTest(TempHome):
         record = tuner.cache.get(pk, 1)
         self.assertEqual("b", record["winner"], "game 1 has the pairing's first deck in seat 1, and seat 0 won")
         self.assertEqual(4, tuner.import_run(prior)["already cached"], "importing twice adds nothing")
-        info["options"]["seed"] = 2
-        (prior / "run.json").write_text(json.dumps(info))
-        with self.assertRaises(RunError):
-            tuner.import_run(prior)
+        self.assertEqual("", info["forge"]["patches"]["combined_sha256"], "execute records the patch set")
+        for change in ({"seed": 2}, {"patched": "abc123"}):
+            broken = json.loads(json.dumps(info))
+            if "seed" in change:
+                broken["options"]["seed"] = change["seed"]
+            else:
+                broken["forge"]["patches"]["combined_sha256"] = change["patched"]
+            (prior / "run.json").write_text(json.dumps(broken))
+            with self.assertRaises(RunError, msg=str(change)):
+                tuner.import_run(prior)
+        # A run from before patches were recorded was unpatched: fine for an unpatched Forge, not for a patched one.
+        old = json.loads(json.dumps(info))
+        del old["forge"]["patches"]
+        (prior / "run.json").write_text(json.dumps(old))
+        self.assertEqual(4, tuner.import_run(prior)["already cached"])
+        patched = self._tuner(self.tmp / "run2")
+        patched.patches = {"state": "up-to-date", "applied": [{"name": "0001-x", "sha256": "f"}], "combined_sha256": "abc"}
+        patched.prepare()
+        with self.assertRaises(RunError) as ctx:
+            patched.import_run(prior)
+        self.assertIn("unpatched", str(ctx.exception))
+
+    def test_the_forge_patch_set_is_part_of_the_engine_identity(self):
+        with mock.patch.object(ForgeInstall, "fingerprint", lambda self: "build1"):
+            plain = tune.engine_identity(self.install, {"combined_sha256": ""})
+            patched = tune.engine_identity(self.install, {"combined_sha256": "abc"})
+            other = tune.engine_identity(self.install, {"combined_sha256": "abd"})
+            tuner = tune.Tuner(self.install, self.tmp / "run", [], tune.parse_space(SEARCH_SPACE), {"seed": 1}, {}, [],
+                               patches={"state": "up-to-date", "applied": [], "combined_sha256": "abc"})
+        self.assertEqual(3, len({plain, patched, other}))
+        self.assertEqual(patched, tuner.engine_id)
+        self.assertEqual("build1", tuner.build_fingerprint)
+        entrants, _ = _decks()
+        keys = {tune.pairing_key(e, 1, entrants[0], entrants[1], "h", "h", "off", 180) for e in (plain, patched)}
+        self.assertEqual(2, len(keys), "a game on a patched Forge is a different game")
 
     @staticmethod
     def _fake_execute_engine():
