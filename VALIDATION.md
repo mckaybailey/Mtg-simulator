@@ -66,12 +66,12 @@ Pearson correlation 0.23, rank correlation 0.24. Creature decks are overrated an
 need planning are underrated. Each meta deck now carries an `ai_pilot` rating (weak / fair /
 strong) in `decks/standard/meta/gauntlet.json`, and reports name the opponents to discount.
 
-**A stronger AI helps, at a price.** Azorius Control vs Boros Dwarves, 40 games each way:
+**A stronger AI helps, at a price.** Azorius Control vs Boros Dwarves, 40 games per setting:
 
-| AI | Control's win rate | Time |
+| AI | Control's win rate (W–L, 95% CI) | Time |
 |---|---|---|
-| Default | 17.5% (7–33) | 1.3 min |
-| `--mc max` (Monte Carlo look-ahead) | 32.5% (13–27) | 7.5 min |
+| Default | 17.5% (7–33, 9–32%) | 1.3 min |
+| `--mc max` (Monte Carlo look-ahead) | 32.5% (13–27, 20–48%) | 7.5 min |
 
 That closes part of the gap for the control deck at about six times the run time. Monte Carlo
 mode thinks against a clock, so its games are not exactly reproducible from the seed.
