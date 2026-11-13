@@ -64,5 +64,10 @@ and status: misplay report (built, needs the final unchanged-games check), tunin
    check games are identical to the baseline; run `misplays` on it.
 3. Measure patches 0001/0002 (above); finish the dead-card investigation (agent B WIP).
 4. Integrate the tuning harness (agent C WIP), run the real tuning experiment.
-5. Merge `main` (the other session's per-deck AI settings), re-run the round robin with combined
-   settings, update calibration fields, docs, push.
+5. `main` (56151e6, the other session's results) is already merged: per-deck Cautious/Hardest
+   profiles and Monte Carlo do not fix the ranking (best rank corr 0.25; `ai_mc: max` for the
+   three weak decks cuts the mean gap to 9.1 but costs 3x and reproducibility), and
+   `gauntlet.json`'s ai_* fields stay unset. Note: Monte Carlo lifted Azorius Control from 20% to
+   46%, plausibly because it also tries plays the heuristics refuse, such as the Empower cards;
+   compare that with patch 0001's effect. Final step: re-run the round robin with this branch's
+   patches (and any shipped tuned profile), update calibration fields and docs, push.
