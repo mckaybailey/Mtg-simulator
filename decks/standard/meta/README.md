@@ -86,3 +86,8 @@ optional fields set how the AI pilots one deck: `ai_profile` (a Forge AI profile
 `Cautious` or `Hardest`) and `ai_mc` (`on` or `max` turns Forge's Monte Carlo search on for
 that deck only; games involving it get slower). `--ai-profile` and `--mc` on the command line
 override them for every deck.
+
+The shipped `gauntlet.json` sets neither. Adding `"ai_mc": "max"` to the three `weak` decks
+(Jund Sacrifice, Dimir Uldaros, Azorius Control) brings their simulated win rates close to the
+real ones, but makes runs about three times slower and no longer exactly reproducible from the
+seed, and it does not improve the overall ranking (see `VALIDATION.md`).
