@@ -1,6 +1,6 @@
 """Calibration metrics for a matrix run: sim vs real win rate per deck, with a game-noise range.
 
-usage: python3 calib.py RUN_DIR [gauntlet.json] [--reps 2000]
+usage: python3 tools/calibration.py RUN_DIR [gauntlet.json] [--reps 2000]
 Noise range: parametric bootstrap. Each pairing's wins are redrawn from Binomial(decided, observed
 rate), deck averages and the correlations are recomputed; the 2.5-97.5 percentiles are reported.
 """

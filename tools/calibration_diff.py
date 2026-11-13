@@ -1,13 +1,13 @@
 """Difference in calibration metrics between two matrix runs, with a bootstrap interval.
 
-usage: python3 calibdiff.py RUN_A RUN_B [--reps 2000]
+usage: python3 tools/calibration_diff.py RUN_A RUN_B [--reps 2000]
 Each run's pairing results are resampled independently (binomial, observed rates), the deck averages,
 Spearman, Pearson and mean absolute gap are recomputed for both, and B minus A is summarised.
 """
 import json, random, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from calib import spearman, pearson  # noqa: E402
+from calibration import spearman, pearson  # noqa: E402
 
 def load(run, gauntlet="decks/standard/meta/gauntlet.json"):
     s = json.loads((Path(run) / "summary.json").read_text())

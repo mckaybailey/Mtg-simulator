@@ -1,6 +1,6 @@
 """Compare gauntlet runs of one hero deck played on different engines (same seeds).
 
-usage: python3 arms.py HERO_KEY RUN_DIR [RUN_DIR ...] [--cards "A,B,C"]
+usage: python3 tools/compare_arms.py HERO_KEY RUN_DIR [RUN_DIR ...] [--cards "A,B,C"]
 Prints, per run: overall win rate (decided games, equal weight per opponent as in the gauntlet
 summary, plus pooled) with 95% Wilson interval; per-opponent win rates; how often the named cards
 were seen and cast. For each later run vs the first: the pooled difference with a 95% interval
@@ -11,7 +11,7 @@ import math
 import sys
 from pathlib import Path
 
-sys.path.insert(0, "/home/user/Mtg-simulator")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from mtgsim import stats  # noqa: E402
 
 

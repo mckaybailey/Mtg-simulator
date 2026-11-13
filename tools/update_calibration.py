@@ -1,6 +1,6 @@
 """Write sim_win_rate / ai_pilot into a gauntlet.json from a matrix run, and print the README table.
 
-usage: python3 update_calibration.py RUN_DIR [GAUNTLET_JSON]
+usage: python3 tools/update_calibration.py RUN_DIR [GAUNTLET_JSON]
 ai_pilot: simulated minus real below -10 -> weak, within +-10 -> fair, above +10 -> strong.
 The "calibration" description string is left for the caller to edit.
 """

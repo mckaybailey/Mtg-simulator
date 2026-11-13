@@ -14,6 +14,7 @@ measured and how far results can be trusted. Each folder with code or data has i
 | `decks/` | the included gauntlets and the `gauntlet.json` format |
 
 `docs/stronger-ai.md` is a design note comparing ways to give mtgsim a stronger pilot than Forge's AI.
+`tools/` holds the analysis scripts behind the calibration numbers in `VALIDATION.md` (see its README).
 
 ## Running simulations for the user
 

@@ -68,6 +68,18 @@ What this means in practice:
 - The meta-weighted win rate is a win rate against these decks as the AI plays them, not a
   forecast of a tournament result.
 
+## Real matchup data (unverified)
+
+`real-matchups-unverified.json` holds deck-vs-deck win rates for these archetypes gathered on
+13 November 2026 from web-search summaries only: the environment's network blocked every MTG
+site, so no source page could be opened and checked. 37 of its 58 rows are unambiguous
+numbers, covering 26 of the 55 pairings, mostly from mtgdecks.net archetype pages (time window,
+platform and best-of-one/three unknown); several pairings appear from both sides and are not
+independent. Each row keeps its URL and the summary text it came from. Use it only as a rough
+secondary check (`tools/matchup_check.py`): against it the round robin scores Pearson 0.15 over
+24 pairings with the Forge patches (0.20 before). It is not in the format `mtgsim tune
+--matchups` expects, deliberately: verify and de-duplicate it first.
+
 ## How far to trust these lists
 
 - The lists were transcribed from web search results of the source pages; the pages

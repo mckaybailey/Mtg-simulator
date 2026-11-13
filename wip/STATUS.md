@@ -23,14 +23,14 @@ Agent handles for resuming subagents are in `$SP/RESUME-agents.txt` (not in the 
 Tests on the merged tree: 279 (273 unit, 6 integration); unit tests pass
 (`MTGSIM_HOME=$(mktemp -d) python3 -m unittest discover -s tests`). The full suite with
 integration tests has not been run on the merged tree yet — run it under the lock.
-`wip/agents/misplay-report.patch` and `tuning-harness.patch` are now obsolete (merged); delete them.
+wip/agents/ removed (all merged).
 
 ## Baseline (re-run here, identical to VALIDATION.md)
 
 `matrix decks/standard/meta -n 30 --seed 1` → `runs/baseline-rr-n30-s1` (1,650 games):
 Spearman 0.236 (noise 0.12–0.35), Pearson 0.228 (0.14–0.32), mean abs gap 13.0 (11.8–14.5).
-Tool: `python3 wip/tools/calib.py RUN_DIR`. Vs the unverified matchup data
-(`wip/tools/matchcheck.py RUN_DIR wip/real-matchups.json`): 24 pairings, Pearson 0.20, Spearman 0.11.
+Tool: `python3 tools/calibration.py RUN_DIR`. Vs the unverified matchup data
+(`tools/matchup_check.py RUN_DIR decks/standard/meta/real-matchups-unverified.json`): 24 pairings, Pearson 0.20, Spearman 0.11.
 
 ## Done since (all pushed)
 
@@ -48,7 +48,7 @@ Tool: `python3 wip/tools/calib.py RUN_DIR`. Vs the unverified matchup data
 
 - Patched round robin (`runs/rr-patched-n30-s1`, 8 patches, 1,650 games, 0 errors): Spearman 0.109
   (noise −0.05..0.25), Pearson 0.079, **mean abs gap 10.8 (9.4–12.5)**. Versus baseline
-  (`wip/tools/calibdiff.py`): mean gap −2.2 points (95% interval −4.1..−0.3, clears noise);
+  (`tools/calibration_diff.py`): mean gap −2.2 points (95% interval −4.1..−0.3, clears noise);
   Spearman −0.13 (−0.32..+0.08, within noise: ranking not improved). Per deck sim (gap): Dwarves 70.0
   (+19.8), Orzhov 65.0 (+11.4), Dragons 63.7 (+18.7), Dimir Mid 58.0 (+3.5), Momo 50.7 (+1.9),
   Landfall 49.3 (−4.1), Artifacts 46.7 (−8.1), AC 42.7 (−3.9), Jund 37.7 (−19.9), Spellementals

@@ -3,7 +3,8 @@
 - `standard/meta/`: eleven Standard archetypes, a snapshot of the Magic.gg metagame table of
   5 November 2026 (69.1% of the field). Its `README.md` gives sources, what was and was not
   verified, and the AI-pilot calibration table. Lists were transcribed from search results, not
-  read from the source pages; Four-Color Control is missing.
+  read from the source pages; Four-Color Control is missing. `real-matchups-unverified.json` is
+  second-hand matchup data (see that README); never use it as tuning data without verifying it.
 - `standard/casual/`: five one-colour decks built from Foundations commons and uncommons, as
   kitchen-table opponents. Written for mtgsim, not tournament lists.
 - `brews/` (create when needed): user decks worth keeping.

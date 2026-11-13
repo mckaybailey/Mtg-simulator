@@ -1,6 +1,5 @@
 """Compare a matrix run's pairing win rates with the (unverified) real matchup rows."""
 import json, sys
-sys.path.insert(0, sys.argv[3] if len(sys.argv) > 3 else ".")
 from pathlib import Path
 run = Path(sys.argv[1]); real = json.load(open(sys.argv[2]))
 s = json.loads((run / "summary.json").read_text())
