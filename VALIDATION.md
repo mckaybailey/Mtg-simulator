@@ -8,7 +8,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 187 pass |
+| Unit tests (no Forge needed) | 217 pass |
 | Integration tests (real games) | 4 pass |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
@@ -18,6 +18,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Simulated vs real meta win rates | weak agreement (rank correlation 0.24); see below |
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
+| Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 
 ## The pipeline behaves correctly
 
@@ -87,6 +88,29 @@ Average engine time per game was 2.8 s across the meta round robin (slowest deck
 Artifacts, 4.1 s). With four workers that is about 85 games a minute: the 550-game sample
 gauntlet (a casual deck against all eleven meta decks, 50 games each) took 6 minutes. Each worker
 uses about 0.9–1.2 GB of memory.
+
+## Forge patches
+
+`setup --build` applies the patches in `mtgsim/forge_patches/` (none ship yet). The mechanism
+was checked on 13 November 2026 in an empty `MTGSIM_HOME`, with throwaway patches that were not
+committed: a card-script hint for Grizzly Bears, a second one for Raging Goblin, and a Java patch
+that adds a new class to `forge-ai`. Maven had the shared `~/.m2` cache; times are wall clock on
+the 4-core machine.
+
+| Step | Result | Time |
+|---|---|---|
+| Fresh build with the Grizzly Bears patch (fetch, apply, Maven, driver, card database) | applied; `doctor` passes: "1 applied, up to date" | 70 s |
+| Add the Java patch | Maven rebuild; the new class is in the jar; card cache and driver get new names | 28 s |
+| Change the Grizzly Bears patch's content and add the Raging Goblin one | both card scripts re-patched, no Maven run (jar unchanged) | 4 s |
+| Remove the Java patch | Maven rebuild; the class and its source are gone | 28 s |
+| Add a patch to the folder without running setup | `doctor` plays its games and then exits 1, saying which patch is missing; `match` warns on stderr; `run.json` records `"state": "out-of-date"` and the applied set | 8–9 s |
+| Add a patch that does not apply | setup stops with an error naming it and the patches it was tried on top of; checkout and `mtgsim-patches.json` unchanged | 1 s |
+| `setup --build --no-patches`, then `setup --build` | card scripts back to the pinned commit ("disabled", `doctor` passes), then re-applied; no Maven run | 3 s, 4 s |
+
+`doctor` took 9 s each time. Afterwards `git status` in the checkout showed only the two patched
+card scripts and the marker file. The unit tests in `tests/test_forge_patches.py` cover the same
+cases on a miniature git repository (plus interrupted applies, a damaged marker, patches that
+create or delete files, and moving to another Forge commit).
 
 ## The goldfish model
 

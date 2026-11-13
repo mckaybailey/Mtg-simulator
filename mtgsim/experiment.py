@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from .decks import Deck
-from .forge import ForgeInstall
+from .forge import ForgeInstall, patches_for_run
 from .runner import Job, run_jobs
 
 
@@ -255,12 +255,13 @@ def execute(
     have = {g["id"] for g in read_games(run_dir) if g["status"] in ("ok", "timeout")}
     todo = [job for job in jobs if job.id not in have]
 
+    patches = patches_for_run(install, run_dir / "run.json", quiet=quiet)  # warns if not what mtgsim ships
     run_info = dict(meta or {})
     run_info.update({
         "options": options.describe(),
         "entrants": [e.describe() for e in entrants],
         "pairings": [[a.key, b.key] for a, b in pairings],
-        "forge": {"version": install.version, "path": str(install.root)},
+        "forge": {"version": install.version, "path": str(install.root), "patches": patches},
         "created": run_info.get("created") or time.strftime("%Y-%m-%d %H:%M:%S"),
     })
     (run_dir / "run.json").write_text(json.dumps(run_info, indent=1), encoding="utf-8")
