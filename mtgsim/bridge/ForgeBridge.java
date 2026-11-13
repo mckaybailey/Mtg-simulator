@@ -13,6 +13,7 @@
  *   stdin : one job per line, tab separated key=value fields:
  *             id=<text> seed=<long> timeout=<seconds> format=<GameType> mc=<off|on|max>
  *             log=<path or empty> deck=<path> deck=<path> ... profile=<name or empty> ...
+ *             seatmc=<off|on|max|empty> ...   (per seat, in deck order; empty follows mc=)
  *           the line "quit" ends the process.
  * Everything Forge itself prints is redirected to stderr so stdout carries only the protocol.
  *
@@ -141,6 +142,7 @@ public final class ForgeBridge {
         String logPath = "";
         final List<String> decks = new ArrayList<>();
         final List<String> profiles = new ArrayList<>();
+        final List<String> seatMonteCarlo = new ArrayList<>();
 
         static Job parse(final String line) {
             final Job job = new Job();
@@ -160,6 +162,7 @@ public final class ForgeBridge {
                     case "log": job.logPath = value; break;
                     case "deck": job.decks.add(value); break;
                     case "profile": job.profiles.add(value); break;
+                    case "seatmc": job.seatMonteCarlo.add(value); break;
                     default: break;
                 }
             }
@@ -227,6 +230,8 @@ public final class ForgeBridge {
                 setFieldIfPresent(game, "AI_FLAT_MONTE_CARLO_MAX", Boolean.TRUE);
             }
         }
+
+        applySeatMonteCarlo(game, seats, job.seatMonteCarlo);
 
         final Tracker tracker = new Tracker(game, seats);
         game.subscribeToEvents(tracker);
@@ -340,6 +345,31 @@ public final class ForgeBridge {
             DECK_CACHE.put(path, deck);
         }
         return deck;
+    }
+
+    /**
+     * Gives individual seats their own Monte Carlo setting, so the search can be switched on just
+     * for the decks the plain heuristics play badly. Forge exposes this per player for its own
+     * A/B tests; on versions without it the request fails rather than being silently ignored.
+     */
+    private static void applySeatMonteCarlo(final Game game, final List<RegisteredPlayer> seats, final List<String> modes) {
+        if (modes.isEmpty()) {
+            return;
+        }
+        for (final Player p : game.getRegisteredPlayers()) {
+            final int seat = seats.indexOf(p.getRegisteredPlayer());
+            final String mode = seat >= 0 && seat < modes.size() ? modes.get(seat) : "";
+            if (mode.isEmpty()) {
+                continue;
+            }
+            try {
+                final Object ai = p.getController().getClass().getMethod("getAi").invoke(p.getController());
+                ai.getClass().getMethod("setFlatMonteCarloOverride", Boolean.class).invoke(ai, !"off".equals(mode));
+                ai.getClass().getMethod("setFlatMonteCarloMaxOverride", Boolean.class).invoke(ai, "max".equals(mode));
+            } catch (final ReflectiveOperationException e) {
+                throw new IllegalArgumentException("this Forge version does not support per-player Monte Carlo settings");
+            }
+        }
     }
 
     private static LobbyPlayer createAi(final String name, final String profile) throws Exception {

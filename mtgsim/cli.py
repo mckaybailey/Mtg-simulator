@@ -167,10 +167,22 @@ def _entrants(ctx: Context, groups: Sequence[Tuple[Sequence[str], str]]) -> Tupl
             weight=float(share) if isinstance(share, (int, float)) and share > 0 else None,
             category=str(info.get("category") or ""),
             pilot=str(info.get("ai_pilot") or ""),
+            ai_profile=str(info.get("ai_profile") or ""),
+            ai_mc=_mc_setting(info.get("ai_mc"), deck.name),
         ))
         if deck.name in notes_by_name:
             notes[key] = notes_by_name[deck.name]
+    for entrant in entrants:
+        _check_profile_name(ctx, entrant.ai_profile, f" (set for {entrant.deck.name})")
     return entrants, notes
+
+
+def _mc_setting(value, deck_name: str) -> str:
+    if value in (None, ""):
+        return ""
+    if value not in ("off", "on", "max"):
+        raise UserError(f"ai_mc for {deck_name} must be off, on or max, not {value!r}")
+    return str(value)
 
 
 def _options(args: argparse.Namespace) -> RunOptions:
@@ -178,7 +190,8 @@ def _options(args: argparse.Namespace) -> RunOptions:
         raise UserError("--games must be at least 1")
     return RunOptions(
         games=args.games, seed=args.seed, timeout=args.timeout, workers=args.workers,
-        heap=args.heap, monte_carlo=args.mc, ai_profile=args.ai_profile or "", save_logs=args.save_logs,
+        heap=args.heap, monte_carlo=args.mc or "off", ai_profile=args.ai_profile or "", save_logs=args.save_logs,
+        force_profile=bool(args.ai_profile), force_monte_carlo=args.mc is not None,
     )
 
 
@@ -195,12 +208,15 @@ def _run_dir(args: argparse.Namespace, kind: str, label: str) -> Path:
 
 
 def _check_ai_profile(ctx: Context) -> None:
-    profile = getattr(ctx.args, "ai_profile", None)
+    _check_profile_name(ctx, getattr(ctx.args, "ai_profile", None))
+
+
+def _check_profile_name(ctx: Context, profile: Optional[str], where: str = "") -> None:
     if not profile:
         return
     available = sorted(p.stem for p in (ctx.install.res / "ai").glob("*.ai"))
     if profile not in available:
-        raise UserError(f"unknown AI profile \"{profile}\". Available: {', '.join(available)}")
+        raise UserError(f"unknown AI profile \"{profile}\"{where}. Available: {', '.join(available)}")
 
 
 def _finish(ctx: Context, run_dir: Path, summary: dict) -> None:
@@ -620,7 +636,7 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
     p.add_argument("--strict", action="store_true", help="refuse to simulate decks that break format rules")
     p.add_argument("--timeout", type=int, default=180, help="seconds before a game is stopped and counted as unfinished")
     p.add_argument("--ai-profile", help="Forge AI profile for both players (Default, Reckless, Cautious, ...)")
-    p.add_argument("--mc", choices=("off", "on", "max"), default="off",
+    p.add_argument("--mc", choices=("off", "on", "max"), default=None,
                    help="Forge's Monte Carlo AI look-ahead: slower, and results are no longer exactly reproducible")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")

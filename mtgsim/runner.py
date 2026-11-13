@@ -37,6 +37,7 @@ class Job:
     monte_carlo: str = "off"
     log_path: str = ""
     profiles: List[str] = field(default_factory=list)
+    seat_monte_carlo: List[str] = field(default_factory=list)  # per seat; "" follows ``monte_carlo``
     meta: dict = field(default_factory=dict)
 
     def line(self) -> str:
@@ -46,6 +47,8 @@ class Job:
         ]
         parts += [f"deck={d}" for d in self.decks]
         parts += [f"profile={p}" for p in self.profiles]
+        if any(self.seat_monte_carlo):
+            parts += [f"seatmc={m}" for m in self.seat_monte_carlo]
         for part in parts:
             if "\t" in part or "\n" in part:
                 raise ValueError(f"job field may not contain tabs or newlines: {part!r}")

@@ -40,6 +40,8 @@ class Entrant:
     weight: Optional[float] = None  # share of the metagame, used to weight gauntlet results
     category: str = ""
     pilot: str = ""  # how well the AI plays this deck compared with people: "weak", "fair", "strong" or unknown
+    ai_profile: str = ""  # Forge AI profile for this deck's seat ("" = the run's default)
+    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max" ("" = the run's default)
     dck_path: str = ""
 
     def describe(self) -> dict:
@@ -50,6 +52,8 @@ class Entrant:
             "weight": self.weight,
             "category": self.category,
             "ai_pilot": self.pilot,
+            "ai_profile": self.ai_profile or None,
+            "ai_mc": self.ai_mc or None,
             "source": str(self.deck.path) if self.deck.path else None,
             "fingerprint": self.deck.fingerprint(),
             "main_count": self.deck.main_count,
@@ -68,6 +72,9 @@ class RunOptions:
     heap: str = "2g"
     monte_carlo: str = "off"
     ai_profile: str = ""
+    # When set (--ai-profile / --mc given), they apply to every seat and override per-deck settings.
+    force_profile: bool = False
+    force_monte_carlo: bool = False
     save_logs: bool = False
 
     def describe(self) -> dict:
@@ -127,10 +134,17 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
             timeout=options.timeout,
             monte_carlo=options.monte_carlo,
             log_path=log_path,
-            profiles=[options.ai_profile, options.ai_profile] if options.ai_profile else [],
+            profiles=_seat_profiles(seats, options),
+            seat_monte_carlo=[] if options.force_monte_carlo else [s.ai_mc for s in seats],
             meta={"a": a.key, "b": b.key, "game": i, "seats": [s.key for s in seats]},
         ))
     return jobs
+
+
+def _seat_profiles(seats: List[Entrant], options: RunOptions) -> List[str]:
+    if options.force_profile or not any(s.ai_profile for s in seats):
+        return [options.ai_profile] * len(seats) if options.ai_profile else []
+    return [s.ai_profile or options.ai_profile for s in seats]
 
 
 def write_decks(entrants: List[Entrant], run_dir: Path) -> None:

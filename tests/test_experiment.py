@@ -61,6 +61,30 @@ class SeedAndPlanTest(unittest.TestCase):
         self.assertEqual(4, len({j.seed for j in jobs}))
         self.assertTrue(all(j.timeout == 99 and j.log_path == "" for j in jobs))
 
+    def test_per_deck_ai_settings_follow_the_deck_to_its_seat(self):
+        a, b = _entrants()
+        a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
+        a.ai_profile, a.ai_mc = "Cautious", "max"
+        jobs = experiment.plan_pairing(a, b, RunOptions(games=2), Path("/tmp/run"))
+        self.assertEqual([["Cautious", ""], ["", "Cautious"]], [j.profiles for j in jobs])
+        self.assertEqual([["max", ""], ["", "max"]], [j.seat_monte_carlo for j in jobs])
+        self.assertIn("seatmc=max\tseatmc=", jobs[0].line())
+
+    def test_command_line_ai_settings_override_per_deck_ones(self):
+        a, b = _entrants()
+        a.ai_profile, a.ai_mc = "Cautious", "max"
+        forced = RunOptions(games=1, ai_profile="Reckless", force_profile=True, monte_carlo="off", force_monte_carlo=True)
+        job = experiment.plan_pairing(a, b, forced, Path("/tmp/run"))[0]
+        self.assertEqual(["Reckless", "Reckless"], job.profiles)
+        self.assertEqual([], job.seat_monte_carlo)
+        self.assertNotIn("seatmc", job.line())
+
+    def test_no_per_deck_settings_adds_nothing_to_the_job(self):
+        a, b = _entrants()
+        job = experiment.plan_pairing(a, b, RunOptions(games=1), Path("/tmp/run"))[0]
+        self.assertEqual([], job.profiles)
+        self.assertNotIn("seatmc", job.line())
+
     def test_unique_keys(self):
         self.assertEqual(["mono-red", "mono-red-2", "deck", "a-b-s-c"],
                          experiment.unique_keys(["Mono Red", "mono-red", "???", "A // B's C"]))

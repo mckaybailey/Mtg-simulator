@@ -547,6 +547,10 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
         main = "".join(f"<div>{n} {esc(c)}</div>" for c, n in info["main"].items())
         side = "".join(f"<div>{n} {esc(c)}</div>" for c, n in info.get("side", {}).items())
         role = {"hero": "deck under test", "variant": "variant"}.get(info.get("role"), info.get("category") or "opponent")
+        ai = [x for x in (info.get("ai_profile") and f"AI profile {info['ai_profile']}",
+                          info.get("ai_mc") and f"Monte Carlo {info['ai_mc']}") if x]
+        if ai:
+            role += " (" + ", ".join(ai) + ")"
         out.append(f'<details{" open" if info.get("role") in ("hero", "variant") else ""}>'
                    f'<summary>{esc(info["name"])} — {esc(role)}, {info["main_count"]} cards</summary>'
                    f'<div class="decklist">{main}</div>'

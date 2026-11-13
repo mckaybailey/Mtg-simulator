@@ -125,8 +125,8 @@ are warnings unless you pass `--strict`.
 | `--vs PATH...` | opponent decklists or folders (default `decks/standard/meta`) |
 | `--seed 7` | base random seed; the same seed and decks replay exactly the same games |
 | `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished |
-| `--ai-profile Reckless` | Forge AI personality for both players (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`) |
-| `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting): slower, and because it thinks against a clock the same seed no longer replays the same game |
+| `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`); overrides per-deck settings |
+| `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting) for every player: slower, and because it thinks against a clock the same seed no longer replays the same game; overrides per-deck settings |
 | `--save-logs` | keep Forge's full play-by-play log of every game |
 
 ### How long it takes

@@ -81,4 +81,8 @@ What this means in practice:
 
 Any folder of decklists works: `python -m mtgsim gauntlet mydeck.txt --vs path/to/folder`.
 A `gauntlet.json` in the folder is optional; it supplies display names, an archetype label
-and `meta_share` (percent of the field), which enables the meta-weighted win rate.
+and `meta_share` (percent of the field), which enables the meta-weighted win rate. Two more
+optional fields set how the AI pilots one deck: `ai_profile` (a Forge AI profile such as
+`Cautious` or `Hardest`) and `ai_mc` (`on` or `max` turns Forge's Monte Carlo search on for
+that deck only; games involving it get slower). `--ai-profile` and `--mc` on the command line
+override them for every deck.
