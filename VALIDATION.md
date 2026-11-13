@@ -19,7 +19,8 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
-| Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical; see below |
+| Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
+| Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 
 ## The pipeline behaves correctly
 
@@ -150,7 +151,8 @@ uses about 0.9–1.2 GB of memory.
 
 ## Forge patches
 
-`setup --build` applies the patches in `mtgsim/forge_patches/` (none ship yet). The mechanism
+`setup --build` applies the patches in `mtgsim/forge_patches/` (eight ship; see "Fixing the cards the
+AI never cast"). The mechanism
 was checked on 13 November 2026 in an empty `MTGSIM_HOME`, with throwaway patches that were not
 committed: a card-script hint for Grizzly Bears, a second one for Raging Goblin, and a Java patch
 that adds a new class to `forge-ai`. Maven had the shared `~/.m2` cache; times are wall clock on
@@ -202,8 +204,65 @@ What the signals showed in those 60 games (first version):
   evaluation the check uses, so that column only catches cards whose own AI logic aims
   elsewhere.
 
-These are pointers for reading card scripts and AI code, not measured misplays. No experiment
-has yet shown that fixing one of them changes a win rate.
+These are pointers for reading card scripts and AI code, not measured misplays; the next
+section shows what fixing the top ones did.
+
+**The whole round robin, replayed.** The 1,650-game meta round robin (seed 1, 30 games per
+pairing) was re-run with the merged driver (misplay tracking plus the per-run AI profile folder)
+on the same unpatched Forge: all 1,650 games identical to the baseline, field by field.
+
+## Fixing the cards the AI never cast
+
+`python3 -m mtgsim misplays` on that round robin put one or two cards at the top of three decks
+that the AI held in almost every game it drew them and almost never cast (seen = games the card
+was in the opening hand or drawn):
+
+| Deck | Card | Hits per 100 games | Seen | Cast |
+|---|---|---|---|---|
+| Azorius Momo | Springleaf Drum | 71 | 230 | 0 |
+| Azorius Control | Countersculpt | 56 | 259 | 0 |
+| Azorius Control | Jace's Machinations | 56 | 228 | 0 |
+| Azorius Momo | Nurturing Pixie | 46 | 165 | 5 |
+| Dimir Uldaros | Seasoned Cryomancer | 39 | 209 | 7 |
+| Azorius Momo | Practiced Offense | 30 | 184 | 0 |
+| Dimir Uldaros | Uldaros Theorix | 18 | 188 | 3 |
+
+Each traced to a gap in Forge's AI code at the pinned commit (an API with no AI class, a missing
+`AILogic`, an `AI:RemoveDeck` filter, enter-the-battlefield checks that refuse a creature over an
+optional trigger). The eight patches in `mtgsim/forge_patches/` fix them; its README lists cause
+and fix per card, and each patch header carries its measurement. Each deck was measured against
+the other ten meta decks, 100 games per opponent, seed 1, on a private copy of the Forge checkout,
+without and with its patches; the games share seeds, so the paired interval is also given:
+
+| Deck (patches) | Without | With | Difference, 95% CI | Mirror, patched (200 games) |
+|---|---|---|---|---|
+| Azorius Control (0001 Empower AI) | 22.4% (20–25%) | 39.9% (37–43%) | +17.5 (+13.5 to +21.4; paired +14.7 to +20.3) | |
+| Azorius Control (0001 + 0002) | 22.4% (20–25%) | 47.8% (45–51%) | +25.4 (+21.3 to +29.4; paired +22.3 to +28.5) | 54.0% (47–61%) |
+| Azorius Momo (0003–0005, 0008) | 44.9% (42–48%) | 54.2% (51–57%) | +9.3 (+4.9 to +13.6) | 50.0% (43–57%) |
+| Dimir Uldaros (0006, 0007) | 30.1% (27–33%) | 33.9% (31–37%) | +3.8 (−0.3 to +7.9), not reliable | 51.0% (44–58%) |
+
+After the fixes the cards are cast in most games they are seen in: Countersculpt 690 of 874,
+Jace's Machinations 600 of 799, Springleaf Drum 655 of 728, Practiced Offense 579 of 629,
+Nurturing Pixie 417 of 483, Seasoned Cryomancer 478 of 679, Uldaros Theorix 326 of 632. Fixing
+Practiced Offense exposed an engine crash (5 of 1,000 Momo games: `PumpEffect` read a target that
+had left in response), which patch 0008 fixes. Dimir Uldaros's patches are kept although its
+gain is not significant: without them two of its cards could not be cast at all.
+
+**What the fixes do to the calibration.** The round robin on the patched engine
+(`setup --build` with all eight patches, same command and seed):
+
+| | Baseline | Patched | Patched minus baseline, 95% interval |
+|---|---|---|---|
+| Rank correlation with real win rates | 0.24 (noise 0.12–0.35) | 0.11 (−0.05–0.25) | −0.13 (−0.32 to +0.08) |
+| Pearson correlation | 0.23 | 0.08 | −0.15 (−0.31 to +0.02) |
+| Mean absolute gap | 13.0 pts (11.8–14.5) | 10.8 pts (9.4–12.5) | −2.2 (−4.1 to −0.3) |
+
+The decks the fixes touch moved towards their real win rates (Azorius Control −26.9 → −3.9
+points, Azorius Momo −3.8 → +1.9), and the average gap shrank by more than the noise. The ranking
+did not improve: Boros Dwarves (+19.8) and Boros Dragons (+18.7) are still the most overrated,
+Jund Sacrifice, the best real deck, is still 20 points low, and Azorius Artifacts fell to −8.1,
+partly because the repaired control deck now beats it. Fixing cards the AI could not cast at all
+is a correctness fix; what remains is how Forge's AI plays the cards it can cast.
 
 ## The goldfish model
 
