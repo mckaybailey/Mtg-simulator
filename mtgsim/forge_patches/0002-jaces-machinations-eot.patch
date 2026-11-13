@@ -4,7 +4,11 @@ Why: The card is an Effect spell with no AILogic, and EffectAi refuses any Effec
   baseline round robin). Its value is the Empower Jace 8 rider; AILogic$ AtOppEOT makes the AI
   consider it only at the end of the opponent's turn, when mana held up for counterspells is
   otherwise wasted, as a control player would.
-Measured: MEASUREMENT_PENDING
+Measured: same command as 0001. With 0001 only: 39.9% (95% CI 37-43%); with 0001 and 0002: 47.8%
+  (45-51%, 478-522), +7.9 points over 0001 alone (95% CI +3.6 to +12.2; paired over the same seeds
+  +5.2 to +10.6: 135 losses became wins, 56 wins became losses); Jace's Machinations cast in 600 of
+  the 799 games it was seen in (0 before). Both together against no patches: +25.4 points (+21.3 to
+  +29.4). Azorius Control mirror on the patched engine (200 games): 54.0% (47-61%), no time-outs.
 
 diff --git a/forge-gui/res/cardsfolder/j/jaces_machinations.txt b/forge-gui/res/cardsfolder/j/jaces_machinations.txt
 index 2b7643b..2f6fabe 100644

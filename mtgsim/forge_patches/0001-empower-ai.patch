@@ -8,7 +8,13 @@ Why: Forge has no AI class for ApiType.Empower, so SpellApiToAi falls back to Ca
   needed), so the new EmpowerAi always accepts it as a rider on a spell, and uses a stand-alone
   Empower ability (Theorist's Sanctum) at the end of the opponent's turn, when mana held up for
   instants would otherwise go unused.
-Measured: MEASUREMENT_PENDING
+Measured: `mtgsim gauntlet decks/standard/meta/azorius-control.txt --vs <the other ten meta decks>
+  -n 100 --seed 1`, default AI, Forge 7db198d72e, 13 Nov 2026, on a private copy of the checkout.
+  Without patches: 22.4% (95% CI 20-25%, 224-776); Countersculpt cast in 0 of the 865 games it was
+  seen in, Jace's Machinations in 0 of 791. With 0001: 39.9% (37-43%, 399-601), +17.5 points (95% CI
+  +13.5 to +21.4; paired over the same seeds +14.7 to +20.3: 203 losses became wins, 28 wins became
+  losses); Countersculpt cast in 666 of 868 games seen. Mirror on the engine with 0001 and 0002
+  (`match azorius-control azorius-control -n 200 --seed 1`): 54.0% (47-61%), no time-outs.
 
 diff --git a/forge-ai/src/main/java/forge/ai/SpellApiToAi.java b/forge-ai/src/main/java/forge/ai/SpellApiToAi.java
 index b830a455..55a179a8 100644

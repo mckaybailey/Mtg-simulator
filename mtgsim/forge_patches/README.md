@@ -5,8 +5,32 @@ mtgsim's own changes to Forge: unified diffs against the pinned Forge commit
 `*.patch` file in this folder, in file-name order, after checking out that commit. A Forge you
 supply with `setup --forge-dir` is never modified.
 
-The folder ships empty apart from this README until a patch has been measured (see the last
-section).
+## The shipped series
+
+Each patch fixes a card the AI held but never (or almost never) cast in the meta round robin.
+Found with `python3 -m mtgsim misplays` and Forge's worker logs; every patch header says which
+code path refused the card and how it was measured. Gauntlet numbers are the deck against the
+other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
+
+| Patch | Card (deck) | Cause | Kind |
+|---|---|---|---|
+| 0001 | Countersculpt, Theorist's Sanctum, Vraska's Final Mercy (Empower) | `ApiType.Empower` had no AI, so `CannotPlayAi` refused every spell with an Empower rider | Java (new `EmpowerAi`) |
+| 0002 | Jace's Machinations (Azorius Control) | `EffectAi` refuses Effect spells without `AILogic` | card script |
+| 0003 | Springleaf Drum (Azorius Momo) | default AI drops `AI:RemoveDeck:All` cards from its candidate plays | card script |
+| 0004 | Practiced Offense (Azorius Momo) | forge-ai ignores `KWChoice`, so the pump step looked useless | card script |
+| 0005 | Nurturing Pixie (Azorius Momo) | ETB bounce refused by `checkETBEffects`, so the creature was never cast | card script |
+| 0006 | Uldaros Theorix (Dimir Uldaros) | same ETB refusal (graveyard pump steps with nothing to aim at) | card script |
+| 0007 | Seasoned Cryomancer (Dimir Uldaros) | stun step has 0 legal targets when the cast is evaluated | card script |
+| 0008 | Practiced Offense (engine crash) | `PumpEffect` read a target from an empty list when the target left in response | Java |
+
+| Deck | Without | With its patches | Difference (95% CI) | Mirror, patched |
+|---|---|---|---|---|
+| Azorius Control (0001, 0002) | 22.4% (20–25%) | 47.8% (45–51%) | +25.4 (+21.3 to +29.4) | 54.0% (47–61%) |
+| Azorius Momo (0003–0005, 0008) | 44.9% (42–48%) | 54.2% (51–57%) | +9.3 (+4.9 to +13.6) | 50.0% (43–57%) |
+| Dimir Uldaros (0006, 0007) | 30.1% (27–33%) | 33.9% (31–37%) | +3.8 (−0.3 to +7.9), not reliable | 51.0% (44–58%) |
+
+Patches that share a deck were measured together, except 0001 and 0002 (0001 alone: +17.5,
+CI +13.5 to +21.4).
 
 ## What `setup --build` does with them
 
