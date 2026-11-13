@@ -8,7 +8,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 229 pass |
+| Unit tests (no Forge needed) | 233 pass |
 | Integration tests (real games) | 4 pass |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
