@@ -7,7 +7,13 @@ Why: The ETB is a chain of DB$ Pump steps that pick up to one card of each type 
   graveyard. OptionalDecider$ You makes the trigger optional (same outcome as choosing no
   targets), so the AI casts Theorix as a 5/5 flier and declines the ETB as before. Making the
   AI use the ETB would need Java (PumpAi target selection for graveyard "choose" steps).
-Measured: PENDING (filled in from the before/after gauntlets).
+Measured: `mtgsim gauntlet decks/standard/meta/dimir-uldaros.txt --vs <the other ten meta decks> -n 100
+  --seed 1`, default AI, Forge 7db198d72e, on 13 Nov 2026. Arm without patches: 30.1% (95% CI
+  27-33%, 301-699). Arm with 0006 and 0007 together (separate shares not measured): 33.9%
+  (31-37%, 339-661). Difference +3.8 points, 95% CI -0.3 to +7.9, p = 0.07: not a reliable
+  change on 1,000 games each. Mirror on the patched engine (`match dimir-uldaros dimir-uldaros
+  -n 200 --seed 1`): 51.0% (44-58%).
+  Uldaros Theorix cast in 326 of 632 games where it was seen (13 of 616 without).
 
 diff --git a/forge-gui/res/cardsfolder/u/uldaros_theorix.txt b/forge-gui/res/cardsfolder/u/uldaros_theorix.txt
 index 2f9973c..aa8a4c0 100644

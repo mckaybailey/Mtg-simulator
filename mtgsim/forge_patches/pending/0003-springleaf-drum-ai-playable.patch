@@ -5,7 +5,15 @@ Why: AiController.chooseSpellAbilityToPlay drops every card marked AI:RemoveDeck
   games, cast in 0). The AI can use it once cast: ComputerUtilMana pays a mana ability's
   "tap an untapped creature" cost through checkTapTypeCost / chooseTapType, which taps the
   lowest-power untapped creature. Removes the hint; nothing else changes.
-Measured: PENDING (filled in from the before/after gauntlets).
+Measured: `mtgsim gauntlet decks/standard/meta/azorius-momo.txt --vs <the other ten meta decks> -n 100
+  --seed 1`, default AI, Forge 7db198d72e, on 13 Nov 2026. Arm without patches: 44.9% (95% CI
+  42-48%, 449-551). Arm with 0003, 0004 and 0005 together (Momo's three patches; their separate
+  shares were not measured): 54.3% (51-57%, 540-455 of 995 decided; the other 5 were engine
+  errors that 0008 fixes; with 0008 the full 1,000 come to 542-458, 54.2%, 51-57%).
+  Difference +9.4 points, 95% CI +5.0 to +13.7, p < 0.001. Mirror on the patched engine
+  (`match azorius-momo azorius-momo -n 200 --seed 1`): 50.0% (43-57%).
+  Springleaf Drum cast in 655 of 728 games where it was seen (0 of 749 without). The AI does tap
+  a creature for its mana: 21 activations paying for spells in a 10-game logged match.
 
 diff --git a/forge-gui/res/cardsfolder/s/springleaf_drum.txt b/forge-gui/res/cardsfolder/s/springleaf_drum.txt
 index 7203571..1c5b458 100644
