@@ -13,7 +13,7 @@
    "source_url": "https://melee.gg/Decklist/View/a2eca677-626f-4322-9d84-b4e7010629fc",
    "source_date": "2026-10-24",
    "real_win_rate": 53.4,
-   "sim_win_rate": 52.0,
+   "sim_win_rate": 49.3,
    "ai_pilot": "fair"
   },
   {
@@ -26,7 +26,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 54.5,
-   "sim_win_rate": 61.3,
+   "sim_win_rate": 58.0,
    "ai_pilot": "fair"
   },
   {
@@ -39,7 +39,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 49.2,
-   "sim_win_rate": 31.3,
+   "sim_win_rate": 32.7,
    "ai_pilot": "weak"
   },
   {
@@ -52,8 +52,8 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 44.3,
-   "sim_win_rate": 37.7,
-   "ai_pilot": "fair"
+   "sim_win_rate": 33.7,
+   "ai_pilot": "weak"
   },
   {
    "file": "jund-sacrifice.txt",
@@ -65,7 +65,7 @@
    "source_url": "https://melee.gg/Decklist/View/5e81449d-aa58-4409-b137-b4ed0006ea1c",
    "source_date": "2026-10-24",
    "real_win_rate": 57.6,
-   "sim_win_rate": 41.0,
+   "sim_win_rate": 37.7,
    "ai_pilot": "weak"
   },
   {
@@ -78,7 +78,7 @@
    "source_url": "https://melee.gg/Decklist/View/423954dd-0eac-429c-94c9-b4e3014be08b",
    "source_date": "2026-10-24",
    "real_win_rate": 53.6,
-   "sim_win_rate": 66.3,
+   "sim_win_rate": 65.0,
    "ai_pilot": "strong"
   },
   {
@@ -91,8 +91,8 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 46.6,
-   "sim_win_rate": 19.7,
-   "ai_pilot": "weak"
+   "sim_win_rate": 42.7,
+   "ai_pilot": "fair"
   },
   {
    "file": "boros-dragons.txt",
@@ -104,7 +104,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 45.0,
-   "sim_win_rate": 68.3,
+   "sim_win_rate": 63.7,
    "ai_pilot": "strong"
   },
   {
@@ -117,7 +117,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 54.8,
-   "sim_win_rate": 52.7,
+   "sim_win_rate": 46.7,
    "ai_pilot": "fair"
   },
   {
@@ -130,7 +130,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 50.2,
-   "sim_win_rate": 74.7,
+   "sim_win_rate": 70.0,
    "ai_pilot": "strong"
   },
   {
@@ -143,9 +143,9 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 48.8,
-   "sim_win_rate": 45.0,
+   "sim_win_rate": 50.7,
    "ai_pilot": "fair"
   }
  ],
- "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05. sim_win_rate is its average win rate against the other ten decks in a 1,650-game mtgsim round robin (30 games per pairing, Forge AI on both sides, Forge commit 7db198d72e). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
+ "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05. sim_win_rate is its average win rate against the other ten decks in a 1,650-game mtgsim round robin (30 games per pairing, seed 1, Forge AI on both sides, Forge commit 7db198d72e with mtgsim's eight Forge patches, combined hash e53414644b43, applied; re-measured 2026-11-13). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
 }

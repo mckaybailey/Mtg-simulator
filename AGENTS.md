@@ -40,7 +40,8 @@ measured and how far results can be trusted. Each folder with code or data has i
 Always pass on the limits with the numbers:
 
 - The pilot is Forge's AI. Simulated meta win rates barely track real ones (rank correlation
-  0.24): creature decks are overrated, control and value decks underrated. Wins against opponents
+  0.11 with mtgsim's Forge patches, 0.24 before; mean gap 10.8 points): creature decks are
+  overrated, Jund Sacrifice, Dimir Uldaros and Izzet Spellementals underrated. Wins against opponents
   marked `ai_pilot: weak` say little.
 - Games are best-of-one without sideboards.
 - A matchup is only decided when its 95% interval excludes 50%; an A/B difference only when the

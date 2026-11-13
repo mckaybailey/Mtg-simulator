@@ -15,7 +15,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Mirror match (identical decks, 400 games) | 48.9%, 95% CI 44–54% (expected 50%) |
 | Lopsided match (meta deck vs 40 lands + 20 Llanowar Elves) | 93.3%, CI 84–97% |
 | A/B with a deliberately worse variant | detected: +12.5 points, CI +6.8 to +18.2, p < 0.001 |
-| Simulated vs real meta win rates | weak agreement (rank correlation 0.24); see below |
+| Simulated vs real meta win rates | weak agreement: rank correlation 0.11 with the Forge patches (0.24 before, within noise of each other), mean gap 10.8 points (13.0 before); see below |
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |

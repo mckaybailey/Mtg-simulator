@@ -32,29 +32,33 @@ every list are in `gauntlet.json`. The archetype types are a judgement call in a
 
 Results against this gauntlet depend heavily on how well Forge's AI pilots each opponent.
 To measure that, all eleven decks were played against each other in the simulator (1,650
-games, 30 per pairing) and each deck's simulated win rate was set beside its real-world
-match win rate from the same Magic.gg table:
+games, 30 per pairing, seed 1) and each deck's simulated win rate was set beside its real-world
+match win rate from the same Magic.gg table. "Simulated" is on Forge with mtgsim's eight Forge
+patches (`mtgsim/forge_patches/`), which fix cards the AI held but could never cast; "before
+fixes" is the same round robin on unpatched Forge:
 
-| Deck | Real win rate | Simulated | Gap | AI pilot |
-|---|---|---|---|---|
-| Boros Dwarves | 50.2% | 74.7% | +24.5 | strong |
-| Boros Dragons | 45.0% | 68.3% | +23.3 | strong |
-| Orzhov Lifegain | 53.6% | 66.3% | +12.7 | strong |
-| Dimir Midrange | 54.5% | 61.3% | +6.8 | fair |
-| Azorius Artifacts | 54.8% | 52.7% | −2.1 | fair |
-| Mono-Green Landfall | 53.4% | 52.0% | −1.4 | fair |
-| Azorius Momo | 48.8% | 45.0% | −3.8 | fair |
-| Izzet Spellementals | 44.3% | 37.7% | −6.6 | fair |
-| Jund Sacrifice | 57.6% | 41.0% | −16.6 | weak |
-| Dimir Uldaros | 49.2% | 31.3% | −17.9 | weak |
-| Azorius Control | 46.6% | 19.7% | −26.9 | weak |
+| Deck | Real win rate | Simulated | Gap | AI pilot | Before fixes |
+|---|---|---|---|---|---|
+| Boros Dwarves | 50.2% | 70.0% | +19.8 | strong | 74.7% |
+| Boros Dragons | 45.0% | 63.7% | +18.7 | strong | 68.3% |
+| Orzhov Lifegain | 53.6% | 65.0% | +11.4 | strong | 66.3% |
+| Dimir Midrange | 54.5% | 58.0% | +3.5 | fair | 61.3% |
+| Azorius Momo | 48.8% | 50.7% | +1.9 | fair | 45.0% |
+| Azorius Control | 46.6% | 42.7% | −3.9 | fair | 19.7% |
+| Mono-Green Landfall | 53.4% | 49.3% | −4.1 | fair | 52.0% |
+| Azorius Artifacts | 54.8% | 46.7% | −8.1 | fair | 52.7% |
+| Izzet Spellementals | 44.3% | 33.7% | −10.6 | weak | 37.7% |
+| Dimir Uldaros | 49.2% | 32.7% | −16.5 | weak | 31.3% |
+| Jund Sacrifice | 57.6% | 37.7% | −19.9 | weak | 41.0% |
 
-The two columns barely agree (rank correlation about 0.24). The AI wins with decks that
-turn creatures sideways and loses with decks that need planning: Jund Sacrifice, the best
-deck in the real field, comes out fourth from the bottom, and Azorius Control wins one game
-in five. The comparison is rough (the real figures are best-of-three matches with
-sideboards against the whole field, played by people of varying skill), but gaps of 17 to
-27 points are far outside its error.
+The fixes brought the decks they touch close to their real win rates (Azorius Control could
+not cast seven of its sixty cards and won one game in five) and cut the average gap from 13.0
+to 10.8 points, but the two columns still barely agree on the order (rank correlation 0.11,
+before 0.24; the difference is within the noise). The AI wins with decks that turn creatures
+sideways and loses with decks that need planning: Jund Sacrifice, the best deck in the real
+field, comes out third from the bottom. The comparison is rough (the real figures are
+best-of-three matches with sideboards against the whole field, played by people of varying
+skill), but gaps of 16 to 20 points are far outside its error.
 
 What this means in practice:
 
@@ -73,9 +77,9 @@ What this means in practice:
   swapped between two cards in a list would not have been caught by those checks.
 - Four-Color Control (4.6% of the field) is missing because no consistent list could be
   retrieved, and there is no dedicated combo deck: none of the top twelve archetypes is one.
-- Forge's AI pilots these decks, and it is much better with the aggro and midrange decks
-  than with the control decks (Azorius Control, Azorius Artifacts, Dimir Uldaros) or the
-  spell-heavy Izzet deck. Results against those four say more about the AI than the matchup.
+- Forge's AI pilots these decks, and it is much better with the aggro decks and creature-based
+  midrange than with Jund Sacrifice, Dimir Uldaros and the spell-heavy Izzet deck. Results
+  against those three say more about the AI than the matchup.
 
 ## Using your own field
 
@@ -87,7 +91,10 @@ optional fields set how the AI pilots one deck: `ai_profile` (a Forge AI profile
 that deck only; games involving it get slower). `--ai-profile` and `--mc` on the command line
 override them for every deck.
 
-The shipped `gauntlet.json` sets neither. Adding `"ai_mc": "max"` to the three `weak` decks
-(Jund Sacrifice, Dimir Uldaros, Azorius Control) brings their simulated win rates close to the
-real ones, but makes runs about three times slower and no longer exactly reproducible from the
-seed, and it does not improve the overall ranking (see `VALIDATION.md`).
+The shipped `gauntlet.json` sets neither. On unpatched Forge, adding `"ai_mc": "max"` to the
+three decks then rated `weak` (Jund Sacrifice, Dimir Uldaros, Azorius Control) brought their
+simulated win rates close to the real ones, but made runs about three times slower and no
+longer exactly reproducible from the seed, and it did not improve the overall ranking (see
+`VALIDATION.md`). That was measured before the Forge patches; part of Monte Carlo's gain for
+Azorius Control was plausibly its trying plays (such as Countersculpt) that the patched AI now
+makes on its own, but that has not been measured.

@@ -35,8 +35,9 @@ What you can do with it:
   win rates.
 - **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,650-game
   round robin of the eleven included meta decks, simulated win rates barely tracked the
-  decks' real tournament win rates (rank correlation about 0.24): creature decks came out
-  on top and the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
+  decks' real tournament win rates (rank correlation 0.11, average gap 11 points, even after
+  mtgsim's Forge patches for cards the AI could not cast): creature decks came out on top and
+  the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
   therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
 - **Games are best-of-one with no sideboarding.** Sideboards are read and checked but never
