@@ -21,6 +21,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
+| Profile tuning on the meta (16 candidates, 12,010 games, 2 decks held out) | no profile beats Forge's default beyond noise (training rank correlation +0.18, noise −0.20 to +0.43; held-out gap −0.8 points, noise −5.8 to +4.7); none shipped |
 
 ## The pipeline behaves correctly
 
@@ -107,8 +108,9 @@ improvement in an A/B test needs about 1,500 games per version.
 
 ## The profile-tuning harness (`tune`)
 
-Checked before any real tuning run, on an unpatched Forge (no Forge patches shipped yet); the
-search itself has not been run on the meta yet.
+The harness was checked first on an unpatched Forge (no Forge patches shipped yet). The full
+search was then run on the meta with all eight patches: no profile it found beats Forge's
+default settings beyond game noise ([below](#the-search-on-the-meta-no-profile-shipped)).
 
 **The metrics reproduce the baseline.** The 1,650-game round robin above (seed 1, 30 games per
 pairing) was imported into `tune` (all 1,650 games qualified as identical to the games `tune` would
@@ -141,6 +143,49 @@ the choice of decks alone is about −0.44 to 0.74 at the baseline's 0.24 (Fishe
 of 0.24, 60 at 0.5 and 30 at 0.7; ±0.1 about 360, 230 and 110. Matchup-level data adds points
 only where each matchup has roughly 100 real matches (±10 points). `tune` prints this for every
 run.
+
+### The search on the meta: no profile shipped
+
+`python3 -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --import runs/rr-patched-n30-s1`
+on the patched engine (seed 1, the default 21-setting space, 3 profiles per group, 16 candidates:
+Default or one of 3 generated profiles for the reactive decks, times the same for the proactive decks). Boros Dragons and Dimir
+Uldaros, two of the worst-calibrated decks, were held out and played but never used to choose.
+Round 1 played 10 games per pairing, round 2 30 for the best 7; the winner and Default were then
+replayed on 30 fresh games per pairing (games 30–59) that took no part in the choice. 12,010 new
+games plus the 1,650 imported, about 2 hours.
+
+| Stage (games per pairing) | Default | Best | Best minus Default |
+|---|---|---|---|
+| Round 1 (10), training rank correlation | 0.28 | 0.42 (five candidates tied) | |
+| Round 2 (30, games 0–29), training rank correlation | 0.13 | 0.18 | |
+| **Confirmation (30 fresh)**, training rank correlation | 0.03 | 0.22 | +0.18, noise −0.20 to +0.43 |
+| Confirmation, training mean gap | 10.1 points | 10.1 points | −0.0, noise −2.3 to +2.2 |
+| Confirmation, held-out mean gap (2 decks) | 19.9 points | 19.1 points | −0.8, noise −5.8 to +4.7 |
+| Confirmation, all 11 decks | rank corr. 0.03, gap 11.9 | 0.16, 11.7 | +0.14 (noise −0.13 to +0.30), −0.2 |
+| Leave-one-deck-out (round 1 games) | 0.28 | 0.40 out of fold (0.42 in sample) | |
+
+The winner (c06) sets, for the control, midrange and tempo decks, counter chances of 0% / 50% for
+1- and 2-drops with no minimum mana value, the default sacrifice preference on, and no avoiding of
+attacks into certain blocks; for the aggro and ramp decks it holds combat tricks until blocks,
+plays aggressively and trades even when behind on creatures. **None of its differences from
+Default clears the noise range**, on training or held-out decks, so nothing was put into
+`mtgsim/profiles/` and `gauntlet.json` keeps `ai_profile` unset.
+
+What the run shows:
+
+- **The search mostly picked up noise.** The round-1 leaders (0.42) fell back to 0.13–0.18 once
+  each pairing had 30 games, and Default itself scored 0.28, 0.13 and 0.03 on three disjoint sets of
+  games. With nine decks, game noise alone moves the rank correlation by about ±0.2.
+- **These settings barely move the decks that are wrong.** On the confirmation games no deck's win
+  rate changed by more than 4 points between Default and the winner (300 games each; a difference
+  between two such rates needs about 8 points to show):
+  Boros Dwarves 77.3% both, Boros Dragons 66.3% → 65.3% (real 45.0%), Jund Sacrifice 38.0% →
+  38.7% (real 57.6%), Dimir Uldaros 30.7% → 31.3% (real 49.2%). The 16–20-point gaps come from
+  things no profile key controls (card-specific AI logic such as the cards patched above, holding
+  mana for instants, sequencing), not from how often the AI counters or trades.
+- With nine training decks the rank correlation's interval from the choice of decks alone is
+  −0.54 to +0.78 at 0.22 (`tune`'s own statement): even a winner that cleared game noise could not
+  be told apart from a useless one by these eleven real win rates.
 
 ## Speed
 

@@ -262,6 +262,9 @@ here makes the simulator's *ranking* of these decks more like the real one; it d
 AI play like a person, and it may simply handicap the decks the AI plays too well. Use it to
 find out which settings matter, then check them on other decks.
 
+The one full search on the meta decks so far (16 candidates, about 12,000 games) found no profile
+that beats Forge's default settings beyond game noise; `VALIDATION.md` has the numbers.
+
 To use a tuned profile, copy `best/tuned-reactive.json` into `~/.mtgsim/profiles/` (any name;
 the file name is the profile name) and set `ai_profile` in `gauntlet.json` or pass
 `--ai-profile`. Profiles there may be complete Forge `.ai` files or JSON

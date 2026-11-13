@@ -34,7 +34,8 @@ measured and how far results can be trusted. Each folder with code or data has i
    `setsid nohup` if they may exceed 2 hours) and say how long they will take.
    `--resume RUN_DIR` continues an interrupted run. `tune` (searching AI profile settings against
    real win rates) is a research command that needs hours of engine time: run it with `--dry-run`
-   first, which prints the candidates and the games needed.
+   first, which prints the candidates and the games needed. The one full search on the meta so far
+   found no profile that beats Forge's default beyond noise (`VALIDATION.md`).
 4. Report the printed summary in chat and hand over `runs/<run>/report.html` as a file. `runs/`
    is git-ignored.
 
