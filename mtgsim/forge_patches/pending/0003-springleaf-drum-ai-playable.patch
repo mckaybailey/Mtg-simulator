@@ -1,0 +1,18 @@
+Subject: Springleaf Drum: let the heuristic AI consider casting it (DRAFT, unmeasured)
+Why: AiController drops every card marked AI:RemoveDeck:All from its list of candidate plays
+  unless Flat Monte Carlo is on, so with the default AI Springleaf Drum was never cast (Azorius
+  Momo baseline: seen in 230 games, cast in 0). Removing the hint lets the normal permanent and
+  mana logic decide. Not yet checked: whether the AI can pay the Drum's own mana ability
+  (T, tap an untapped creature); if it casts the Drum but never uses it, this makes the deck worse.
+Measured: NOT MEASURED. Draft only; it lives in pending/ so setup --build does not apply it.
+
+diff --git a/forge-gui/res/cardsfolder/s/springleaf_drum.txt b/forge-gui/res/cardsfolder/s/springleaf_drum.txt
+index 7203571..1c5b458 100644
+--- a/forge-gui/res/cardsfolder/s/springleaf_drum.txt
++++ b/forge-gui/res/cardsfolder/s/springleaf_drum.txt
+@@ -2,5 +2,4 @@ Name:Springleaf Drum
+ ManaCost:1
+ Types:Artifact
+ A:AB$ Mana | Cost$ T tapXType<1/Creature> | Produced$ Any | SpellDescription$ Add one mana of any color.
+-AI:RemoveDeck:All
+ Oracle:{T}, Tap an untapped creature you control: Add one mana of any color.
