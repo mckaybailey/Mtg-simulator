@@ -66,6 +66,15 @@ mtgsim compiles a small Java driver against whichever Forge it is given. It is d
 tested against one specific Forge commit (the one `--build` fetches); other versions work
 as long as the driver still compiles against them, and `setup` tells you if it does not.
 
+`--build` also applies mtgsim's own fixes to Forge (`mtgsim/forge_patches/`, for example AI
+hints in card scripts) on top of that commit, and records them in `mtgsim-patches.json` in the
+checkout. A Forge you point to with `--forge-dir` is never modified, so it plays without them.
+`doctor` shows which patches are applied; after updating mtgsim, run `setup --build` again when
+it says they are out of date. That re-applies the patches in seconds and rebuilds Forge only
+when a patch changes its Java code. `setup --build --no-patches` builds the plain Forge commit,
+for comparing results with and without the patches. Every run's `run.json` records the patch
+set it was played with.
+
 Everything mtgsim stores lives in `~/.mtgsim` (override with `MTGSIM_HOME`), including a
 private profile directory for Forge, so simulations never read or change the settings of a
 Forge you use for playing.

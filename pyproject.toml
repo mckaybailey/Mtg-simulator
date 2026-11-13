@@ -17,4 +17,4 @@ mtgsim = "mtgsim.cli:main"
 packages = ["mtgsim"]
 
 [tool.setuptools.package-data]
-mtgsim = ["bridge/*.java"]
+mtgsim = ["bridge/*.java", "forge_patches/*.patch", "forge_patches/README.md"]
