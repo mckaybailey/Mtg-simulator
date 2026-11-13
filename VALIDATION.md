@@ -74,6 +74,27 @@ strong) in `decks/standard/meta/gauntlet.json`, and reports name the opponents t
 That closes part of the gap for the control deck at about six times the run time. Monte Carlo
 mode thinks against a clock, so its games are not exactly reproducible from the seed.
 
+**Per-deck AI settings do not fix the ranking.** The full round robin (1,650 games, 30 per
+pairing) was repeated with four settings applied through `ai_profile` / `ai_mc` in
+`gauntlet.json`. Ranges are 95% bootstrap intervals (games resampled within each pairing):
+
+| Setting | Rank corr. | Mean gap | Time | s/game |
+|---|---|---|---|---|
+| Default AI for every deck (baseline) | 0.24 (0.12–0.35) | 13.0 pts (11.9–14.5) | 19 min | 2.8 |
+| `Cautious` profile for the three control decks | 0.24 (0.12–0.34) | 12.7 pts (11.7–14.3) | 16 min | 2.3 |
+| `ai_mc: max` for the three `weak` decks | 0.21 (0.05–0.42) | 9.1 pts (8.2–11.1) | 63 min | 9.1 |
+| `Hardest` + `ai_mc: max` for the `weak` decks | 0.25 (0.08–0.40) | 9.4 pts (8.4–11.1) | ~60 min | 9.0 |
+| `--mc max` for every deck | 0.16 (−0.09–0.33) | 11.6 pts (10.2–12.9) | 167 min | 24.2 |
+
+Monte Carlo for the weak decks lifts them to realistic levels (Jund Sacrifice 41→50%, Dimir
+Uldaros 31→48%, Azorius Control 20→46%) and cuts the average gap by about four points, beyond
+the noise. The ranking does not improve: Azorius Artifacts, Azorius Momo and Izzet
+Spellementals lose ground, and Boros Dwarves (72%) and Boros Dragons (62%) stay overrated.
+Monte Carlo for everyone is worse on both measures and nine times slower. The `Cautious` and
+`Hardest` profiles change nothing measurable. The shipped gauntlet therefore keeps the
+default AI, and its games stay reproducible. Setting `ai_mc: max` on the three `weak` decks
+is a reasonable opt-in when realistic opponents matter more than speed and exact replays.
+
 **Card statistics are noisy.** In the 400-game mirror, the two identical decks' cards should
 have scored the same; Giant Growth came out at +18.7 points in one copy and −1.3 in the other.
 Reports now show a 95% interval for every card and mark only the differences that exclude zero.
