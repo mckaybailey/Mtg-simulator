@@ -51,22 +51,26 @@ Tool: `python3 wip/tools/calib.py RUN_DIR`. Vs the unverified matchup data
    (b) full misplay report before any fix: `python3 -m mtgsim misplays runs/rr-newdriver-n30-s1`.
    (It warns that patches are "out of date" because of the temporary copies; the shared Forge
    really is unpatched, and run.json records that.)
-3. **Dead-card subagent** (worktree `.claude/worktrees/agent-aa70316c921c8d2b6`, branch
-   `worktree-agent-aa70316c921c8d2b6`, last commit dc94741). Patches 0003–0008 in its
-   `mtgsim/forge_patches/pending/`; its runs `runs/dc-*` in that worktree look complete (before/after
-   1,000 games each for Azorius Momo and Dimir Uldaros, mirrors 200 each, 0008 extra arm). Causes:
-   0003 Springleaf Drum (`AI:RemoveDeck:All` filtered by default AI), 0004 Practiced Offense
-   (forge-ai ignores KWChoice → Pump refused; `AILogic$ ContinuousBonus`), 0005 Nurturing Pixie and
-   0006 Uldaros Theorix (ETB refused by checkETBEffects; `OptionalDecider$ You`), 0007 Seasoned
-   Cryomancer (`AILogic$ Always` on the ImmediateTrigger), 0008 (pump KWChoice lost target; new).
-   Expect its report; then merge its branch and take its Measured: numbers.
+3. **Dead-card patches 0003–0008: DONE, measured, merged (d6ac13d)**, still in
+   `mtgsim/forge_patches/pending/` with numbers in each `Measured:` line. Causes: 0003 Springleaf
+   Drum (`AI:RemoveDeck:All` filtered by the default AI), 0004 Practiced Offense (forge-ai ignores
+   KWChoice → Pump refused; `AILogic$ ContinuousBonus`), 0005 Nurturing Pixie and 0006 Uldaros
+   Theorix (ETB refused by `AiController.checkETBEffects`; `OptionalDecider$ You`), 0007 Seasoned
+   Cryomancer (`AILogic$ Always` on the ImmediateTrigger), 0008 Java: `PumpEffect` crash when a
+   KWChoice target is removed in response (5/1,000 Momo games crashed once Practiced Offense was cast).
+   Gauntlet vs the other 10, 100 each, seed 1: **Azorius Momo 44.9% (42–48) → 54.2% (51–57), +9.3
+   (CI +4.9..+13.6, p<0.001), mirror 50.0% (43–57); Dimir Uldaros 30.1% (27–33) → 33.9% (31–37),
+   +3.8 (CI −0.3..+7.9, p=0.07, not reliable), mirror 51.0% (44–58).** Cast when seen, before →
+   after: Drum 0/749 → 655/728, Practiced Offense 0/613 → 579/629, Pixie 14/522 → 417/483,
+   Theorix 13/616 → 326/632, Cryomancer 13/695 → 478/679. Each deck's patches were measured
+   together (individual shares unknown). 0001 and 0008 are Java (Maven rebuild ~1 min).
 
 ## Next steps, in order
 
 1. When arm1/arm2/mirror finish: fill `Measured:` in `pending/0001`, `0002` from arms.py output
    (win rate + interval per arm, paired diff, cast counts, mirror result); judge whether each patch
    clears noise (report negative results honestly).
-2. Merge the dead-card branch; review patches 0003–0008 and their numbers.
+2. (done) Dead-card branch merged.
 3. Promote measured patches from `pending/` to `mtgsim/forge_patches/` (remove the
    `.git/info/exclude` lines first), commit, then install into the shared Forge:
    `flock $SP/engine.lock python3 -m mtgsim setup --build` (Java patch 0001 → Maven rebuild ~1–2 min),
