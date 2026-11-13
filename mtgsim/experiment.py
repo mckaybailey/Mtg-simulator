@@ -5,6 +5,7 @@ A run lives in its own directory::
     run.json      what was asked for: decks, options, seed, engine version
     games.jsonl   one line per finished game (appended as games finish, so a run can be resumed)
     decks/        the exact .dck files handed to Forge
+    ai/           the AI profiles Forge loads for this run (see ai_profiles.py)
     logs/         worker output, and per-game logs when --save-logs is used
     summary.json  the analysed results (written by the commands, see analysis.py)
     report.html   the human-readable report
@@ -21,6 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
+from . import ai_profiles
 from .decks import Deck
 from .forge import ForgeInstall
 from .runner import Job, run_jobs
@@ -147,6 +149,31 @@ def _seat_profiles(seats: List[Entrant], options: RunOptions) -> List[str]:
     return [s.ai_profile or options.ai_profile for s in seats]
 
 
+def prepare_profiles(install: ForgeInstall, run_dir: Path, jobs: Iterable[Job],
+                     extra: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    """Write the run's AI profile folder and check that every profile a job names is in it.
+
+    Returns the settings hash of each profile the jobs use ("Default" stands for a seat with none),
+    so run.json records exactly which AI settings played.
+    """
+    hashes = ai_profiles.prepare_dir(install, Path(run_dir) / "ai", extra)
+    named = {p for job in jobs for p in job.profiles if p}
+    missing = sorted(p for p in named if p not in hashes)
+    if missing:
+        raise RunError(f"unknown AI profile(s): {', '.join(missing)}. Available: {', '.join(sorted(hashes))}")
+    if any(not p for job in jobs for p in (job.profiles or [""])) and "Default" in hashes:
+        named.add("Default")  # a seat without a profile plays Forge's preferred one, which the driver pins to Default
+    return {p: hashes[p] for p in sorted(named)}
+
+
+def _engine_fingerprint(install: ForgeInstall) -> Optional[str]:
+    """Identifies the Forge build, so later runs (``tune --import``) can tell whether games are comparable."""
+    try:
+        return install.fingerprint()
+    except OSError:
+        return None
+
+
 def write_decks(entrants: List[Entrant], run_dir: Path) -> None:
     deck_dir = run_dir / "decks"
     deck_dir.mkdir(parents=True, exist_ok=True)
@@ -242,8 +269,12 @@ def execute(
     options: RunOptions,
     meta: Optional[dict] = None,
     quiet: bool = False,
+    profiles: Optional[Dict[str, str]] = None,
 ) -> List[dict]:
-    """Play every pairing, skipping games already recorded in ``run_dir``, and return all records."""
+    """Play every pairing, skipping games already recorded in ``run_dir``, and return all records.
+
+    ``profiles`` adds run-generated AI profiles (name -> full profile text) to the run's profile folder.
+    """
     run_dir = Path(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
     write_decks(entrants, run_dir)
@@ -251,6 +282,7 @@ def execute(
     jobs: List[Job] = []
     for a, b in pairings:
         jobs.extend(plan_pairing(a, b, options, run_dir))
+    used_profiles = prepare_profiles(install, run_dir, jobs, profiles)
     wanted = {job.id for job in jobs}
     have = {g["id"] for g in read_games(run_dir) if g["status"] in ("ok", "timeout")}
     todo = [job for job in jobs if job.id not in have]
@@ -260,7 +292,8 @@ def execute(
         "options": options.describe(),
         "entrants": [e.describe() for e in entrants],
         "pairings": [[a.key, b.key] for a, b in pairings],
-        "forge": {"version": install.version, "path": str(install.root)},
+        "forge": {"version": install.version, "path": str(install.root), "fingerprint": _engine_fingerprint(install)},
+        "ai_profiles": used_profiles,
         "created": run_info.get("created") or time.strftime("%Y-%m-%d %H:%M:%S"),
     })
     (run_dir / "run.json").write_text(json.dumps(run_info, indent=1), encoding="utf-8")
@@ -286,7 +319,7 @@ def execute(
             progress.tick()
 
         engine = run_jobs(install, todo, on_result, workers=options.workers, heap=options.heap,
-                          log_dir=run_dir / "logs")
+                          log_dir=run_dir / "logs", profile_dir=run_dir / "ai")
 
     if engine:
         run_info["forge"].update(engine)

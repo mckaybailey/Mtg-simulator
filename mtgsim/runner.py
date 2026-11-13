@@ -60,8 +60,9 @@ class _Worker:
 
     _EOF = object()
 
-    def __init__(self, cmd: List[str], cwd: Path, env: dict, stderr_path: Path):
+    def __init__(self, cmd: List[str], cwd: Path, env: dict, stderr_path: Path, expect_profiles: bool = False):
         self._cmd, self._cwd, self._env, self._stderr_path = cmd, cwd, env, stderr_path
+        self._expect_profiles = expect_profiles
         self.proc: Optional[subprocess.Popen] = None
         self.info: dict = {}
         self._messages: "queue.Queue" = queue.Queue()
@@ -84,6 +85,11 @@ class _Worker:
                 "A Forge worker failed to start" + (f": {detail.strip()[:600]}" if detail else "")
                 + f" (see {self._stderr_path})."
             )
+        if self._expect_profiles and not message.get("aiProfileDir"):
+            # An old driver would ignore the folder and play every seat with Forge's own profiles.
+            self.stop()
+            raise ForgeError("The Forge driver did not load the run's AI profile folder; "
+                             "delete ~/.mtgsim/bridge so it is recompiled.")
         self.info = message
 
     @classmethod
@@ -171,15 +177,18 @@ def run_jobs(
     workers: Optional[int] = None,
     heap: str = "2g",
     log_dir: Optional[Path] = None,
+    profile_dir: Optional[Path] = None,
 ) -> dict:
     """Play every job, calling ``on_result(job, result)`` (serialised) as each game finishes.
 
-    Returns information about the engine that played them (Forge and Java versions).
+    ``profile_dir`` is the AI profile folder the JVMs load instead of Forge's own (every profile a
+    job names must be in it). Returns information about the engine that played them (Forge and
+    Java versions).
     """
     if not jobs:
         return {}
     classes = forge_mod.ensure_bridge(install)
-    cmd = forge_mod.java_command(install, classes, heap=heap)
+    cmd = forge_mod.java_command(install, classes, heap=heap, profile_dir=profile_dir)
     env = forge_mod.java_env()
     log_dir = Path(log_dir) if log_dir else forge_mod.home_dir() / "logs"
     count = max(1, min(workers or default_workers(), len(jobs)))
@@ -204,7 +213,8 @@ def run_jobs(
                 except queue.Empty:
                     return
                 while worker is None and not stop.is_set():
-                    candidate = _Worker(cmd, install.workdir, env, log_dir / f"worker-{index}.log")
+                    candidate = _Worker(cmd, install.workdir, env, log_dir / f"worker-{index}.log",
+                                        expect_profiles=profile_dir is not None)
                     try:
                         candidate.start()
                     except ForgeError:

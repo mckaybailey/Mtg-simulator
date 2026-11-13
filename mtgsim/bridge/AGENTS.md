@@ -9,7 +9,10 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
 - stdout carries only protocol lines; everything Forge prints is redirected to stderr (the
   runner saves it as `logs/worker-N.log` in the run directory).
 - Startup: `{"type":"ready","forgeVersion":…,"java":…}` once the card database is loaded
-  (several seconds), or `{"type":"fatal",…}`.
+  (several seconds), or `{"type":"fatal",…}`. With `-Dmtgsim.aiProfileDir=DIR` (always set by
+  the runner: the run's `ai/` folder) the driver calls `AiProfileUtil.loadAllProfiles(DIR)` after
+  `FModel.initialize`, replacing Forge's `res/ai` set, and the ready line adds `aiProfileDir` and
+  `aiProfiles` (count). A profile setting this Forge does not know is a fatal startup error.
 - stdin: one job per line, tab-separated `key=value`: `id`, `seed`, `timeout`, `format`,
   `mc` (`off|on|max`, whole game), `log` (path or empty), repeated `deck=` (seat order),
   repeated `profile=`, repeated `seatmc=` (per seat; empty follows `mc`). `quit` ends the process.
@@ -31,4 +34,7 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
   tracker swallows its own exceptions so it can never break a game.
 - Optional or newer Forge APIs (per-player profiles, per-player Monte Carlo) are reached by
   reflection and fail loudly if missing rather than being silently ignored.
+- A `profile=` the JVM did not load makes that game an `error` (Forge would otherwise use the
+  `AiProps` enum defaults, which differ from Default.ai). An empty `profile=` plays Forge's
+  preferred profile, pinned to Default at startup.
 - It relies on Forge internals, so it is tied to `FORGE_PINNED_REF` in `mtgsim/forge.py`.

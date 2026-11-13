@@ -10,6 +10,8 @@
  *
  * Protocol (line based, UTF-8):
  *   stdout: {"type":"ready",...} once the card database is loaded, then one result line per job.
+ *   -Dmtgsim.aiProfileDir=<folder> makes Forge load its AI profiles (*.ai) from that folder instead of
+ *           res/ai; the ready line then names it ("aiProfileDir") and counts them ("aiProfiles").
  *   stdin : one job per line, tab separated key=value fields:
  *             id=<text> seed=<long> timeout=<seconds> format=<GameType> mc=<off|on|max>
  *             log=<path or empty> deck=<path> deck=<path> ... profile=<name or empty> ...
@@ -37,15 +39,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import com.google.common.eventbus.Subscribe;
 
 import forge.GuiDesktop;
 import forge.LobbyPlayer;
+import forge.ai.AiProfileUtil;
 import forge.deck.Deck;
 import forge.deck.DeckSection;
 import forge.deck.io.DeckSerializer;
@@ -85,10 +90,13 @@ public final class ForgeBridge {
     private static final long GAME_STACK_BYTES = 64L * 1024 * 1024;
 
     private static final Map<String, Deck> DECK_CACHE = new HashMap<>();
+    /** The AI profiles this JVM loaded; a seat asking for any other name fails instead of silently using defaults. */
+    private static final Set<String> PROFILES = new HashSet<>();
 
     private ForgeBridge() { }
 
     public static void main(final String[] args) throws Exception {
+        String profileDir = "";
         final PrintStream proto = new PrintStream(new FileOutputStream(FileDescriptor.out), true, "UTF-8");
         System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.err), true, "UTF-8"));
         System.setProperty("java.awt.headless", "true");
@@ -103,13 +111,16 @@ public final class ForgeBridge {
                 prefs.setPref(FPref.FILTERED_HANDS, false);
                 return null;
             });
+            profileDir = loadProfiles(System.getProperty("mtgsim.aiProfileDir", ""));
         } catch (final Throwable t) {
             proto.println("{\"type\":\"fatal\",\"error\":" + quote(stackTrace(t)) + "}");
             System.exit(2);
         }
 
         proto.println("{\"type\":\"ready\",\"forgeVersion\":" + quote(BuildInfo.getVersionString())
-                + ",\"java\":" + quote(System.getProperty("java.version")) + "}");
+                + ",\"java\":" + quote(System.getProperty("java.version"))
+                + (profileDir.isEmpty() ? "" : ",\"aiProfileDir\":" + quote(profileDir) + ",\"aiProfiles\":" + PROFILES.size())
+                + "}");
 
         final BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         String line;
@@ -129,6 +140,36 @@ public final class ForgeBridge {
             }
         }
         System.exit(0);
+    }
+
+    /**
+     * Forge loads its AI profiles from res/ai once, inside FModel.initialize. mtgsim gives every run a
+     * folder of its own (Forge's profiles plus mtgsim's, the user's and the run's) so that generated
+     * profiles never have to be written into the Forge installation; loading it replaces Forge's set.
+     * Returns the folder's absolute path, or "" when Forge's own folder is used.
+     */
+    private static String loadProfiles(final String dir) {
+        String loadedFrom = "";
+        if (!dir.isEmpty()) {
+            final File folder = new File(dir);
+            if (!folder.isDirectory()) {
+                throw new IllegalArgumentException("AI profile folder not found: " + dir);
+            }
+            loadedFrom = folder.getAbsolutePath();
+            try {
+                AiProfileUtil.loadAllProfiles(loadedFrom);
+            } catch (final IllegalArgumentException e) {
+                // AiProps.valueOf rejects a setting this Forge version does not have
+                throw new IllegalArgumentException("an AI profile in " + dir
+                        + " has a setting this Forge version does not know: " + e.getMessage(), e);
+            }
+        }
+        PROFILES.clear();
+        PROFILES.addAll(AiProfileUtil.getAvailableProfiles());
+        if (!dir.isEmpty() && PROFILES.isEmpty()) {
+            throw new IllegalArgumentException("no AI profiles (*.ai) in " + dir);
+        }
+        return loadedFrom;
     }
 
     // ------------------------------------------------------------------ jobs
@@ -375,6 +416,10 @@ public final class ForgeBridge {
     private static LobbyPlayer createAi(final String name, final String profile) throws Exception {
         if (profile == null || profile.isEmpty()) {
             return GamePlayerUtil.createAiPlayer(name, 0, 0);
+        }
+        if (!PROFILES.contains(profile)) {
+            // Forge would quietly fall back to the AiProps defaults, which are not the Default profile.
+            throw new IllegalArgumentException("unknown AI profile \"" + profile + "\" (loaded: " + PROFILES + ")");
         }
         // Per-player AI profiles are a recent Forge addition; look the overload up reflectively so
         // this driver still compiles against releases that predate it.

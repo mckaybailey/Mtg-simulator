@@ -125,7 +125,7 @@ are warnings unless you pass `--strict`.
 | `--vs PATH...` | opponent decklists or folders (default `decks/standard/meta`) |
 | `--seed 7` | base random seed; the same seed and decks replay exactly the same games |
 | `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished |
-| `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`); overrides per-deck settings |
+| `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`, or one of yours from `~/.mtgsim/profiles`); overrides per-deck settings |
 | `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting) for every player: slower, and because it thinks against a clock the same seed no longer replays the same game; overrides per-deck settings |
 | `--save-logs` | keep Forge's full play-by-play log of every game |
 
@@ -152,6 +152,62 @@ each of the eleven meta decks takes roughly a quarter of an hour.
   role rather than reading the numbers as each card's worth. They are also noisy: in a
   400-game test of two identical decks, the same card came out 20 points apart. Reports
   mark the differences whose 95% interval excludes zero; ignore the rest.
+
+## Tuning the AI pilot (`tune`)
+
+`tune` is a research tool: it searches Forge's AI profile settings (the `AiProps` keys in
+Forge's `res/ai/*.ai` files) for values under which simulated win rates track real tournament
+win rates better, and tells you how far that can be trusted.
+
+```
+# What would it play, and how long would it take? (plays nothing)
+python -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --dry-run
+
+# The search, reusing the games of an earlier seed-1 round robin of the same decks
+python -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --import runs/<matrix-run>
+```
+
+- **Groups, not decks, get profiles.** Decks are grouped by `category` in `gauntlet.json`
+  (default `reactive` = control, midrange, tempo; `proactive` = aggro, ramp, combo; change with
+  `--group NAME=CAT,CAT`). Each tuned group (`--tune`, default all) gets `--profiles K` random
+  profiles drawn from a parameter space (`--space`, default `mtgsim/profiles/spaces/default.json`,
+  which explains each setting it includes), and the candidates are every combination of them,
+  the untouched Default profile included as the baseline.
+- **Objective:** the rank (Spearman) correlation between each deck's simulated win rate (its
+  average over the round robin) and its `real_win_rate`, over the training decks. Pearson and the
+  mean absolute gap are reported too. `--matchups FILE` adds real deck-vs-deck win rates
+  (`[{"a", "b", "real_win_rate", "games", "source"}]`, percent from `a`'s side) and
+  `--objective matchup|both` uses them.
+- **Successive halving:** every candidate plays `--rounds` first number of games per pairing
+  (default 10), the best third (`--eta 3`) plus the baseline go on to the next number (30), and
+  the winner and the baseline are finally re-played on `--confirm 30` fresh games per pairing that
+  played no part in choosing the winner.
+- **Overfitting guards:** `--holdout` decks play but their real win rates are never used for any
+  choice; `--cv loo` (default) re-does the choice once per training deck without that deck and
+  reports the out-of-fold correlation. Every number has a game-noise range from resampling the
+  pairing results, and an improvement is only called real when its range clears zero.
+- **Compute:** game seeds depend only on the decks, the seed and the game index, so a game is
+  fully determined by the two decks, the two profiles' settings, seed, game index, time limit and
+  Monte Carlo setting. Results are cached under exactly that key in `RUN_DIR/cache.jsonl`, so a
+  pairing whose profiles did not change is never replayed, later rounds only play the extra
+  games, `--import RUN_DIR` reuses an earlier run's identical games (a `matrix` with the same
+  seed covers the baseline) and `--resume RUN_DIR` continues where a run stopped.
+- **Output:** a terminal summary, `RUN_DIR/tune.json` (every candidate's settings and metrics in
+  every round, the confirmation, the cross-validation and a statement of how much real data the
+  result would need) and `RUN_DIR/best/tuned-<group>.json`.
+
+What it can and cannot tell you: with eleven decks, a rank correlation has a 95% interval of
+roughly ±0.4 to ±0.6 from the choice of decks alone (0.24 means anything from −0.44 to 0.74), so
+no tuning can be validated against real data to better than that; `tune` prints how many decks or matchups would narrow it. A profile that wins
+here makes the simulator's *ranking* of these decks more like the real one; it does not make the
+AI play like a person, and it may simply handicap the decks the AI plays too well. Use it to
+find out which settings matter, then check them on other decks.
+
+To use a tuned profile, copy `best/tuned-reactive.json` into `~/.mtgsim/profiles/` (any name;
+the file name is the profile name) and set `ai_profile` in `gauntlet.json` or pass
+`--ai-profile`. Profiles there may be complete Forge `.ai` files or JSON
+`{"base": "Default", "overrides": {"KEY": value}}`. They are copied into each run's own profile
+folder; mtgsim never changes Forge's.
 
 ## Included decks
 

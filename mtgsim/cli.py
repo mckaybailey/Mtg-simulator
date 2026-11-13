@@ -214,7 +214,9 @@ def _check_ai_profile(ctx: Context) -> None:
 def _check_profile_name(ctx: Context, profile: Optional[str], where: str = "") -> None:
     if not profile:
         return
-    available = sorted(p.stem for p in (ctx.install.res / "ai").glob("*.ai"))
+    from . import ai_profiles
+
+    available = ai_profiles.available(ctx.install)  # Forge's, mtgsim's and the user's (MTGSIM_HOME/profiles)
     if profile not in available:
         raise UserError(f"unknown AI profile \"{profile}\"{where}. Available: {', '.join(available)}")
 
@@ -607,6 +609,26 @@ def cmd_goldfish(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_tune(args: argparse.Namespace) -> int:
+    """Search AI profile settings that make simulated win rates track real ones (see tune.py)."""
+    from . import tune
+
+    ctx = Context(args)
+    stored = tune.stored_run(args.resume) if args.resume else None
+    paths = [d["file"] for d in stored["decks"]] if stored else (args.decks or [str(DEFAULT_GAUNTLET)])
+    entrants, _notes = _entrants(ctx, [(paths, "hero")])
+    real = {}
+    for e in entrants:
+        info = _read_manifest(e.deck.path.parent).get(e.deck.path.name, {}) if e.deck.path else {}
+        real[e.key] = info.get("real_win_rate")
+    if args.resume:
+        run_dir = Path(args.resume).expanduser()
+    else:
+        run_dir = Path(args.out).expanduser() if args.out else \
+            Path("runs") / f"{time.strftime('%Y%m%d-%H%M%S')}-tune-{len(entrants)}-decks"
+    return tune.command(ctx.install, run_dir, entrants, real, args, stored)
+
+
 def cmd_report(args: argparse.Namespace) -> int:
     from . import report
 
@@ -700,6 +722,42 @@ def build_parser() -> argparse.ArgumentParser:
                    help="also measure the kill turn on Forge against an opponent that does nothing (default 200 games)")
     _add_common(p)
     p.set_defaults(func=cmd_goldfish)
+
+    p = sub.add_parser("tune", help="search AI profile settings that make simulated win rates track real ones")
+    p.add_argument("decks", nargs="*", help="decklists or folders whose gauntlet.json has real_win_rate "
+                   "(default: decks/standard/meta)")
+    _add_common(p, sim=False)
+    p.add_argument("--space", help="parameter space JSON (default: mtgsim/profiles/spaces/default.json)")
+    p.add_argument("--group", action="append", metavar="NAME=CAT,CAT",
+                   help="decks sharing a profile, by category (default: reactive=control,midrange,tempo "
+                        "and proactive=aggro,ramp,combo); repeat for each group")
+    p.add_argument("--tune", nargs="+", metavar="GROUP", help="groups that get candidate profiles (default: all)")
+    p.add_argument("--profiles", type=int, default=3, metavar="K",
+                   help="random profiles per tuned group; candidates are every combination (default 3)")
+    p.add_argument("--rounds", default="10,30", metavar="N,N",
+                   help="games per pairing in each round of successive halving (default 10,30)")
+    p.add_argument("--eta", type=int, default=3, help="keep the best 1/ETA candidates after each round (default 3)")
+    p.add_argument("--confirm", type=int, default=30, metavar="GAMES",
+                   help="fresh games per pairing to re-measure the winner and the baseline (default 30; 0 skips)")
+    p.add_argument("--holdout", nargs="+", metavar="DECK", help="decks whose real win rates are never used for selection")
+    p.add_argument("--cv", default="loo", help="cross-validate the selection over training decks: loo, K folds, or off")
+    p.add_argument("--matchups", metavar="FILE", help="real deck-vs-deck win rates (see README)")
+    p.add_argument("--objective", choices=("deck", "matchup", "both"), default="deck",
+                   help="rank correlation over deck win rates, matchup win rates, or their mean (default deck)")
+    p.add_argument("--bootstrap", type=int, default=1000, help="resamples for the game-noise ranges (default 1000)")
+    p.add_argument("--search-seed", type=int, default=None, help="seed for drawing profiles (default: --seed)")
+    p.add_argument("--import", dest="import_runs", nargs="+", metavar="RUN_DIR",
+                   help="reuse games of earlier runs (e.g. a matrix with the same seed) where they are identical")
+    p.add_argument("--dry-run", action="store_true", help="print the candidates and the games needed, play nothing")
+    p.add_argument("-j", "--workers", type=int, default=None, help="parallel Forge processes (default: CPU count, max 8)")
+    p.add_argument("--out", help="directory for results (default: runs/<timestamp>-tune-...)")
+    p.add_argument("--resume", metavar="RUN_DIR", help="continue a tuning run (its settings are read from tune.json)")
+    p.add_argument("--strict", action="store_true", help="refuse decks that break format rules")
+    p.add_argument("--timeout", type=int, default=180, help="seconds before a game is stopped and counted as unfinished")
+    p.add_argument("--mc", choices=("off", "on", "max"), default=None,
+                   help="Monte Carlo search for every seat (default off; on makes the cache inexact)")
+    p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
+    p.set_defaults(func=cmd_tune)
 
     p = sub.add_parser("report", help="rebuild report.html for an existing run directory")
     p.add_argument("run_dir")

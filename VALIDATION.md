@@ -8,8 +8,8 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 187 pass |
-| Integration tests (real games) | 4 pass |
+| Unit tests (no Forge needed) | 229 pass |
+| Integration tests (real games) | 6 pass |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
 | Mirror match (identical decks, 400 games) | 48.9%, 95% CI 44–54% (expected 50%) |
@@ -80,6 +80,42 @@ Reports now show a 95% interval for every card and mark only the differences tha
 
 **Sample size.** A 100-game matchup is known to about ±10 points. Detecting a 5-point
 improvement in an A/B test needs about 1,500 games per version.
+
+## The profile-tuning harness (`tune`)
+
+Checked before any real tuning run; the search itself has not been run on the meta yet.
+
+**The metrics reproduce the baseline.** The 1,650-game round robin above (seed 1, 30 games per
+pairing) was imported into `tune` (all 1,650 games qualified as identical to the games `tune` would
+play) and scored by its code: rank correlation 0.236, game-noise range 0.12–0.35, Pearson 0.23,
+mean gap 13.0 points, and every deck's simulated win rate as in the table above. On the first 10
+games per pairing only, the same baseline scores 0.29 with a noise range of 0.06–0.41: the first
+round of a search separates only large effects.
+
+**Generated profiles reach the engine, and unchanged pairings are not replayed.** Smoke run on four
+meta decks (Boros Dwarves, Mono-Green Landfall, Dimir Midrange, Orzhov Lifegain) with a one-setting
+space, `MULLIGAN_THRESHOLD=8` (a seven-card hand is already below it, so the AI never mulligans),
+one profile per group, four candidates, rounds of 4 and 8 games per pairing and 4 confirmation games
+(168 games, about 5 minutes including JVM starts):
+
+| Check | Result |
+|---|---|
+| Seats playing the generated profile that mulliganed | 0 of 232 seat-games (Default: 76 of 256, 30%) |
+| Same seed, one deck's profile changed | 44 of 112 games came out differently; the other 68 are games in which Default kept its hand anyway |
+| Baseline games played through the run's own profile folder vs the round robin above (Forge's folder, older driver) | 60 of 60 comparable games identical |
+| Round 1 / round 2 | 80 / 44 games played for 96 / 96 game results used: shared pairings and earlier games were not replayed |
+| `--resume` of the finished run | 0 games played, same result |
+
+`tests/test_integration_profiles.py` repeats the first check on every full test run (60 Forests
+mulligan under Default, never under the generated profile) and checks that an unknown profile name
+is an engine error rather than Forge's silent fallback to its enum defaults.
+
+**How much a tuning result can show.** Over eleven decks, a rank correlation's 95% interval from
+the choice of decks alone is about −0.44 to 0.74 at the baseline's 0.24 (Fisher z, variance
+1.06/(n−3)). Narrowing it to ±0.2 would take about 90 decks with real win rates at a correlation
+of 0.24, 60 at 0.5 and 30 at 0.7; ±0.1 about 360, 230 and 110. Matchup-level data adds points
+only where each matchup has roughly 100 real matches (±10 points). `tune` prints this for every
+run.
 
 ## Speed
 

@@ -217,18 +217,19 @@ def forge_user_home() -> Path:
     return path
 
 
-def java_command(install: ForgeInstall, classes: Path, heap: str = "2g") -> list:
+def java_command(install: ForgeInstall, classes: Path, heap: str = "2g", profile_dir: Optional[Path] = None) -> list:
+    """The driver's command line. ``profile_dir`` replaces Forge's own AI profile folder (see ai_profiles.py)."""
     sep = os.pathsep
-    return [
+    cmd = [
         java_path(),
         f"-Xmx{heap}",
         "-Djava.awt.headless=true",
         f"-Duser.home={forge_user_home()}",
         "-Dfile.encoding=UTF-8",
-        "-cp",
-        f"{classes}{sep}{install.jar}",
-        BRIDGE_MAIN_CLASS,
     ]
+    if profile_dir is not None:
+        cmd.append(f"-Dmtgsim.aiProfileDir={Path(profile_dir).resolve()}")
+    return cmd + ["-cp", f"{classes}{sep}{install.jar}", BRIDGE_MAIN_CLASS]
 
 
 def java_env() -> dict:

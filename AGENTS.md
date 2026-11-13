@@ -25,7 +25,9 @@ measured and how far results can be trusted. Each folder with code or data has i
    engine-measured kill turn). About 85 games a minute on 4 cores; 100 games against each of the
    11 meta decks is roughly 15 minutes. Start long runs in the background (detach with
    `setsid nohup` if they may exceed 2 hours) and say how long they will take.
-   `--resume RUN_DIR` continues an interrupted run.
+   `--resume RUN_DIR` continues an interrupted run. `tune` (searching AI profile settings against
+   real win rates) is a research command that needs hours of engine time: run it with `--dry-run`
+   first, which prints the candidates and the games needed.
 4. Report the printed summary in chat and hand over `runs/<run>/report.html` as a file. `runs/`
    is git-ignored.
 
@@ -46,7 +48,7 @@ Always pass on the limits with the numbers:
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (191 tests, ~2 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (235 tests, ~2 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match

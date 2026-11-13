@@ -12,6 +12,11 @@ not installed and must not be required.
 - Anything that touches `MTGSIM_HOME` must point it at a temporary directory.
 - `test_experiment.py` replaces `experiment.run_jobs` with a fake to test planning, storage and
   resume without Java.
+- `test_tune.py` covers `ai_profiles.py` (Forge's file-reading rules, overrides, the run's
+  profile folder) and `tune.py` with a fake `runner.run_jobs` whose outcomes depend on the seed
+  and each seat's profile: cache reuse, resume, successive halving, hold-out isolation,
+  cross-validation, import from an earlier run. It patches `ai_profiles.SHIPPED_DIR` and
+  `MTGSIM_HOME` so no real profile folder is read.
 - `test_report.py` renders every report kind and checks that names containing `<script>` and
   quotes come out escaped.
 - `test_goldfish.py` checks the solo model against exact hypergeometric probabilities.
@@ -19,4 +24,7 @@ not installed and must not be required.
   not set up. Its decks (Raging Goblin vs Grizzly Bears) were chosen because they cannot stall;
   Grizzly Bears vs Hill Giant can, and a stalled game hits the time limit and breaks the
   reproducibility check.
+- **`test_integration_profiles.py`** (a few seconds of real games, skipped without Forge) checks
+  that a run-generated AI profile reaches the engine: 60 Forests mulligan under Default but never
+  with MULLIGAN_THRESHOLD=8, and an unknown profile name is an error, not a silent fallback.
 - When a test exposes a real bug, fix the module rather than the expectation.
