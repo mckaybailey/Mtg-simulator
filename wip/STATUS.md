@@ -53,7 +53,9 @@ Spearman 0.11, mean absolute gap 19.3 points.
 
 ## Subagent work in progress
 
-See `wip/agents/README.md` for each agent's WIP patch (apply with `git apply`) and status.
+See `wip/agents/README.md` for each agent's WIP commit (saved as a patch; apply with `git am`)
+and status: misplay report (built, needs the final unchanged-games check), tuning harness
+(complete, experiment not started), dead-card investigation (one cause found, nothing measured).
 
 ## Resume order
 
