@@ -13,6 +13,8 @@ measured and how far results can be trusted. Each folder with code or data has i
 | `tests/` | unit tests (no Forge needed) and the integration test |
 | `decks/` | the included gauntlets and the `gauntlet.json` format |
 
+`docs/stronger-ai.md` is a design note comparing ways to give mtgsim a stronger pilot than Forge's AI.
+
 ## Running simulations for the user
 
 1. `python3 -m mtgsim doctor` checks Java, Forge and plays two games. If Forge is missing, run
