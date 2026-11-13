@@ -46,12 +46,20 @@ Tool: `python3 wip/tools/calib.py RUN_DIR`. Vs the unverified matchup data
   Cryomancer 39, Theorix 18 hits/100). Unpatched candidates it also flags: Pinnacle Starcage
   (Artifacts 22), Nova Hellkite (Dragons 21), Torch the Tower (Jund 17), Seam Rip (AC 15).
 
+- Patched round robin (`runs/rr-patched-n30-s1`, 8 patches, 1,650 games, 0 errors): Spearman 0.109
+  (noise −0.05..0.25), Pearson 0.079, **mean abs gap 10.8 (9.4–12.5)**. Versus baseline
+  (`wip/tools/calibdiff.py`): mean gap −2.2 points (95% interval −4.1..−0.3, clears noise);
+  Spearman −0.13 (−0.32..+0.08, within noise: ranking not improved). Per deck sim (gap): Dwarves 70.0
+  (+19.8), Orzhov 65.0 (+11.4), Dragons 63.7 (+18.7), Dimir Mid 58.0 (+3.5), Momo 50.7 (+1.9),
+  Landfall 49.3 (−4.1), Artifacts 46.7 (−8.1), AC 42.7 (−3.9), Jund 37.7 (−19.9), Spellementals
+  33.7 (−10.6), Uldaros 32.7 (−16.5). Unverified matchups: Pearson 0.15, MAE 17.8 (baseline 0.20/19.3).
+
 ## Running now
 
-`$SP/patched-rr.sh` (log `$SP/patched-rr.log`): `setup --build` on the shared Forge (installs the
-8 patches, Maven rebuild), `doctor`, `matrix ... --out runs/rr-patched-n30-s1`, then the full test
-suite (log `$SP/fullsuite-patched.log`). If killed: re-run the script (setup is idempotent, the
-matrix resumes).
+- Full test suite on the patched engine (end of `$SP/patched-rr.sh`, log `$SP/fullsuite-patched.log`).
+- Then the full tuning search (queued on the lock, ~2.5 h, 12,570 games, log `$SP/tune-meta-s1.log`):
+  `python3 -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --import runs/rr-patched-n30-s1 --out runs/tune-meta-s1`.
+  If killed: `flock $SP/engine.lock python3 -m mtgsim tune --resume runs/tune-meta-s1`.
 
 ## Next steps, in order
 
