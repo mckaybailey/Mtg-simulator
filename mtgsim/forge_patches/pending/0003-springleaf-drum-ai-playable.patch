@@ -1,10 +1,11 @@
-Subject: Springleaf Drum: let the heuristic AI consider casting it (DRAFT, unmeasured)
-Why: AiController drops every card marked AI:RemoveDeck:All from its list of candidate plays
-  unless Flat Monte Carlo is on, so with the default AI Springleaf Drum was never cast (Azorius
-  Momo baseline: seen in 230 games, cast in 0). Removing the hint lets the normal permanent and
-  mana logic decide. Not yet checked: whether the AI can pay the Drum's own mana ability
-  (T, tap an untapped creature); if it casts the Drum but never uses it, this makes the deck worse.
-Measured: NOT MEASURED. Draft only; it lives in pending/ so setup --build does not apply it.
+Subject: Springleaf Drum: let the default AI cast it
+Why: AiController.chooseSpellAbilityToPlay drops every card marked AI:RemoveDeck:All from the
+  candidate plays unless Flat Monte Carlo is on (`isCardRemAIDeck(h) && !flatMc`), so with the
+  default AI the Drum was never even considered (Azorius Momo, baseline round robin: seen in 230
+  games, cast in 0). The AI can use it once cast: ComputerUtilMana pays a mana ability's
+  "tap an untapped creature" cost through checkTapTypeCost / chooseTapType, which taps the
+  lowest-power untapped creature. Removes the hint; nothing else changes.
+Measured: PENDING (filled in from the before/after gauntlets).
 
 diff --git a/forge-gui/res/cardsfolder/s/springleaf_drum.txt b/forge-gui/res/cardsfolder/s/springleaf_drum.txt
 index 7203571..1c5b458 100644

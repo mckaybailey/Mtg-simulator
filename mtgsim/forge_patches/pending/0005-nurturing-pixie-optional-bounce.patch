@@ -1,0 +1,24 @@
+Subject: Nurturing Pixie: do not refuse the creature because its bounce has no good target
+Why: Before casting a creature the AI asks whether it would use each ETB trigger
+  (AiController.checkETBEffects) and refuses the creature if not. ChangeZoneAi only likes
+  bouncing opponents' permanents (or saving one of its own that is about to die), and Pixie can
+  only return its controller's own, so the answer was almost always no (Azorius Momo, baseline:
+  seen in 165 games, cast in 5). The BadETB escape does not apply to a TargetMin$ 0 trigger.
+  OptionalDecider$ You makes the trigger optional, which plays out the same as "up to one
+  target" choosing none: the AI now casts Pixie as a one-mana flier and still uses the bounce
+  when it saves a threatened permanent. (A person playing it gets a yes/no prompt first.)
+Measured: PENDING (filled in from the before/after gauntlets).
+
+diff --git a/forge-gui/res/cardsfolder/n/nurturing_pixie.txt b/forge-gui/res/cardsfolder/n/nurturing_pixie.txt
+index 66ce545..f003f2c 100644
+--- a/forge-gui/res/cardsfolder/n/nurturing_pixie.txt
++++ b/forge-gui/res/cardsfolder/n/nurturing_pixie.txt
+@@ -3,7 +3,7 @@ ManaCost:W
+ Types:Creature Faerie Rogue
+ PT:1/1
+ K:Flying
+-T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigReturn | TriggerDescription$ When CARDNAME enters, return up to one target non-Faerie, nonland permanent you control to its owner's hand. If a permanent was returned this way, put a +1/+1 counter on CARDNAME.
++T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigReturn | OptionalDecider$ You | TriggerDescription$ When CARDNAME enters, return up to one target non-Faerie, nonland permanent you control to its owner's hand. If a permanent was returned this way, put a +1/+1 counter on CARDNAME.
+ SVar:TrigReturn:DB$ ChangeZone | Origin$ Battlefield | Destination$ Hand | ValidTgts$ Permanent.nonFaerie+nonLand+YouCtrl | TargetMin$ 0 | TargetMax$ 1 | TgtPrompt$ Select up to one target non-Faerie, nonland permanent you control | RememberLKI$ True | SubAbility$ DBPutCounter
+ SVar:DBPutCounter:DB$ PutCounter | CounterType$ P1P1 | CounterNum$ 1 | ConditionDefined$ RememberedLKI | ConditionPresent$ Card.Permanent | SubAbility$ DBCleanup
+ SVar:DBCleanup:DB$ Cleanup | ClearRemembered$ True

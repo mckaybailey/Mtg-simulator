@@ -1,0 +1,24 @@
+Subject: Uldaros Theorix: let the AI cast it (its ETB stays unused)
+Why: The ETB is a chain of DB$ Pump steps that pick up to one card of each type in the
+  graveyard. PumpAi refuses a Pump with nothing to aim at, and its sub-ability check ignores
+  AILogic$ Always, so AiController.checkETBEffects rejected the trigger and with it the creature:
+  the deck's 6-drop sat in hand (Dimir Uldaros, baseline: seen in 188 games, cast in 3). Even
+  when cast, the refusing steps left no targets, so the AI never cast anything from the
+  graveyard. OptionalDecider$ You makes the trigger optional (same outcome as choosing no
+  targets), so the AI casts Theorix as a 5/5 flier and declines the ETB as before. Making the
+  AI use the ETB would need Java (PumpAi target selection for graveyard "choose" steps).
+Measured: PENDING (filled in from the before/after gauntlets).
+
+diff --git a/forge-gui/res/cardsfolder/u/uldaros_theorix.txt b/forge-gui/res/cardsfolder/u/uldaros_theorix.txt
+index 2f9973c..aa8a4c0 100644
+--- a/forge-gui/res/cardsfolder/u/uldaros_theorix.txt
++++ b/forge-gui/res/cardsfolder/u/uldaros_theorix.txt
+@@ -3,7 +3,7 @@ ManaCost:3 U B B
+ Types:Legendary Creature Elder Sphinx
+ PT:5/5
+ K:Flying
+-T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self+wasCastByYou | Execute$ TrigArtifact | TriggerDescription$ When CARDNAME enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs. (Permanent spells cast this way become tokens.)
++T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self+wasCastByYou | Execute$ TrigArtifact | OptionalDecider$ You | TriggerDescription$ When CARDNAME enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs. (Permanent spells cast this way become tokens.)
+ SVar:TrigArtifact:DB$ Pump | ValidTgts$ Artifact.nonLand+YouOwn | ValidTgtsDesc$ nonland artifact card in your graveyard | TargetMin$ 0 | TargetMax$ 1 | TgtZone$ Graveyard | SubAbility$ DBBattle
+ SVar:DBBattle:DB$ Pump | ValidTgts$ Battle.nonLand+YouOwn | ValidTgtsDesc$ nonland battle card in your graveyard | TargetMin$ 0 | TargetMax$ 1 | TgtZone$ Graveyard | TargetUnique$ True | SubAbility$ DBCreature
+ SVar:DBCreature:DB$ Pump | ValidTgts$ Creature.nonLand+YouOwn | ValidTgtsDesc$ nonland creature card in your graveyard | TargetMin$ 0 | TargetMax$ 1 | TgtZone$ Graveyard | TargetUnique$ True | SubAbility$ DBEnchantment

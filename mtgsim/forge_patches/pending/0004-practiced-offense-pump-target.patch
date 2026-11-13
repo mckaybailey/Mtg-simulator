@@ -1,0 +1,21 @@
+Subject: Practiced Offense: give the AI a target for the double strike / lifelink part
+Why: The AI checks a spell's sub-abilities before casting it. The second half (Pump with
+  KWChoice$ Double Strike,Lifelink) reads to PumpAi as +0/+0 with no keyword, because nothing in
+  forge-ai looks at KWChoice, so getPumpCreatures finds no creature that would benefit and the
+  whole spell is refused (Azorius Momo, baseline: seen in 184 games, cast in 0).
+  AILogic$ ContinuousBonus makes PumpAi pick the AI's own creature with the highest power, the
+  right target for double strike. The counters half (target yourself) already passed.
+Measured: PENDING (filled in from the before/after gauntlets).
+
+diff --git a/forge-gui/res/cardsfolder/p/practiced_offense.txt b/forge-gui/res/cardsfolder/p/practiced_offense.txt
+index 7d5469d..767efaa 100644
+--- a/forge-gui/res/cardsfolder/p/practiced_offense.txt
++++ b/forge-gui/res/cardsfolder/p/practiced_offense.txt
+@@ -2,6 +2,6 @@ Name:Practiced Offense
+ ManaCost:2 W
+ Types:Sorcery
+ A:SP$ PutCounterAll | ValidTgts$ Player | ValidCards$ Creature | CounterType$ P1P1 | CounterNum$ 1 | SubAbility$ DBPump | SpellDescription$ Put a +1/+1 counter on each creature target player controls. Target creature gains your choice of double strike or lifelink until end of turn.
+-SVar:DBPump:DB$ Pump | ValidTgts$ Creature | KWChoice$ Double Strike,Lifelink
++SVar:DBPump:DB$ Pump | ValidTgts$ Creature | KWChoice$ Double Strike,Lifelink | AILogic$ ContinuousBonus
+ K:Flashback:1 W
+ Oracle:Put a +1/+1 counter on each creature target player controls. Target creature gains your choice of double strike or lifelink until end of turn.\nFlashback {1}{W} (You may cast this card from your graveyard for its flashback cost. Then exile it.)
