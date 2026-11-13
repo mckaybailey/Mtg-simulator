@@ -39,7 +39,9 @@ Tool: `python3 wip/tools/calib.py RUN_DIR`. Vs the unverified matchup data
    private Forge copy (`$SP/fixhome`): arm0 no patches (DONE), arm1 = 0001 (in progress, ~300/1000),
    arm2 = 0001+0002, then a 200-game AC mirror. Results: `runs/fix-arm{0,1,2}`, `runs/fix-mirror-ac`.
    **arm0: 22.4% (20–25), 224–776; Countersculpt seen 865 / cast 0; Jace's Machinations seen 791 /
-   cast 0; No More Lies seen 764 / cast 524.** Compare: `python3 wip/tools/arms.py azorius-control
+   cast 0; No More Lies seen 764 / cast 524.** **arm1 (0001 only): 39.9% (37–43), 399–601; +17.5 points
+   vs arm0 (unpaired CI +13.5..+21.4, paired CI +14.7..+20.3; loss→win 203, win→loss 28); Countersculpt
+   cast in 666 of 868 games seen; Machinations still 0 of 799 (needs 0002).** Compare: `python3 wip/tools/arms.py azorius-control
    runs/fix-arm0 runs/fix-arm1 runs/fix-arm2 --cards "Countersculpt,Jace's Machinations,No More Lies"`.
    While it runs, the script copies 0001/0002 into `mtgsim/forge_patches/` (excluded locally in
    `.git/info/exclude`; the sources are in `forge_patches/pending/`). Don't commit those copies
