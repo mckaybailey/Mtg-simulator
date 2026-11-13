@@ -1,0 +1,143 @@
+From 7cb137f816f2c9d8e66a4bb4a8452997fe2e1b4e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 02:33:55 +0000
+Subject: [PATCH] WIP: dead-card AI fixes for Azorius Momo and Dimir Uldaros
+ (paused)
+
+Paused at the coordinator's request; nothing is measured yet. The one
+draft lives in mtgsim/forge_patches/pending/, which setup --build does not
+read (load_patches only globs the top-level folder), so no engine changes.
+Scope: Practiced Offense, Springleaf Drum, Nurturing Pixie (Azorius Momo);
+Uldaros Theorix, Seasoned Cryomancer (Dimir Uldaros). Not to be touched:
+patches 0001/0002 (coordinator's Azorius Control work), Countersculpt,
+Theorist's Sanctum, Vraska's Final Mercy. My patches start at 0003.
+
+Baseline (runs/baseline-rr-n30-s1/games.jsonl, 30 games per pairing, seed
+1; seen = in opening hand or drawn, cast = players[].played > 0), which I
+reproduced exactly:
+  azorius-momo (300 games): Practiced Offense seen 184 cast 0; Springleaf
+    Drum seen 230 cast 0; Nurturing Pixie seen 165 cast 5. For comparison,
+    Momo 227/210, Starfield Shepherd 219/203, Sage of the Skies 227/206.
+  dimir-uldaros (300 games): Uldaros Theorix seen 188 cast 3; Seasoned
+    Cryomancer seen 209 cast 7 (Deceit 232/218, Overlord 141/130).
+  Median own turns in those games: 8-10, so mana value is not the blocker.
+
+Findings so far (shared ~/.mtgsim/forge, read only; line numbers at
+FORGE_PINNED_REF 7db198d72e):
+
+1. Springleaf Drum - CAUSE FOUND. AiController.java ~2025-2031:
+   saList.removeIf(... ComputerUtilCard.isCardRemAIDeck(h) && !flatMc ...)
+   drops every AI:RemoveDeck:All card from the candidate plays unless Flat
+   Monte Carlo is on. With --mc off (the default) the Drum is never
+   considered. Only Flat MC offers it (isRemoveDeckManaPermanent, ~2637).
+   DRAFT: pending/0003-springleaf-drum-ai-playable.patch removes the
+   AI:RemoveDeck:All line. Still to check before measuring: can
+   ComputerUtilMana pay its mana ability "T tapXType<1/Creature>" (grep
+   ComputerUtilMana for CostTapType / tapXType)? Does tapping a creature
+   for mana cost the AI attacks? Also look at ComputerUtilAbility.java
+   ~339, another isCardRemAIDeck check. If the AI casts the Drum but never
+   taps it, the patch is a net loss: measure and drop it if so.
+
+2. Nurturing Pixie - HYPOTHESIS from reading the code, not yet confirmed
+   in game logs. For a creature spell, AiController.saSideEffects ->
+   checkETBEffects (~293-450) runs each mandatory ETB trigger through
+   doTrigger(exSA, false). If the AI would not use the trigger, the
+   creature is rejected (BadEtbEffects). The exemption at ~436 (AILogic$
+   BadETB) applies only when the trigger is NOT fully targetable, so it
+   does not help while the AI controls a nonland permanent. The trigger
+   (ChangeZone Battlefield->Hand, ValidTgts Permanent.nonFaerie+nonLand+
+   YouCtrl, TargetMin 0) goes to ChangeZoneAi.knownOriginTriggerAI
+   (~1458) -> isPreferredTarget (~865). For Battlefield origin, ~1094
+   filters to opponents' cards unless the ability has AITgtOwnCards, so
+   with only own targets the list is empty. canBouncePermanent (saving a
+   threatened permanent) is the only path to yes. Next: read
+   isUnpreferredTarget (~1369) with mandatory=false; confirm with
+   --save-logs games; compare Mischievous Pup (same "up to one other
+   target permanent you control" shape, no hint). Candidate fixes to
+   evaluate: OptionalDecider$ You on the trigger (equivalent in rules,
+   since choosing zero targets does nothing, but check the +1/+1 counter
+   condition still works), or AITgtOwnCards plus a sensible target such
+   as a permanent with an ETB.
+
+3. Practiced Offense - NOT YET INVESTIGATED. Script: SP$ PutCounterAll |
+   ValidTgts$ Player | ValidCards$ Creature (P1P1) with SubAbility DB$ Pump
+   | ValidTgts$ Creature | KWChoice$ Double Strike,Lifelink; Flashback 1W.
+   Next: read ability/PutCounterAllAi.java (does it handle a targeted
+   player and target itself?) and PumpAi's handling of KWChoice as a
+   sub-ability.
+
+4. Uldaros Theorix - HYPOTHESIS. Same checkETBEffects path: the ETB
+   (ValidCard Card.Self+wasCastByYou, no OptionalDecider) starts a chain of
+   DB$ Pump with TgtZone Graveyard, TargetMin 0, and no NumAtt/KW, then
+   ChangeZone exile and Play WithoutManaCost CopyCard WithTotalCMC 6.
+   PumpAi probably refuses a pump with no effect aimed at graveyard cards
+   -> BadEtbEffects -> the 6-drop is never cast. Next: read PumpAi
+   (pumpTgtAI / TgtZone handling) and confirm with --save-logs. Candidate
+   fix: an AILogic on the Pump chain that PumpAi accepts (look for one
+   meaning "always" or "pick from graveyard"), or OptionalDecider on the
+   trigger. Also check that the Play step then actually casts the copies.
+
+5. Seasoned Cryomancer - HYPOTHESIS. ETB DB$ Draw 2 -> DB$ Discard 2
+   (Mode TgtChoose, no Defined) -> ImmediateTrigger tap+stun. DrawAi
+   (sub-ability check) or DiscardAi (discarding from own hand) likely
+   refuses -> BadEtbEffects. Next: read DrawAi (trigger / sub-ability
+   handling) and DiscardAi (Mode TgtChoose with no target -> defaults to
+   the activator?); compare other loot-on-ETB creatures' scripts.
+
+Next steps, in order:
+ a. Finish the code reading above; confirm each cause with a few games
+    with --save-logs (any engine run goes through the lock below).
+ b. Write one patch per concern as mtgsim/forge_patches/pending/NNNN-*.patch
+    (0003 onward), following mtgsim/forge_patches/README.md. Move a patch
+    to mtgsim/forge_patches/ only once it is measured.
+ c. Measure on a private copy, never the shared checkout:
+      export MTGSIM_HOME=<scratch>/dead-cards-home
+      cp -a ~/.mtgsim/forge $MTGSIM_HOME/forge
+      echo '{"forge_dir": "'$MTGSIM_HOME/forge'"}' > $MTGSIM_HOME/config.json
+    Every engine command goes through
+      flock /tmp/claude-0/-home-user-Mtg-simulator/ac175026-a9a0-5278-9b10-d7c0563130a0/scratchpad/engine.lock ...
+    in the background (the queue is shared). Per deck: gauntlet
+    decks/standard/meta/<deck>.txt --vs <the other ten meta .txt> -n 100
+    --seed 1, once without and once with that deck's patches (setup --build
+    in between, with the patch copied into the top-level folder of a
+    scratch copy of the repo or of this worktree). Report the win rate with
+    its 95% interval, before and after, and how often the fixed card is now
+    cast. Then a mirror on the patched engine: match <deck> <deck> -n 200
+    --seed 1, which should come out near 50%. Put the numbers in each
+    patch's Measured: line.
+ d. Commit on this branch, delete the private Forge copy, report back.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_018QGFjWtkWUaBP81mSgrMCb
+---
+ .../0003-springleaf-drum-ai-playable.patch     | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+ create mode 100644 mtgsim/forge_patches/pending/0003-springleaf-drum-ai-playable.patch
+
+diff --git a/mtgsim/forge_patches/pending/0003-springleaf-drum-ai-playable.patch b/mtgsim/forge_patches/pending/0003-springleaf-drum-ai-playable.patch
+new file mode 100644
+index 0000000..eb64284
+--- /dev/null
++++ b/mtgsim/forge_patches/pending/0003-springleaf-drum-ai-playable.patch
+@@ -0,0 +1,18 @@
++Subject: Springleaf Drum: let the heuristic AI consider casting it (DRAFT, unmeasured)
++Why: AiController drops every card marked AI:RemoveDeck:All from its list of candidate plays
++  unless Flat Monte Carlo is on, so with the default AI Springleaf Drum was never cast (Azorius
++  Momo baseline: seen in 230 games, cast in 0). Removing the hint lets the normal permanent and
++  mana logic decide. Not yet checked: whether the AI can pay the Drum's own mana ability
++  (T, tap an untapped creature); if it casts the Drum but never uses it, this makes the deck worse.
++Measured: NOT MEASURED. Draft only; it lives in pending/ so setup --build does not apply it.
++
++diff --git a/forge-gui/res/cardsfolder/s/springleaf_drum.txt b/forge-gui/res/cardsfolder/s/springleaf_drum.txt
++index 7203571..1c5b458 100644
++--- a/forge-gui/res/cardsfolder/s/springleaf_drum.txt
+++++ b/forge-gui/res/cardsfolder/s/springleaf_drum.txt
++@@ -2,5 +2,4 @@ Name:Springleaf Drum
++ ManaCost:1
++ Types:Artifact
++ A:AB$ Mana | Cost$ T tapXType<1/Creature> | Produced$ Any | SpellDescription$ Add one mana of any color.
++-AI:RemoveDeck:All
++ Oracle:{T}, Tap an untapped creature you control: Add one mana of any color.
+-- 
+2.43.0
+

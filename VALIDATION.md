@@ -8,7 +8,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 187 pass |
+| Unit tests (no Forge needed) | 217 pass |
 | Integration tests (real games) | 4 pass |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
@@ -18,6 +18,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Simulated vs real meta win rates | weak agreement (rank correlation 0.24); see below |
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
+| Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 
 ## The pipeline behaves correctly
 
@@ -74,6 +75,27 @@ strong) in `decks/standard/meta/gauntlet.json`, and reports name the opponents t
 That closes part of the gap for the control deck at about six times the run time. Monte Carlo
 mode thinks against a clock, so its games are not exactly reproducible from the seed.
 
+**Per-deck AI settings do not fix the ranking.** The full round robin (1,650 games, 30 per
+pairing) was repeated with four settings applied through `ai_profile` / `ai_mc` in
+`gauntlet.json`. Ranges are 95% bootstrap intervals (games resampled within each pairing):
+
+| Setting | Rank corr. | Mean gap | Time | s/game |
+|---|---|---|---|---|
+| Default AI for every deck (baseline) | 0.24 (0.12–0.35) | 13.0 pts (11.9–14.5) | 19 min | 2.8 |
+| `Cautious` profile for the three control decks | 0.24 (0.12–0.34) | 12.7 pts (11.7–14.3) | 16 min | 2.3 |
+| `ai_mc: max` for the three `weak` decks | 0.21 (0.05–0.42) | 9.1 pts (8.2–11.1) | 63 min | 9.1 |
+| `Hardest` + `ai_mc: max` for the `weak` decks | 0.25 (0.08–0.40) | 9.4 pts (8.4–11.1) | ~60 min | 9.0 |
+| `--mc max` for every deck | 0.16 (−0.09–0.33) | 11.6 pts (10.2–12.9) | 167 min | 24.2 |
+
+Monte Carlo for the weak decks lifts them to realistic levels (Jund Sacrifice 41→50%, Dimir
+Uldaros 31→48%, Azorius Control 20→46%) and cuts the average gap by about four points, beyond
+the noise. The ranking does not improve: Azorius Artifacts, Azorius Momo and Izzet
+Spellementals lose ground, and Boros Dwarves (72%) and Boros Dragons (62%) stay overrated.
+Monte Carlo for everyone is worse on both measures and nine times slower. The `Cautious` and
+`Hardest` profiles change nothing measurable. The shipped gauntlet therefore keeps the
+default AI, and its games stay reproducible. Setting `ai_mc: max` on the three `weak` decks
+is a reasonable opt-in when realistic opponents matter more than speed and exact replays.
+
 **Card statistics are noisy.** In the 400-game mirror, the two identical decks' cards should
 have scored the same; Giant Growth came out at +18.7 points in one copy and −1.3 in the other.
 Reports now show a 95% interval for every card and mark only the differences that exclude zero.
@@ -87,6 +109,29 @@ Average engine time per game was 2.8 s across the meta round robin (slowest deck
 Artifacts, 4.1 s). With four workers that is about 85 games a minute: the 550-game sample
 gauntlet (a casual deck against all eleven meta decks, 50 games each) took 6 minutes. Each worker
 uses about 0.9–1.2 GB of memory.
+
+## Forge patches
+
+`setup --build` applies the patches in `mtgsim/forge_patches/` (none ship yet). The mechanism
+was checked on 13 November 2026 in an empty `MTGSIM_HOME`, with throwaway patches that were not
+committed: a card-script hint for Grizzly Bears, a second one for Raging Goblin, and a Java patch
+that adds a new class to `forge-ai`. Maven had the shared `~/.m2` cache; times are wall clock on
+the 4-core machine.
+
+| Step | Result | Time |
+|---|---|---|
+| Fresh build with the Grizzly Bears patch (fetch, apply, Maven, driver, card database) | applied; `doctor` passes: "1 applied, up to date" | 70 s |
+| Add the Java patch | Maven rebuild; the new class is in the jar; card cache and driver get new names | 28 s |
+| Change the Grizzly Bears patch's content and add the Raging Goblin one | both card scripts re-patched, no Maven run (jar unchanged) | 4 s |
+| Remove the Java patch | Maven rebuild; the class and its source are gone | 28 s |
+| Add a patch to the folder without running setup | `doctor` plays its games and then exits 1, saying which patch is missing; `match` warns on stderr; `run.json` records `"state": "out-of-date"` and the applied set | 8–9 s |
+| Add a patch that does not apply | setup stops with an error naming it and the patches it was tried on top of; checkout and `mtgsim-patches.json` unchanged | 1 s |
+| `setup --build --no-patches`, then `setup --build` | card scripts back to the pinned commit ("disabled", `doctor` passes), then re-applied; no Maven run | 3 s, 4 s |
+
+`doctor` took 9 s each time. Afterwards `git status` in the checkout showed only the two patched
+card scripts and the marker file. The unit tests in `tests/test_forge_patches.py` cover the same
+cases on a miniature git repository (plus interrupted applies, a damaged marker, patches that
+create or delete files, and moving to another Forge commit).
 
 ## The goldfish model
 

@@ -1,0 +1,21 @@
+Subject: Jace's Machinations: let the AI cast it at the opponent's end step
+Why: The card is an Effect spell with no AILogic, and EffectAi refuses any Effect spell without
+  one, so even with Empower playable (0001) the AI never casts it (0 of 228 games in the
+  baseline round robin). Its value is the Empower Jace 8 rider; AILogic$ AtOppEOT makes the AI
+  consider it only at the end of the opponent's turn, when mana held up for counterspells is
+  otherwise wasted, as a control player would.
+Measured: MEASUREMENT_PENDING
+
+diff --git a/forge-gui/res/cardsfolder/j/jaces_machinations.txt b/forge-gui/res/cardsfolder/j/jaces_machinations.txt
+index 2b7643b..2f6fabe 100644
+--- a/forge-gui/res/cardsfolder/j/jaces_machinations.txt
++++ b/forge-gui/res/cardsfolder/j/jaces_machinations.txt
+@@ -1,7 +1,7 @@
+ Name:Jace's Machinations
+ ManaCost:2 U
+ Types:Instant
+-A:SP$ Effect | StaticAbilities$ InstantJace | SubAbility$ DBEmpower | SpellDescription$ Until end of turn, you may activate loyalty abilities of Jace planeswalkers you control on any player's turn any time you could cast an instant.
++A:SP$ Effect | StaticAbilities$ InstantJace | SubAbility$ DBEmpower | AILogic$ AtOppEOT | SpellDescription$ Until end of turn, you may activate loyalty abilities of Jace planeswalkers you control on any player's turn any time you could cast an instant.
+ SVar:InstantJace:Mode$ CastWithFlash | ValidCard$ Planeswalker.Jace+YouCtrl | ValidSA$ Activated.Loyalty | Caster$ You | Description$ You may activate loyalty abilities of Jace planeswalkers you control on any player's turn any time you could cast an instant.
+ SVar:DBEmpower:DB$ Empower | Type$ Jace | Num$ 8 | SpellDescription$ Empower Jace 8. (Put eight loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with "[-1]: Surveil 1" and "[-3]: Draw a card.")
+ DeckHints:Type$Jace

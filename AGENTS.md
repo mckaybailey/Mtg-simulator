@@ -13,12 +13,18 @@ measured and how far results can be trusted. Each folder with code or data has i
 | `tests/` | unit tests (no Forge needed) and the integration test |
 | `decks/` | the included gauntlets and the `gauntlet.json` format |
 
+`docs/stronger-ai.md` is a design note comparing ways to give mtgsim a stronger pilot than Forge's AI.
+
 ## Running simulations for the user
 
-1. `python3 -m mtgsim doctor` checks Java, Forge and plays two games. If Forge is missing, run
-   `python3 -m mtgsim setup --build` (fetches the pinned Forge commit, builds it with Maven;
-   about 2 minutes, ~1 GB in `~/.mtgsim/forge`). The cloud environment "Mtg-simulator" runs
-   that in its setup script before the session starts.
+1. `python3 -m mtgsim doctor` checks Java, Forge and mtgsim's Forge patches and plays two games.
+   If Forge is missing, run `python3 -m mtgsim setup --build` (fetches the pinned Forge commit,
+   applies `mtgsim/forge_patches/`, builds it with Maven; about 2 minutes, ~1 GB in
+   `~/.mtgsim/forge`). The cloud environment "Mtg-simulator" runs that in its setup script
+   before the session starts. If `doctor` says the patches are out of date (the repository
+   gained or changed a patch since the build), run `setup --build` again: it re-applies them and
+   rebuilds only when a patch touches Java code. Do not run it while games are running on that
+   Forge.
 2. Save the user's list to a file (`decks/brews/` if they want it kept) and run
    `python3 -m mtgsim check FILE` first. Resolve unknown card names with the user; never guess.
 3. Run what they asked for: `gauntlet`, `ab`, `match`, `matrix`, `goldfish` (`--clock` for the
@@ -46,11 +52,21 @@ Always pass on the limits with the numbers:
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (191 tests, ~2 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (221 tests, ~2 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match
-  (two copies of one deck should come out near 50%).
+  (two copies of one deck should come out near 50%). Bumping it also means checking that every
+  Forge patch still applies (`setup --build` names any that does not) and still does its job.
+- Changes to Forge itself (card-script AI hints such as `AILogic$`, `SVar:PlayMain1`,
+  `AI:RemoveDeck`, AI profiles, AI Java code) go in `mtgsim/forge_patches/NNNN-name.patch`, a
+  `git diff` against the pinned commit with a `Subject:` / `Why:` / `Measured:` header;
+  `mtgsim/forge_patches/README.md` says how to make one without disturbing runs on the shared
+  checkout. Never edit `~/.mtgsim/forge` by hand to change results: only the patch set is
+  recorded in each run's `run.json`. **Every patch must be measured before it is committed**:
+  the same command and seed with and without it, enough games to see the difference, and the
+  numbers (with intervals) in its `Measured:` line. A patch without a measurable effect still
+  records that it had none.
 - Commit to `main` and keep `claude/mtg-deck-simulator-h1pbfa` pointing at the same commit; push
   both. Commit messages explain why, not just what.
 - Never commit `runs/`, Forge itself, or anything from `~/.mtgsim`.

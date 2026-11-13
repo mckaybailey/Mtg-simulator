@@ -351,8 +351,11 @@ def cmd_setup(args: argparse.Namespace) -> int:
     major = forge.check_java()
     print(f"Java {major} found.")
     if args.build:
-        install = forge.build_from_source(Path(args.dest) if args.dest else None, ref=args.ref)
+        install = forge.build_from_source(Path(args.dest) if args.dest else None, ref=args.ref,
+                                          apply_patches=not args.no_patches)
     elif args.forge_dir:
+        if args.no_patches:
+            raise UserError("--no-patches only applies to --build; mtgsim never patches a Forge you supply")
         install = forge.detect_install(Path(args.forge_dir))
     else:
         raise UserError("choose --build (fetch and build Forge) or --forge-dir PATH (use an existing Forge)")
@@ -360,6 +363,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
     config["forge_dir"] = str(install.root)
     forge.save_config(config)
     print(f"Forge {install.version} at {install.root}")
+    print(forge.patch_status(install, verify=args.build).summary())
     print("Compiling the game driver...")
     forge.ensure_bridge(install, force=True)
     print("Reading the card database...")
@@ -376,6 +380,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"Java {forge.check_java()}")
     install = ctx.install
     print(f"Forge {install.version} at {install.root}")
+    patches = forge.patch_status(install, verify=True)
+    print(patches.summary())
     print(f"Card database: {len(ctx.db)} cards")
     formats = legality.load_formats(install.res)
     if "standard" in formats:
@@ -392,7 +398,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     ok = [r for r in records if r["status"] == "ok"]
     if len(ok) != 2:
         raise UserError("the test games did not complete: " + "; ".join(r.get("error", r["status"]) for r in records))
-    print(f"Played 2 test games in {sum(r['ms'] for r in ok) / 1000:.1f}s of engine time. Everything works.")
+    played = f"Played 2 test games in {sum(r['ms'] for r in ok) / 1000:.1f}s of engine time."
+    if patches.state == "out-of-date":
+        raise UserError(f"{played} The engine works, but its Forge patches are out of date; "
+                        "run `python -m mtgsim setup --build` to update them.")
+    print(f"{played} Everything works.")
     return 0
 
 
@@ -761,6 +771,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--forge-dir", help="use an existing Forge installation or built source checkout")
     p.add_argument("--dest", help="where --build puts Forge (default: ~/.mtgsim/forge)")
     p.add_argument("--ref", default=forge.FORGE_PINNED_REF, help="Forge commit to build (default: the validated one)")
+    p.add_argument("--no-patches", action="store_true",
+                   help="build Forge without mtgsim's Forge patches (mtgsim/forge_patches), e.g. to measure what they change")
     p.set_defaults(func=cmd_setup)
 
     p = sub.add_parser("doctor", help="verify the installation by playing two test games")

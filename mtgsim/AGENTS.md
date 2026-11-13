@@ -4,7 +4,8 @@
 
 | Module | Job |
 |---|---|
-| `forge.py` | find or build Forge, compile the Java driver, build the `java` command line; `MTGSIM_HOME` (default `~/.mtgsim`) holds config, the Forge build, compiled driver, card cache and a private Forge profile |
+| `forge.py` | find or build Forge, apply mtgsim's Forge patches, compile the Java driver, build the `java` command line; `MTGSIM_HOME` (default `~/.mtgsim`) holds config, the Forge build, compiled driver, card cache and a private Forge profile |
+| `forge_patches/` | mtgsim's own changes to Forge as `NNNN-name.patch` diffs against `FORGE_PINNED_REF`; its `README.md` gives the format, how to make one and how to measure it |
 | `carddb.py` | card database parsed from Forge's own card scripts and edition files, so a name that resolves here is one the engine can play; cached as `~/.mtgsim/cache/carddb-v<CACHE_VERSION>-<fingerprint>.json.gz` |
 | `decks.py` | parse Arena / MTGO / Forge `.dck` lists, resolve names, write `.dck` for Forge |
 | `legality.py` | deck size, copy limits and format legality from Forge's `res/formats` files |
@@ -37,6 +38,22 @@
 - **The driver's tracker only reads game state** (see `bridge/AGENTS.md`); a tracker that calls
   something with side effects silently changes every game. `misplay.POOR_TARGET` must match
   `Tracker.POOR_TARGET` in the driver.
+- **Forge patches are applied only by `setup --build`, only to the checkout it manages**, never
+  to a Forge given with `--forge-dir`. `forge.sync_patches` tries the series on a scratch git
+  index first (a patch that does not apply raises `ForgeError` naming it and changes nothing),
+  then restores every path the old or new series touches to the pinned commit and `git apply`s
+  the whole series. `mtgsim-patches.json` in the checkout root records names, sha256, touched
+  paths, the expected blob of each path and what the jar was built from; Maven runs only when
+  that jar record differs from the commit plus the patches touching anything outside
+  `forge-gui/res/`. Write the marker through `_write_marker` (atomic, state `applying` while
+  files change) so an interrupted setup is repaired on the next run.
+- **The applied patch set is part of `ForgeInstall.fingerprint()`** (only when non-empty, so an
+  unpatched Forge keeps its cache names). A patched card script changes neither the jar nor the
+  folder timestamps the fingerprint also uses, so without this the card cache and compiled
+  driver would go stale. `experiment.execute` records `forge.patch_status(...).record()` in
+  `run.json` under `forge.patches` and warns on stderr (unless `quiet`) when the install is not
+  carrying the shipped set or a resumed run changes set. `patch_status` reads only the marker
+  (cheap, no git); `verify=True` (doctor, setup) also hashes the patched files with git.
 
 ## Reports
 

@@ -1,0 +1,72 @@
+Subject: Give the Empower ability an AI so spells with "Empower Jace" can be cast
+Why: Forge has no AI class for ApiType.Empower, so SpellApiToAi falls back to CannotPlayAi
+  ("No AI assigned for API: Empower" in the worker logs) and the AI refuses every spell or
+  ability that has Empower in it. In the baseline round robin (seed 1, 30 games per pairing)
+  Azorius Control saw Countersculpt in 259 games and Jace's Machinations in 228 and cast neither
+  once; Theorist's Sanctum's Empower ability and Vraska's Final Mercy's second mode are affected
+  too. Empower only adds loyalty to a Jace its controller controls (creating one first if
+  needed), so the new EmpowerAi always accepts it as a rider on a spell, and uses a stand-alone
+  Empower ability (Theorist's Sanctum) at the end of the opponent's turn, when mana held up for
+  instants would otherwise go unused.
+Measured: MEASUREMENT_PENDING
+
+diff --git a/forge-ai/src/main/java/forge/ai/SpellApiToAi.java b/forge-ai/src/main/java/forge/ai/SpellApiToAi.java
+index b830a455..55a179a8 100644
+--- a/forge-ai/src/main/java/forge/ai/SpellApiToAi.java
++++ b/forge-ai/src/main/java/forge/ai/SpellApiToAi.java
+@@ -91,6 +91,7 @@ public enum SpellApiToAi {
+             .put(ApiType.EachDamage, DamageEachAi.class)
+             .put(ApiType.Earthbend, EarthbendAi.class)
+             .put(ApiType.Effect, EffectAi.class)
++            .put(ApiType.Empower, EmpowerAi.class)
+             .put(ApiType.Encode, EncodeAi.class)
+             .put(ApiType.Endure, EndureAi.class)
+             .put(ApiType.EndCombatPhase, EndTurnAi.class)
+diff --git a/forge-ai/src/main/java/forge/ai/ability/EmpowerAi.java b/forge-ai/src/main/java/forge/ai/ability/EmpowerAi.java
+new file mode 100644
+index 00000000..4110691f
+--- /dev/null
++++ b/forge-ai/src/main/java/forge/ai/ability/EmpowerAi.java
+@@ -0,0 +1,42 @@
++package forge.ai.ability;
++
++import java.util.Map;
++
++import forge.ai.AiAbilityDecision;
++import forge.ai.AiPlayDecision;
++import forge.ai.SpellAbilityAi;
++import forge.game.phase.PhaseHandler;
++import forge.game.phase.PhaseType;
++import forge.game.player.Player;
++import forge.game.player.PlayerActionConfirmMode;
++import forge.game.spellability.SpellAbility;
++
++/**
++ * Empower N puts N loyalty counters on a planeswalker of the named type that its controller
++ * controls, creating a token one first if there is none, so it only ever helps the AI.
++ * As a rider on a spell (Countersculpt, Jace's Machinations) the default sub-ability check
++ * accepts it. As an ability of its own (a mana sink such as Theorist's Sanctum) the AI uses it
++ * at the end of the opponent's turn, when mana held up for instants would otherwise go unused.
++ */
++public class EmpowerAi extends SpellAbilityAi {
++    @Override
++    protected boolean checkPhaseRestrictions(final Player ai, final SpellAbility sa, final PhaseHandler ph) {
++        return ph.is(PhaseType.END_OF_TURN) && ph.isPlayerNextTurn(ai);
++    }
++
++    @Override
++    protected AiAbilityDecision checkApiLogic(final Player ai, final SpellAbility sa) {
++        return new AiAbilityDecision(100, AiPlayDecision.WillPlay);
++    }
++
++    @Override
++    protected AiAbilityDecision doTriggerNoCost(final Player ai, final SpellAbility sa, final boolean mandatory) {
++        return new AiAbilityDecision(100, AiPlayDecision.WillPlay);
++    }
++
++    @Override
++    public boolean confirmAction(final Player player, final SpellAbility sa, final PlayerActionConfirmMode mode,
++            final String message, final Map<String, Object> params) {
++        return true;
++    }
++}
