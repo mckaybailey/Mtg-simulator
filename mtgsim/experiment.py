@@ -43,7 +43,7 @@ class Entrant:
     category: str = ""
     pilot: str = ""  # how well the AI plays this deck compared with people: "weak", "fair", "strong" or unknown
     ai_profile: str = ""  # Forge AI profile for this deck's seat ("" = the run's default)
-    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max" ("" = the run's default)
+    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max", "fixed" ("" = the run's default)
     dck_path: str = ""
 
     def describe(self) -> dict:
@@ -212,6 +212,8 @@ def _record(job: Job, result: dict) -> dict:
     record["end_reason"] = result.get("endReason")
     record["ms"] = result.get("ms")
     record["players"] = result.get("players", [])
+    if result.get("mc") is not None:  # search counters, only reported for games with Monte Carlo
+        record["mc"] = result["mc"]
     if result.get("error"):
         record["error"] = str(result["error"])[:2000]
     return record

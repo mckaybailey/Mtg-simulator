@@ -13,9 +13,11 @@
  *   -Dmtgsim.aiProfileDir=<folder> makes Forge load its AI profiles (*.ai) from that folder instead of
  *           res/ai; the ready line then names it ("aiProfileDir") and counts them ("aiProfiles").
  *   stdin : one job per line, tab separated key=value fields:
- *             id=<text> seed=<long> timeout=<seconds> format=<GameType> mc=<off|on|max>
+ *             id=<text> seed=<long> timeout=<seconds> format=<GameType> mc=<off|on|max|fixed>
  *             log=<path or empty> deck=<path> deck=<path> ... profile=<name or empty> ...
- *             seatmc=<off|on|max|empty> ...   (per seat, in deck order; empty follows mc=)
+ *             seatmc=<off|on|max|fixed|empty> ...   (per seat, in deck order; empty follows mc=)
+ *           "fixed" is Monte Carlo with a counted budget that never reads the clock, so the game still
+ *           replays from its seed; it needs mtgsim's Forge patch 0020 (applied by `mtgsim setup --build`).
  *           the line "quit" ends the process.
  * Everything Forge itself prints is redirected to stderr so stdout carries only the protocol.
  *
@@ -35,6 +37,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -51,6 +54,7 @@ import com.google.common.eventbus.Subscribe;
 import forge.GuiDesktop;
 import forge.LobbyPlayer;
 import forge.ai.AiProfileUtil;
+import forge.ai.simulation.FlatMonteCarloStats;
 import forge.deck.Deck;
 import forge.deck.DeckSection;
 import forge.deck.io.DeckSerializer;
@@ -114,6 +118,15 @@ public final class ForgeBridge {
     private static final int EXIT_RESTART = 3;
     /** Game threads get a large stack: deep trigger chains otherwise overflow the default one. */
     private static final long GAME_STACK_BYTES = 64L * 1024 * 1024;
+    /** Monte Carlo settings a job may ask for; anything else is an error rather than a silent "on". */
+    private static final Set<String> MC_MODES = new HashSet<>(Arrays.asList("off", "on", "max", "fixed"));
+    /**
+     * Forge's AI gives up on a decision after Game.AI_TIMEOUT seconds (5 by default), which makes play depend on how
+     * fast the machine is. A game with a "fixed" seat gets a limit no game reaches; the job's own timeout still ends it.
+     */
+    private static final int UNREACHABLE_AI_TIMEOUT_SECONDS = 1_000_000;
+    /** At or below this heap Forge shrinks its Monte Carlo search to phone size and checks free memory between rollouts. */
+    private static final long MIN_FIXED_HEAP_BYTES = 768L << 20;
 
     private static final Map<String, Deck> DECK_CACHE = new HashMap<>();
     /** The AI profiles this JVM loaded; a seat asking for any other name fails instead of silently using defaults. */
@@ -291,14 +304,26 @@ public final class ForgeBridge {
         final Match match = new Match(rules, seats, "mtgsim");
         final Game game = match.createGame();
         invokeIfPresent(game, "setNoGUIUser");
+        if (!MC_MODES.contains(job.monteCarlo)) {
+            throw new IllegalArgumentException("unknown Monte Carlo setting \"" + job.monteCarlo + "\"");
+        }
+        for (final String mode : job.seatMonteCarlo) {
+            if (!mode.isEmpty() && !MC_MODES.contains(mode)) {
+                throw new IllegalArgumentException("unknown Monte Carlo setting \"" + mode + "\"");
+            }
+        }
         if (!"off".equals(job.monteCarlo)) {
             setFieldIfPresent(game, "AI_FLAT_MONTE_CARLO", Boolean.TRUE);
-            if ("max".equals(job.monteCarlo)) {
+            if ("max".equals(job.monteCarlo) || "fixed".equals(job.monteCarlo)) {
                 setFieldIfPresent(game, "AI_FLAT_MONTE_CARLO_MAX", Boolean.TRUE);
             }
         }
 
         applySeatMonteCarlo(game, seats, job.seatMonteCarlo);
+        final boolean searching = applyFixedMonteCarlo(game, seats, job);
+        if (searching) {
+            FlatMonteCarloStats.reset(); // counters are per JVM; one game at a time runs here
+        }
 
         final Tracker tracker = new Tracker(game, seats);
         game.subscribeToEvents(tracker);
@@ -357,6 +382,14 @@ public final class ForgeBridge {
         sb.append(",\"endReason\":").append(outcome == null ? "null" : quote(String.valueOf(outcome.getWinCondition())));
         sb.append(",\"ms\":").append(System.currentTimeMillis() - started);
         sb.append(",\"restart\":").append(tainted);
+        if (searching && !tainted) {
+            // Only games with Monte Carlo carry this, so records of games without it are unchanged.
+            sb.append(",\"mc\":{\"decisions\":").append(FlatMonteCarloStats.getDecisions());
+            sb.append(",\"rollouts\":").append(FlatMonteCarloStats.getRollouts());
+            sb.append(",\"failures\":").append(FlatMonteCarloStats.getFailureCount()).append('}');
+            System.err.println("[mtgsim] Monte Carlo in game " + job.id + " (" + (System.currentTimeMillis() - started)
+                    + " ms, status " + status + "):\n" + FlatMonteCarloStats.summary());
+        }
         if (failure[0] != null) {
             sb.append(",\"error\":").append(quote(stackTrace(failure[0])));
         }
@@ -436,11 +469,49 @@ public final class ForgeBridge {
             try {
                 final Object ai = p.getController().getClass().getMethod("getAi").invoke(p.getController());
                 ai.getClass().getMethod("setFlatMonteCarloOverride", Boolean.class).invoke(ai, !"off".equals(mode));
-                ai.getClass().getMethod("setFlatMonteCarloMaxOverride", Boolean.class).invoke(ai, "max".equals(mode));
+                // "fixed" is the maximum-strength search at a counted size, see applyFixedMonteCarlo
+                ai.getClass().getMethod("setFlatMonteCarloMaxOverride", Boolean.class)
+                        .invoke(ai, "max".equals(mode) || "fixed".equals(mode));
             } catch (final ReflectiveOperationException e) {
                 throw new IllegalArgumentException("this Forge version does not support per-player Monte Carlo settings");
             }
         }
+    }
+
+    /**
+     * Seats playing "fixed" get Forge's Monte Carlo with a budget counted in rollouts instead of milliseconds
+     * (mtgsim's Forge patch 0020, AiController.setFlatMonteCarloCountOnly), and the game gets an AI timeout that is
+     * never reached, so nothing in the game depends on the clock and the seed replays it exactly.
+     * Returns whether any seat of this game uses Monte Carlo at all.
+     */
+    private static boolean applyFixedMonteCarlo(final Game game, final List<RegisteredPlayer> seats, final Job job) {
+        boolean searching = false;
+        boolean fixed = false;
+        for (final Player p : game.getRegisteredPlayers()) {
+            final int seat = seats.indexOf(p.getRegisteredPlayer());
+            final String own = seat >= 0 && seat < job.seatMonteCarlo.size() ? job.seatMonteCarlo.get(seat) : "";
+            final String mode = own.isEmpty() ? job.monteCarlo : own;
+            searching |= !"off".equals(mode);
+            if (!"fixed".equals(mode)) {
+                continue;
+            }
+            if (Runtime.getRuntime().maxMemory() <= MIN_FIXED_HEAP_BYTES) {
+                throw new IllegalArgumentException("Monte Carlo \"fixed\" needs a Java heap above 768 MB: below that"
+                        + " Forge shrinks the search and checks free memory, and games would no longer replay");
+            }
+            try {
+                final Object ai = p.getController().getClass().getMethod("getAi").invoke(p.getController());
+                ai.getClass().getMethod("setFlatMonteCarloCountOnly", boolean.class).invoke(ai, true);
+            } catch (final ReflectiveOperationException e) {
+                throw new IllegalArgumentException("this Forge build cannot play Monte Carlo \"fixed\": it lacks mtgsim's"
+                        + " Forge patch 0020 (counted Monte Carlo); run `python3 -m mtgsim setup --build`");
+            }
+            fixed = true;
+        }
+        if (fixed) {
+            game.AI_TIMEOUT = UNREACHABLE_AI_TIMEOUT_SECONDS;
+        }
+        return searching;
     }
 
     private static LobbyPlayer createAi(final String name, final String profile) throws Exception {
