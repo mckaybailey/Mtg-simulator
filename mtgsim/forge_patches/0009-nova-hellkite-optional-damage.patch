@@ -1,0 +1,31 @@
+Subject: Nova Hellkite: do not hold the dragon because its 1 damage would kill nothing
+Why: Before casting a creature the AI asks whether it would use each ETB trigger
+  (AiController.checkETBEffects) and refuses the creature if not. DamageDealAi only wants the
+  1 damage when it kills something, so a 4/5 flying haste creature stayed in hand whenever the
+  opponent had no creature with toughness 1 (Boros Dragons, patched round robin: castable but
+  never cast in 50 of the 71 games where it could have been cast). The BadETB escape only
+  applies when the trigger has no legal target at all. OptionalDecider$ You makes the trigger
+  optional: the AI now casts the dragon and still uses the damage when it kills. (Against the
+  printed card the difference is that the 1 damage is skipped when it would not kill; a
+  person playing it gets a yes/no prompt first.)
+Measured: `mtgsim gauntlet decks/standard/meta/boros-dragons.txt --vs <the other ten meta decks> -n 100
+  --seed 1`, default AI, Forge 7db198d72e with patches 0001-0008, on 14 Nov 2026. Without:
+  64.5% (95% CI 61-67%, 645-355). With this patch: 66.0% (63-69%, 660-340). Difference +1.5
+  points, 95% CI -2.7 to +5.7 (paired over the same 1,000 seeds: -0.8 to +3.8): not reliable.
+  Nova Hellkite cast in 660 of the 671 games where it was seen (346 of 671 without; 1,348 casts
+  against 528). Mirror with the patch (`match boros-dragons boros-dragons -n 200 --seed 1`):
+  53.0% (46-60%). The card is fixed; the deck's win rate did not measurably change.
+
+diff --git a/forge-gui/res/cardsfolder/n/nova_hellkite.txt b/forge-gui/res/cardsfolder/n/nova_hellkite.txt
+index d4d52f9..40430f0 100644
+--- a/forge-gui/res/cardsfolder/n/nova_hellkite.txt
++++ b/forge-gui/res/cardsfolder/n/nova_hellkite.txt
+@@ -4,7 +4,7 @@ Types:Creature Dragon
+ PT:4/5
+ K:Flying
+ K:Haste
+-T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigDamage | TriggerDescription$ When this creature enters, it deals 1 damage to target creature an opponent controls.
++T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigDamage | OptionalDecider$ You | TriggerDescription$ When this creature enters, it deals 1 damage to target creature an opponent controls.
+ SVar:TrigDamage:DB$ DealDamage | ValidTgts$ Creature.OppCtrl | TgtPrompt$ Select target creature an opponent controls | NumDmg$ 1
+ K:Warp:2 R
+ Oracle:Flying, haste\nWhen this creature enters, it deals 1 damage to target creature an opponent controls.\nWarp {2}{R} (You may cast this card from your hand for its warp cost. Exile this creature at the beginning of the next end step, then you may cast it from exile on a later turn.)

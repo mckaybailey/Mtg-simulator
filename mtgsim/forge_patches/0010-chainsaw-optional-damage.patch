@@ -1,0 +1,29 @@
+Subject: Chainsaw: do not hold the equipment because its 3 damage would kill nothing
+Why: Same refusal as Nova Hellkite (0009): AiController.checkETBEffects asks DamageDealAi
+  whether it would use the ETB, and with no opposing creature that 3 damage kills the answer
+  is no, so the AI kept Chainsaw in hand (Boros Dwarves, patched round robin: castable but
+  never cast in 25 of the 38 games where it could have been cast). The trigger already says
+  "up to one target", so OptionalDecider$ You changes nothing in the rules: declining is the
+  same as choosing no target. The AI now plays Chainsaw as an equipment and still shoots a
+  creature when the damage kills it.
+Measured: `mtgsim gauntlet decks/standard/meta/boros-dwarves.txt --vs <the other ten meta decks> -n 100
+  --seed 1`, default AI, Forge 7db198d72e with patches 0001-0008, on 14 Nov 2026. Without:
+  74.5% (95% CI 72-77%, 745-255). With this patch: 74.4% (72-77%, 744-256). Difference -0.1
+  points, 95% CI -3.9 to +3.7 (paired over the same 1,000 seeds: -1.6 to +1.4): no effect on
+  the win rate. Chainsaw cast in 408 of the 444 games where it was seen (284 of 444 without).
+  Mirror with 0009 and 0010 (`match boros-dwarves boros-dwarves -n 200 --seed 1`): 48.0%
+  (41-55%).
+
+diff --git a/forge-gui/res/cardsfolder/c/chainsaw.txt b/forge-gui/res/cardsfolder/c/chainsaw.txt
+index 33b051f..e91e90e 100644
+--- a/forge-gui/res/cardsfolder/c/chainsaw.txt
++++ b/forge-gui/res/cardsfolder/c/chainsaw.txt
+@@ -1,7 +1,7 @@
+ Name:Chainsaw
+ ManaCost:1 R
+ Types:Artifact Equipment
+-T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigDealDamage | TriggerDescription$ When CARDNAME enters, it deals 3 damage to up to one target creature.
++T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigDealDamage | OptionalDecider$ You | TriggerDescription$ When CARDNAME enters, it deals 3 damage to up to one target creature.
+ SVar:TrigDealDamage:DB$ DealDamage | ValidTgts$ Creature | TgtPrompt$ Select up to one target creature | TargetMin$ 0 | TargetMax$ 1 | NumDmg$ 3
+ T:Mode$ ChangesZoneAll | TriggerZones$ Battlefield | ValidCards$ Creature | Origin$ Battlefield | Destination$ Graveyard | Execute$ TrigPutCounter | TriggerDescription$ Whenever one or more creatures die, put a rev counter on CARDNAME.
+ SVar:TrigPutCounter:DB$ PutCounter | CounterType$ REV
