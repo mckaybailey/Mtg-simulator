@@ -61,6 +61,14 @@ class SeedAndPlanTest(unittest.TestCase):
         self.assertEqual(4, len({j.seed for j in jobs}))
         self.assertTrue(all(j.timeout == 99 and j.log_path == "" for j in jobs))
 
+    def test_saved_game_logs_get_absolute_paths(self):
+        # the JVMs run in Forge's folder, so a relative --out must not leak into the log path
+        a, b = _entrants()
+        a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
+        jobs = experiment.plan_pairing(a, b, RunOptions(games=2, save_logs=True), Path("runs/x"))
+        self.assertTrue(all(Path(j.log_path).is_absolute() for j in jobs))
+        self.assertTrue(jobs[1].log_path.endswith("runs/x/logs/games/red__green__0001.log".replace("/", os.sep)))
+
     def test_per_deck_ai_settings_follow_the_deck_to_its_seat(self):
         a, b = _entrants()
         a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"

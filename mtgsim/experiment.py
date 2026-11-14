@@ -128,7 +128,8 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
         job_id = f"{a.key}|{b.key}|{i}"
         log_path = ""
         if options.save_logs:
-            log_path = str(run_dir / "logs" / "games" / f"{a.key}__{b.key}__{i:04d}.log")
+            # absolute: the Forge JVMs run in Forge's own folder, where a relative path would land
+            log_path = str(Path(run_dir).resolve() / "logs" / "games" / f"{a.key}__{b.key}__{i:04d}.log")
         jobs.append(Job(
             id=job_id,
             seed=game_seed(options.seed, a.deck, b.deck, i),
