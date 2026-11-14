@@ -24,7 +24,7 @@ Any folder of `.txt` / `.dck` lists works as a gauntlet. Check every list with
 | `list_type`, `pilot`, `source_url`, `source_date` | provenance |
 | `real_win_rate`, `sim_win_rate` | real tournament match win rate vs. average win rate in the mtgsim round robin |
 | `ai_pilot` | `weak` / `fair` / `strong`: simulated minus real win rate below −10, within ±10, above +10 points; reports warn about `weak` opponents |
-| `ai_profile`, `ai_mc` | optional per-deck AI settings: a profile name (Forge's, `mtgsim/profiles/` or `~/.mtgsim/profiles/`); Monte Carlo search `on` / `max` for this deck's seat only. `tune` ignores both and assigns profiles by group |
+| `ai_profile`, `ai_mc` | optional per-deck AI settings: a profile name (Forge's, `mtgsim/profiles/` or `~/.mtgsim/profiles/`); Monte Carlo search `on` / `max` / `fixed` for this deck's seat only (`fixed` is the only one whose games replay from the seed; a game with a `fixed` seat gets the 1,800 s time limit). `tune` ignores both and assigns profiles by group |
 
 ## Refreshing the meta gauntlet
 

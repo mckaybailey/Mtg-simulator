@@ -68,7 +68,7 @@ from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, 
 from . import ai_profiles, experiment, forge, runner, stats
 from .experiment import Entrant, RunError
 from .forge import ForgeInstall
-from .runner import Job
+from .runner import DEFAULT_TIMEOUT, FIXED_TIMEOUT, Job
 
 TUNE_VERSION = 1
 CACHE_VERSION = 1
@@ -1320,7 +1320,9 @@ def settings_from_args(args) -> dict:
         "groups": {g: list(c) for g, c in parse_groups(args.group).items()},
         "tune_groups": [g.lower() for g in args.tune] if args.tune else None,
         "holdout": list(args.holdout or []), "confirm_games": args.confirm, "cv": parse_cv(args.cv),
-        "objective": args.objective, "bootstrap": args.bootstrap, "timeout": args.timeout, "mc": args.mc or "off",
+        "objective": args.objective, "bootstrap": args.bootstrap,
+        # a "fixed" search is never cut short by the clock, so its games need the longer limit
+        "timeout": args.timeout or (FIXED_TIMEOUT if args.mc == "fixed" else DEFAULT_TIMEOUT), "mc": args.mc or "off",
         "space": str(Path(args.space).expanduser().resolve()) if args.space else str(DEFAULT_SPACE),
         "matchups": str(Path(args.matchups).expanduser().resolve()) if args.matchups else None,
     }
