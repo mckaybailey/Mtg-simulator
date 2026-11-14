@@ -72,7 +72,7 @@ the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay
   the lines still in the race. `fixed` is refused on a heap of 768 MB or less, where Forge
   shrinks its search to phone size. What still reads the clock in such a game: the job's own
   `timeout` (a game stopped by it is a `timeout`, not a replay; the runner gives fixed games
-  1,800 s), and Forge's `StormSolver` (storm combo decks only, a 2 s budget; not exercised by the
+  1,800 s), and Forge's `StormSolver` (only for decks whose plan Forge classifies as a tutor-storm combo, a 4 s budget; not exercised by the
   measurements in `VALIDATION.md`).
 - After every game with Monte Carlo the driver prints `FlatMonteCarloStats.summary()` to stderr
   (the worker log) under a `[mtgsim] Monte Carlo in game <id>` line; the counters are reset at
