@@ -69,7 +69,9 @@ the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay
   no AI decision of either seat, searched or heuristic, is ever cut short by the clock. The
   budget is in the patch (`FlatMonteCarloPicker.Config.counted`): per decision at most 3 approved
   plays + 1 other target + 2 discovered plays + holding, 4 rounds for every line and 2 more for
-  the lines still in the race. `fixed` is refused on a heap of 768 MB or less, where Forge
+  the lines still in the race, and at most 100 rollouts per player per game turn before the
+  rest of that turn goes to the heuristics (this counted turn budget is what ends a turn in which
+  the search keeps choosing a play that cannot be put on the stack). `fixed` is refused on a heap of 768 MB or less, where Forge
   shrinks its search to phone size. What still reads the clock in such a game: the job's own
   `timeout` (a game stopped by it is a `timeout`, not a replay; the runner gives fixed games
   1,800 s), and Forge's `StormSolver` (only for decks whose plan Forge classifies as a tutor-storm combo, a 4 s budget; not exercised by the
