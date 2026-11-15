@@ -2,7 +2,8 @@
 
 usage: python3 tools/calibration_diff.py RUN_A RUN_B [--reps 2000]
 Each run's pairing results are resampled independently (binomial, observed rates), the deck averages,
-Spearman, Pearson and mean absolute gap are recomputed for both, and B minus A is summarised.
+Spearman, Pearson and mean absolute gap are recomputed for both, and B minus A is summarised. If the runs hold different decks, only the
+decks in both, and the pairings among them, are used.
 """
 import json, random, sys
 from pathlib import Path
@@ -34,7 +35,14 @@ def resample(cells, rng):
 reps = int(sys.argv[sys.argv.index("--reps") + 1]) if "--reps" in sys.argv else 2000
 a, b = sys.argv[1], sys.argv[2]
 ka, _, ca, ra = load(a); kb, _, cb, rb = load(b)
-assert ka == kb
+if ka != kb:  # compare over the decks both runs have, using only the pairings among them
+    shared = sorted(set(ka) & set(kb))
+    print(f"Runs differ in decks; comparing the {len(shared)} they share (pairings among those only).")
+    ra = [r for k, r in zip(ka, ra) if k in shared]
+    rb = [r for k, r in zip(kb, rb) if k in shared]
+    ca = {k: v for k, v in ca.items() if k[0] in shared and k[1] in shared}
+    cb = {k: v for k, v in cb.items() if k[0] in shared and k[1] in shared}
+    ka = kb = shared
 ma, mb = metrics(ka, ca, ra), metrics(kb, cb, rb)
 rng = random.Random(7)
 diffs = []

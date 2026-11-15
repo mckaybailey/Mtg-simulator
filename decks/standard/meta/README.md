@@ -1,12 +1,12 @@
 # Standard meta gauntlet
 
-Eleven of the most-played Standard archetypes, used as the default opponents for
+Twelve of the most-played Standard archetypes, used as the default opponents for
 `python -m mtgsim gauntlet` and `python -m mtgsim ab`.
 
 **Snapshot: 5 November 2026.** Metagame shares come from the Magic.gg "Metagame Mentor"
 table published that day, which combines Arena Championship 13 and the Magic Spotlight:
-Fracture events (about 1,810 decklists from late October 2026). The eleven decks cover
-69.1% of that field. The snapshot predates the Star Trek set and World Championship 32,
+Fracture events (about 1,810 decklists from late October 2026). The twelve decks cover
+73.7% of that field. The snapshot predates the Star Trek set and World Championship 32,
 so expect it to drift; replace the lists whenever you want a fresher field.
 
 | Deck | Type | Share | List |
@@ -18,6 +18,7 @@ so expect it to drift; replace the lists whenever you want a fresher field.
 | Jund Sacrifice | midrange | 7.4% | Alexander von Stange, 1st, Magic Spotlight: Fracture |
 | Orzhov Lifegain | midrange | 6.9% | Gage Fevold, 1st, Arena Championship 13 |
 | Azorius Control | control | 5.9% | aggregate |
+| Four-Color Control | control | 4.6% | aggregate |
 | Boros Dragons | ramp | 3.6% | aggregate |
 | Azorius Artifacts | control | 3.5% | aggregate |
 | Boros Dwarves | aggro | 2.3% | aggregate |
@@ -31,34 +32,38 @@ every list are in `gauntlet.json`. The archetype types are a judgement call in a
 ## How well the AI plays each deck
 
 Results against this gauntlet depend heavily on how well Forge's AI pilots each opponent.
-To measure that, all eleven decks were played against each other in the simulator (1,650
+To measure that, all twelve decks were played against each other in the simulator (1,980
 games, 30 per pairing, seed 1) and each deck's simulated win rate was set beside its real-world
-match win rate from the same Magic.gg table. "Simulated" is on Forge with mtgsim's eight Forge
-patches (`mtgsim/forge_patches/`), which fix cards the AI held but could never cast; "before
-fixes" is the same round robin on unpatched Forge:
+match win rate from the same Magic.gg table. "Simulated" is on Forge with mtgsim's eleven Forge
+patches (`mtgsim/forge_patches/`); the last column is the eleven-deck round robin played with
+the first eight:
 
-| Deck | Real win rate | Simulated | Gap | AI pilot | Before fixes |
+| Deck | Real win rate | Simulated | Gap | AI pilot | Before patches 0009–0011 (eleven decks) |
 |---|---|---|---|---|---|
-| Boros Dwarves | 50.2% | 70.0% | +19.8 | strong | 74.7% |
-| Boros Dragons | 45.0% | 63.7% | +18.7 | strong | 68.3% |
-| Orzhov Lifegain | 53.6% | 65.0% | +11.4 | strong | 66.3% |
-| Dimir Midrange | 54.5% | 58.0% | +3.5 | fair | 61.3% |
-| Azorius Momo | 48.8% | 50.7% | +1.9 | fair | 45.0% |
-| Azorius Control | 46.6% | 42.7% | −3.9 | fair | 19.7% |
-| Mono-Green Landfall | 53.4% | 49.3% | −4.1 | fair | 52.0% |
-| Azorius Artifacts | 54.8% | 46.7% | −8.1 | fair | 52.7% |
-| Izzet Spellementals | 44.3% | 33.7% | −10.6 | weak | 37.7% |
-| Dimir Uldaros | 49.2% | 32.7% | −16.5 | weak | 31.3% |
-| Jund Sacrifice | 57.6% | 37.7% | −19.9 | weak | 41.0% |
+| Boros Dragons | 45.0% | 63.9% | +18.9 | strong | 63.7% |
+| Boros Dwarves | 50.2% | 68.8% | +18.6 | strong | 70.0% |
+| Mono-Green Landfall | 53.4% | 67.0% | +13.6 | strong | 49.3% |
+| Orzhov Lifegain | 53.6% | 66.1% | +12.5 | strong | 65.0% |
+| Azorius Momo | 48.8% | 50.3% | +1.5 | fair | 50.7% |
+| Dimir Midrange | 54.5% | 54.2% | −0.3 | fair | 58.0% |
+| Azorius Control | 46.6% | 43.0% | −3.6 | fair | 42.7% |
+| Azorius Artifacts | 54.8% | 47.3% | −7.5 | fair | 46.7% |
+| Four-Color Control | 48.8% | 38.5% | −10.3 | weak | not included |
+| Izzet Spellementals | 44.3% | 30.9% | −13.4 | weak | 33.7% |
+| Dimir Uldaros | 49.2% | 31.8% | −17.4 | weak | 32.7% |
+| Jund Sacrifice | 57.6% | 38.2% | −19.4 | weak | 37.7% |
 
-The fixes brought the decks they touch close to their real win rates (Azorius Control could
-not cast seven of its sixty cards and won one game in five) and cut the average gap from 13.0
-to 10.8 points, but the two columns still barely agree on the order (rank correlation 0.11,
-before 0.24; the difference is within the noise). The AI wins with decks that turn creatures
+The patches fix cards the AI could not cast or used wrongly, and each moved its deck a lot
+(Azorius Control could not cast seven of its sixty cards and won one game in five; Mono-Green
+Landfall spent its mana on Ba Sing Se every turn and gained 20 points once that was fixed), but
+the two columns still barely agree on the order: rank correlation 0.23 (game noise alone moves
+it between 0.08 and 0.36), mean gap 11.4 points. The AI wins with decks that turn creatures
 sideways and loses with decks that need planning: Jund Sacrifice, the best deck in the real
-field, comes out third from the bottom. The comparison is rough (the real figures are
-best-of-three matches with sideboards against the whole field, played by people of varying
-skill), but gaps of 16 to 20 points are far outside its error.
+field, comes out third from the bottom. Part of this is not the AI. The simulation is the
+first game of a match, without sideboards, and creature decks are at their best there; the real
+figures are best-of-three matches with sideboards against the whole field, played by people of
+varying skill. `VALIDATION.md` ("More card fixes, and why the creature decks win") has what the
+game logs show. Gaps of 17 to 19 points are still far outside the comparison's error.
 
 What this means in practice:
 
@@ -71,27 +76,38 @@ What this means in practice:
 ## Real matchup data (unverified)
 
 `real-matchups-unverified.json` holds deck-vs-deck win rates for these archetypes gathered on
-13 November 2026 from web-search summaries only: the environment's network blocked every MTG
-site, so no source page could be opened and checked. 37 of its 58 rows are unambiguous
-numbers, covering 26 of the 55 pairings, mostly from mtgdecks.net archetype pages (time window,
-platform and best-of-one/three unknown); several pairings appear from both sides and are not
-independent. Each row keeps its URL and the summary text it came from. Use it only as a rough
-secondary check (`tools/matchup_check.py`): against it the round robin scores Pearson 0.15 over
-24 pairings with the Forge patches (0.20 before). It is not in the format `mtgsim tune
---matchups` expects, deliberately: verify and de-duplicate it first.
+13 November 2026 from web-search summaries only. 37 of its 58 rows are unambiguous numbers,
+covering 26 of the 55 pairings among the first eleven decks, mostly from mtgdecks.net archetype
+pages (time window, platform and best-of-one/three unknown); several pairings appear from both
+sides and are not independent. Each row keeps its URL and the summary text it came from. It is
+still unverified: on 14 November mtgdecks.net was allowed through the environment's network
+policy, but the site answers automated requests with a Cloudflare challenge (HTTP 403), so its
+pages could not be read. Checking it needs a person with a browser. Use it only as a rough
+secondary check (`tools/matchup_check.py`): against it the eleven-deck round robin scored
+Pearson 0.15 over 24 pairings with the first eight Forge patches (0.20 before). It is not in the
+format `mtgsim tune --matchups` expects, deliberately: verify and de-duplicate it first.
 
 ## How far to trust these lists
 
-- The lists were transcribed from web search results of the source pages; the pages
-  themselves could not be opened from the environment this was built in. Each list was
-  checked to total exactly 60 main / 15 sideboard, every card name resolves in Forge, and
-  every card is Standard-legal and unbanned according to Forge's format file. A count
-  swapped between two cards in a list would not have been caught by those checks.
-- Four-Color Control (4.6% of the field) is missing because no consistent list could be
-  retrieved, and there is no dedicated combo deck: none of the top twelve archetypes is one.
-- Forge's AI pilots these decks, and it is much better with the aggro decks and creature-based
-  midrange than with Jund Sacrifice, Dimir Uldaros and the spell-heavy Izzet deck. Results
-  against those three say more about the AI than the matchup.
+- The win rates, metagame shares and the nine aggregate lists were checked on 14 November 2026
+  against the Magic.gg article itself (it could be opened once `magic.gg` was allowed in the
+  environment's network policy). The twelve decks' shares and win rates match its table, and the eight aggregate lists transcribed earlier from search results (Dimir Midrange,
+  Dimir Uldaros, Izzet Spellementals, Azorius Control, Boros Dragons, Azorius Artifacts, Boros
+  Dwarves, Azorius Momo) are identical to the article's, main deck and sideboard. Four-Color
+  Control was copied from the article directly.
+- Mono-Green Landfall, Jund Sacrifice and Orzhov Lifegain are single tournament lists from
+  melee.gg, transcribed from search results and not checked against their pages (melee.gg is not
+  reachable). The article prints aggregate lists for these too, which differ by a few cards, as
+  one player's list would.
+- Every list totals exactly 60 main / 15 sideboard, every card name resolves in Forge, and
+  every card is Standard-legal and unbanned according to Forge's format file.
+- There is no dedicated combo deck: none of the top twelve archetypes is one. The article's
+  table gives win rates for six more archetypes (Dimir Excruciator 46.0%, Rakdos Lizards 42.9%,
+  Izzet Prowess 30.6%, Mono-Black Aggro 42.6%, Golgari Midrange 47.5%, Grixis Reanimator 52.7%,
+  each 1.0–1.4% of the field) but prints no lists for them.
+- Forge's AI pilots these decks, and it is much better with the creature decks than with Jund
+  Sacrifice, Dimir Uldaros, the spell-heavy Izzet deck and Four-Color Control. Results against
+  those four say more about the AI than the matchup.
 
 ## Using your own field
 

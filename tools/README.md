@@ -17,3 +17,18 @@ implementation of the same metrics.
 
 `VALIDATION.md` quotes noise ranges and intervals from 1,000 resamples (`--reps 1000`); fewer
 resamples move the interval ends by a few hundredths.
+
+## `log_analysis/`
+
+Exploratory scripts that parse the per-game text logs of a run made with `--save-logs`; they
+produced the blocking, removal and ward numbers in `VALIDATION.md` ("More card fixes, and why the
+creature decks win"). Run from the repository root, with the run in `MTGSIM_RUN` (default
+`runs/rr-patched`) and the folder on the path:
+`MTGSIM_RUN=runs/x PYTHONPATH=tools/log_analysis python3 tools/log_analysis/combat.py`.
+`parse.py` reads a log into turns and events and `board.py` keeps a rough board state on top of it
+(it misses tokens until they act and ignores vigilance); the rest print one analysis each:
+`basic` (records, play/draw, game length), `combat` and `blockavail` (attacks and blocks),
+`lethal` (the turn before a kill), `removal DECK`, `remuse`, `remwr DECK` (removal aimed at a deck
+and win rate by amount), `equip` (equipment, and when removal was cast), `ward` (spells lost to
+Lavaspur Boots' ward). Deck names and several card lists are written for Boros Dwarves and Boros
+Dragons; treat the output as a pointer to logs worth reading, not as exact counts.

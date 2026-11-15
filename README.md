@@ -33,10 +33,10 @@ What you can do with it:
   that need careful sequencing are understated, on both sides of the table. Use the results
   to compare similar decks and to spot weak cards and bad mana, not to predict tournament
   win rates.
-- **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,650-game
-  round robin of the eleven included meta decks, simulated win rates barely tracked the
-  decks' real tournament win rates (rank correlation 0.11, average gap 11 points, even after
-  mtgsim's Forge patches for cards the AI could not cast): creature decks came out on top and
+- **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,980-game
+  round robin of the twelve included meta decks, simulated win rates barely tracked the
+  decks' real tournament win rates (rank correlation 0.23, average gap 11 points, even after
+  mtgsim's Forge patches for cards the AI could not cast or misused): creature decks came out on top and
   the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
   therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
@@ -149,7 +149,7 @@ are warnings unless you pass `--strict`.
 
 Most games take 2–4 seconds of engine time; slow control and artifact decks take longer.
 On a 4-core machine the meta decks ran at about 85 games per minute, so 100 games against
-each of the eleven meta decks takes roughly a quarter of an hour.
+each of the twelve meta decks takes roughly a quarter of an hour.
 
 ## How results are produced
 
@@ -273,7 +273,7 @@ folder; mtgsim never changes Forge's.
 
 ## Included decks
 
-- `decks/standard/meta/` – eleven of the most-played Standard archetypes as of early
+- `decks/standard/meta/` – twelve of the most-played Standard archetypes as of early
   November 2026, with metagame shares. See the README in that folder for sources and limits.
 - `decks/standard/casual/` – five simple one-colour decks built from Foundations commons and
   uncommons, as kitchen-table opponents.

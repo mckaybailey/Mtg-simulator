@@ -1,9 +1,9 @@
 # Decks
 
-- `standard/meta/`: eleven Standard archetypes, a snapshot of the Magic.gg metagame table of
-  5 November 2026 (69.1% of the field). Its `README.md` gives sources, what was and was not
-  verified, and the AI-pilot calibration table. Lists were transcribed from search results, not
-  read from the source pages; Four-Color Control is missing. `real-matchups-unverified.json` is
+- `standard/meta/`: twelve Standard archetypes, a snapshot of the Magic.gg metagame table of
+  5 November 2026 (73.7% of the field). Its `README.md` gives sources, what was and was not
+  verified, and the AI-pilot calibration table. Win rates and the nine aggregate lists were
+  checked against the article; the three melee.gg tournament lists were not. `real-matchups-unverified.json` is
   second-hand matchup data (see that README); never use it as tuning data without verifying it.
 - `standard/casual/`: five one-colour decks built from Foundations commons and uncommons, as
   kitchen-table opponents. Written for mtgsim, not tournament lists.
@@ -30,5 +30,5 @@ Any folder of `.txt` / `.dck` lists works as a gauntlet. Check every list with
 
 1. Replace the lists and update `meta_share`, provenance fields and the README table.
 2. `python3 -m mtgsim check decks/standard/meta` must pass with no errors.
-3. Re-calibrate: `python3 -m mtgsim matrix decks/standard/meta -n 30` (about 20 minutes), then
+3. Re-calibrate: `python3 -m mtgsim matrix decks/standard/meta -n 30` (about 30 minutes), then
    update `sim_win_rate` and `ai_pilot` for every deck and the README's calibration table.

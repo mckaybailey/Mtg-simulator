@@ -32,7 +32,7 @@ learned and what to do next. Read it before working on the AI, patches or calibr
    `python3 -m mtgsim check FILE` first. Resolve unknown card names with the user; never guess.
 3. Run what they asked for: `gauntlet`, `ab`, `match`, `matrix`, `goldfish` (`--clock` for the
    engine-measured kill turn). About 85 games a minute on 4 cores; 100 games against each of the
-   11 meta decks is roughly 15 minutes. Start long runs in the background (detach with
+   12 meta decks is roughly 15 minutes. Start long runs in the background (detach with
    `setsid nohup` if they may exceed 2 hours) and say how long they will take.
    `--resume RUN_DIR` continues an interrupted run. `tune` (searching AI profile settings against
    real win rates) is a research command that needs hours of engine time: run it with `--dry-run`
@@ -44,10 +44,12 @@ learned and what to do next. Read it before working on the AI, patches or calibr
 Always pass on the limits with the numbers:
 
 - The pilot is Forge's AI. Simulated meta win rates barely track real ones (rank correlation
-  0.11 with mtgsim's Forge patches, 0.24 before; mean gap 10.8 points): creature decks are
-  overrated, Jund Sacrifice, Dimir Uldaros and Izzet Spellementals underrated. Wins against opponents
-  marked `ai_pilot: weak` say little.
-- Games are best-of-one without sideboards.
+  0.23 over twelve decks with mtgsim's Forge patches, noise 0.08–0.36; mean gap 11.4 points):
+  creature decks (Boros Dwarves, Boros Dragons, Mono-Green Landfall, Orzhov Lifegain) are
+  overrated, Jund Sacrifice, Dimir Uldaros, Izzet Spellementals and Four-Color Control underrated.
+  Wins against opponents marked `ai_pilot: weak` say little.
+- Games are best-of-one without sideboards. That alone favours creature decks: in the logs their
+  results turn on how much removal the opponent draws, and sideboards are where the rest of it is.
 - A matchup is only decided when its 95% interval excludes 50%; an A/B difference only when the
   verdict says it is reliable. 100 games pin a win rate to about ±10 points; detecting a 5-point
   A/B gap needs ~1,500 games per version. Never present a 54% from 100 games as an edge.
@@ -62,7 +64,7 @@ Always pass on the limits with the numbers:
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (279 tests, ~2 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (280 tests, ~2 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match

@@ -8,19 +8,21 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 273 pass |
+| Unit tests (no Forge needed) | 274 pass |
 | Integration tests (real games) | 6 pass |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
 | Mirror match (identical decks, 400 games) | 48.9%, 95% CI 44–54% (expected 50%) |
 | Lopsided match (meta deck vs 40 lands + 20 Llanowar Elves) | 93.3%, CI 84–97% |
 | A/B with a deliberately worse variant | detected: +12.5 points, CI +6.8 to +18.2, p < 0.001 |
-| Simulated vs real meta win rates | weak agreement: rank correlation 0.11 with the Forge patches (0.24 before, within noise of each other), mean gap 10.8 points (13.0 before); see below |
+| Simulated vs real meta win rates | weak agreement: rank correlation 0.23 over twelve decks with all eleven Forge patches (noise 0.08–0.36), mean gap 11.4 points; 0.24 and 13.0 on unpatched Forge with eleven decks; see below |
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
+| Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
+| Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
 | Profile tuning on the meta (16 candidates, 12,010 games, 2 decks held out) | no profile beats Forge's default beyond noise (training rank correlation +0.18, noise −0.20 to +0.43; held-out gap −0.8 points, noise −5.8 to +4.7); none shipped |
 
 ## The pipeline behaves correctly
@@ -196,7 +198,7 @@ uses about 0.9–1.2 GB of memory.
 
 ## Forge patches
 
-`setup --build` applies the patches in `mtgsim/forge_patches/` (eight ship; see "Fixing the cards the
+`setup --build` applies the patches in `mtgsim/forge_patches/` (eleven ship; see "Fixing the cards the
 AI never cast"). The mechanism
 was checked on 13 November 2026 in an empty `MTGSIM_HOME`, with throwaway patches that were not
 committed: a card-script hint for Grizzly Bears, a second one for Raging Goblin, and a Java patch
@@ -308,6 +310,116 @@ did not improve: Boros Dwarves (+19.8) and Boros Dragons (+18.7) are still the m
 Jund Sacrifice, the best real deck, is still 20 points low, and Azorius Artifacts fell to −8.1,
 partly because the repaired control deck now beats it. Fixing cards the AI could not cast at all
 is a correctness fix; what remains is how Forge's AI plays the cards it can cast.
+
+## More card fixes, and why the creature decks win (14 November 2026)
+
+**Cards the misplay report still flagged.** On the patched round robin (re-run with `--save-logs`;
+all 1,650 games identical to the first patched run) the cards "castable but never cast" most
+often were read against Forge's AI code:
+
+| Card (deck) | Castable, never cast | Cause | Outcome |
+|---|---|---|---|
+| Nova Hellkite (Boros Dragons) | 50 of 71 games | `AiController.checkETBEffects` refuses a creature whose enter trigger `DamageDealAi` would not use; 1 damage rarely kills | patch 0009 |
+| Chainsaw (Boros Dwarves) | 25 of 38 | the same refusal, for its 3 damage | patch 0010 |
+| Pinnacle Starcage (Azorius Artifacts, Azorius Control) | 56 of 67, 46 of 100 | `ChangeZoneAllAi` casts it only when the opponent loses more value than the AI; Artifacts' own cheap artifacts are exiled too | left alone: the rule is sensible |
+| Day of Judgment (Azorius Control) | 52 of 122 | `DestroyAllAi` sweeps when the opponent's creatures are worth 200 evaluation points more than its own, or when it would otherwise die next turn | left alone |
+| Torch the Tower (Jund Sacrifice) | 31 of 61 | no target the damage kills. The AI does bargain (it pays every optional cost it can), so it shoots toughness-3 creatures when it has something to sacrifice | left alone |
+| Seam Rip (Azorius Control, Azorius Momo) | 26 of 143, 13 of 32 | needs an opposing permanent of mana value 2 or less to be worth casting | left alone |
+
+Each patch was measured as before (deck against the other ten, 100 games each, seed 1, without and
+with; paired interval over the shared seeds in brackets):
+
+| Deck (patch) | Without | With | Difference, 95% CI | Card cast in games seen | Mirror (200 games) |
+|---|---|---|---|---|---|
+| Boros Dragons (0009) | 64.5% (61–67%) | 66.0% (63–69%) | +1.5 (−2.7 to +5.7; paired −0.8 to +3.8), not reliable | 346 → 660 of 671 | 53.0% (46–60%) |
+| Boros Dwarves (0010) | 74.5% (72–77%) | 74.4% (72–77%) | −0.1 (−3.9 to +3.7; paired −1.6 to +1.4), no effect | 284 → 408 of 444 | 48.0% (41–55%) |
+| Mono-Green Landfall (0011) | 47.4% (44–50%) | 67.7% (65–71%) | +20.3 (+16.0 to +24.5; paired +17.7 to +22.9) | see below | 54.8% (48–62%) |
+
+0009 and 0010 make the AI play the cards and are kept for that; they do not change a win rate.
+
+**Why Boros Dwarves and Boros Dragons win.** The 1,650 game logs of that round robin were
+parsed (`tools/log_analysis/`; the board state it reconstructs is approximate) to test the
+obvious suspects, and they are not the cause:
+
+- *Blocking.* Dwarves' attackers are blocked more than any other deck's (22% of attackers, 42%
+  when the defender had an untapped creature), but 44% of those blocks are chump blocks and the
+  attacker dies in only 21%. On the 208 turns Dwarves dealt lethal damage the defender had a
+  blocker in 109 and blocked in 99. Dragons' fliers are blocked 6.5% of the time.
+- *Removal.* Against Dwarves opponents see 1.61 removal cards a game and cast 79% of them (1.86
+  and 78% against other decks), at a target quality of 0.99. Nothing is held or wasted.
+  Lavaspur Boots' ward countered 21 of 119 spells or abilities because the AI targets without
+  keeping the mana to pay; that is a real mistake, but 21 events in 300 games.
+- *Card scripts.* Every main-deck card of the two decks matches its Oracle text, and equipment,
+  double strike with trample and the pre-game Leyline Axe resolved correctly in the logs read.
+- *Only beating badly piloted decks.* Against the seven decks not rated weak Dwarves still win
+  66% and Dragons 59%.
+
+What the logs do show is how much removal decides these games. Dwarves win 72% of the 225 games
+in which the opponent cast at most one removal spell at their permanents and 45% of the 22 games
+with three or more; 80% when at most one of their creatures left the battlefield, 44% when four
+or more did. In 125 of 300 games the opponent cast no removal at all. The simulation is game one
+of a match: no sideboards, and the opposing sideboards hold exactly what an equipment deck fears
+(sweepers, artifact removal, three Clarion Conqueror in Azorius Momo). A best-of-three match is
+won with probability p2·(2·p1 + p2 − 2·p1·p2) for a game-one rate p1 and a post-board rate p2:
+70% in game one and 40% after sideboarding is a 49.6% match win rate, Dwarves' real figure. That
+split is a hypothesis, not a measurement. Testing it needs hand-built post-board lists and an AI
+that casts sweepers well (see Day of Judgment above), so it was not run.
+
+**The Ba Sing Se bug.** The same reading found one real pilot error on the other side of those
+games. `EarthbendAi.canPlay` approved Ba Sing Se's `{2}{G}, {T}: Earthbend 2` whenever the AI
+controlled a land, so Mono-Green Landfall activated it in the first main phase of every turn
+(4.35 times a game) and had no mana left for the permanents Forge's AI casts in the second. In
+the 190 round-robin games where Landfall played Ba Sing Se it won 44.2% and cast Mossborn Hydra
+in 31% of the games it saw one; in the other 110 it won 58.2% and cast it in 76%. Patch 0011
+puts the activation off while a permanent in hand can be paid for. Against the other ten decks
+Landfall rises from 47.4% to 67.7% (table above; 209 losses became wins and 6 wins became
+losses), and games in which the card was cast, of 1,000, go from 340 to 502 for Mossborn Hydra,
+295 to 534 for Icetill Explorer and 298 to 451 for Earthbender Ascension. The misplay report
+could not see this: the mana was tapped by the cleanup step, so nothing counted as castable.
+
+Leads from the logs that were not followed up: the AI attacks without counting equipment the
+opponent has on the battlefield but not attached (`ComputerUtil.predictNextCombat` uses current
+power; 20 to 45 of Dwarves' 208 kills followed such an attack), it casts instant-speed removal
+in its own upkeep rather than in response to an equip, and the 20- to 22-land decks mulligan
+in 51–63% of their games (Izzet Spellementals kept no two-land seven-card hand in 112). The
+mulligan switch (`FLAT_MC_MULLIGAN`) was in the profile search and did not win there.
+
+**The round robin with all eleven patches and a twelfth deck.** Four-Color Control (4.6% of the
+field, real win rate 48.8%) was added from the Magic.gg article once the page could be read, and
+the round robin replayed (`matrix decks/standard/meta -n 30 --seed 1`, 1,980 games, no time-outs
+or errors):
+
+| Deck | Real | Simulated | Gap |
+|---|---|---|---|
+| Boros Dragons | 45.0% | 63.9% | +18.9 |
+| Boros Dwarves | 50.2% | 68.8% | +18.6 |
+| Mono-Green Landfall | 53.4% | 67.0% | +13.6 |
+| Orzhov Lifegain | 53.6% | 66.1% | +12.5 |
+| Azorius Momo | 48.8% | 50.3% | +1.5 |
+| Dimir Midrange | 54.5% | 54.2% | −0.3 |
+| Azorius Control | 46.6% | 43.0% | −3.6 |
+| Azorius Artifacts | 54.8% | 47.3% | −7.5 |
+| Four-Color Control | 48.8% | 38.5% | −10.3 |
+| Izzet Spellementals | 44.3% | 30.9% | −13.4 |
+| Dimir Uldaros | 49.2% | 31.8% | −17.4 |
+| Jund Sacrifice | 57.6% | 38.2% | −19.4 |
+
+Rank correlation 0.23 (noise 0.08–0.36), Pearson 0.20 (0.09–0.30), mean absolute gap 11.4 points
+(10.4–13.0). Over the eleven decks both runs share, and only the pairings among them
+(`tools/calibration_diff.py`), against the eight-patch round robin:
+
+| | Eight patches | Eleven patches | Difference, 95% interval |
+|---|---|---|---|
+| Rank correlation | 0.11 | 0.16 | +0.05 (−0.16 to +0.25) |
+| Pearson correlation | 0.08 | 0.17 | +0.09 (−0.09 to +0.26) |
+| Mean absolute gap | 10.8 pts | 11.5 pts | +0.7 (−1.3 to +2.8) |
+
+Nothing here clears the noise. Fixing Ba Sing Se moved Mono-Green Landfall from 4 points under
+its real win rate to 14 over (it now loses to Boros Dwarves 12–18 instead of 6–24) and took a few
+points from most other decks, Boros Dwarves (70.0% → 67.3% on the shared pairings) and Dimir
+Midrange (58.0% → 53.3%) among them. A deck the AI now pilots properly is one more creature deck
+the simulation overrates, which fits the reading above: the remaining gap is less about cards
+the AI cannot play than about game one without sideboards and about decks that need planning.
 
 ## The goldfish model
 

@@ -7,7 +7,8 @@ supply with `setup --forge-dir` is never modified.
 
 ## The shipped series
 
-Each patch fixes a card the AI held but never (or almost never) cast in the meta round robin.
+Patches 0001–0010 each fix a card the AI held but never (or almost never) cast in the meta round
+robin; 0011 fixes an ability it activated at the wrong time.
 Found with `python3 -m mtgsim misplays` and Forge's worker logs; every patch header says which
 code path refused the card and how it was measured. Gauntlet numbers are the deck against the
 other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
@@ -22,15 +23,23 @@ other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
 | 0006 | Uldaros Theorix (Dimir Uldaros) | same ETB refusal (graveyard pump steps with nothing to aim at) | card script |
 | 0007 | Seasoned Cryomancer (Dimir Uldaros) | stun step has 0 legal targets when the cast is evaluated | card script |
 | 0008 | Practiced Offense (engine crash) | `PumpEffect` read a target from an empty list when the target left in response | Java |
+| 0009 | Nova Hellkite (Boros Dragons) | ETB refusal again: `DamageDealAi` does not want 1 damage that kills nothing, so the dragon was not cast | card script |
+| 0010 | Chainsaw (Boros Dwarves) | the same, for its "up to one target" 3 damage | card script |
+| 0011 | Ba Sing Se (Mono-Green Landfall) | `EarthbendAi` approved the activation every first main phase, leaving no mana for permanents cast in the second | Java |
 
 | Deck | Without | With its patches | Difference (95% CI) | Mirror, patched |
 |---|---|---|---|---|
 | Azorius Control (0001, 0002) | 22.4% (20–25%) | 47.8% (45–51%) | +25.4 (+21.3 to +29.4) | 54.0% (47–61%) |
 | Azorius Momo (0003–0005, 0008) | 44.9% (42–48%) | 54.2% (51–57%) | +9.3 (+4.9 to +13.6) | 50.0% (43–57%) |
 | Dimir Uldaros (0006, 0007) | 30.1% (27–33%) | 33.9% (31–37%) | +3.8 (−0.3 to +7.9), not reliable | 51.0% (44–58%) |
+| Boros Dragons (0009) | 64.5% (61–67%) | 66.0% (63–69%) | +1.5 (−2.7 to +5.7), not reliable | 53.0% (46–60%) |
+| Boros Dwarves (0010) | 74.5% (72–77%) | 74.4% (72–77%) | −0.1 (−3.9 to +3.7), no effect | 48.0% (41–55%) |
+| Mono-Green Landfall (0011) | 47.4% (44–50%) | 67.7% (65–71%) | +20.3 (+16.0 to +24.5) | 54.8% (48–62%) |
 
 Patches that share a deck were measured together, except 0001 and 0002 (0001 alone: +17.5,
-CI +13.5 to +21.4).
+CI +13.5 to +21.4). 0009–0011 were each measured on top of the patches before them (0009 and
+0010 on 0001–0008, 0011 on 0001–0010). 0009 and 0010 get their card cast (Nova Hellkite in 660 of
+671 games seen instead of 346, Chainsaw in 408 of 444 instead of 284) without moving the win rate.
 
 ## What `setup --build` does with them
 
