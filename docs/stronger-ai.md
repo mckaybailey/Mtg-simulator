@@ -239,6 +239,10 @@ most effort.
 3. **ISMCTS** with blocks, and/or evaluator weights learned from search-vs-search games, only if
    stage 1 shows search helps and the evaluator is the limit; judged on the next meta snapshot.
 
+*Status, 15 November 2026: built (Forge patch 0020, driver, `--mc fixed`). Replay 40 of 40, mirror
+50%, 0.08–0.14 s per rollout; the 200-game A/B gave +6.0 points (−2.9 to +14.8), not a reliable
+gain. Numbers and commands are in `VALIDATION.md`, "Monte Carlo with a fixed budget".*
+
 **First prototype: `--mc fixed`** (and `ai_mc: fixed`), Flat Monte Carlo with a rollout budget:
 - `mtgsim/bridge/ForgeBridge.java`: raise `game.AI_TIMEOUT`; load an extra profile with fixed
   `FLAT_MC_*` counts and maximal budgets (`AiProfileUtil.loadAllProfiles` on a directory of Forge's

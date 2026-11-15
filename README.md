@@ -140,9 +140,10 @@ are warnings unless you pass `--strict`.
 | `-j 4` | parallel Forge processes (default: one per CPU core, up to 8; each uses about 1 GB of memory) |
 | `--vs PATH...` | opponent decklists or folders (default `decks/standard/meta`) |
 | `--seed 7` | base random seed; the same seed and decks replay exactly the same games |
-| `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished |
+| `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished (default 180; 1800 for games with `--mc fixed`) |
 | `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`, or one of yours from `~/.mtgsim/profiles`); overrides per-deck settings |
 | `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting) for every player: slower, and because it thinks against a clock the same seed no longer replays the same game; overrides per-deck settings |
+| `--mc fixed` | the same look-ahead with a budget counted in playouts instead of milliseconds, so the same seed replays the same games on any machine and with any `-j`. About 9 times the engine time for each searching player (some 20 s a game with one, 45 s with both); a gain in play strength over the default AI has not been shown yet (`VALIDATION.md`). Needs the Forge build made by `setup --build` (patch 0020) |
 | `--save-logs` | keep Forge's full play-by-play log of every game |
 
 ### How long it takes

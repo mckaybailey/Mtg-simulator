@@ -10,7 +10,7 @@ from mtgsim import experiment
 from mtgsim.decks import deck_from_text
 from mtgsim.experiment import Entrant, RunError, RunOptions
 from mtgsim.forge import ForgeInstall
-from mtgsim.runner import Job
+from mtgsim.runner import DEFAULT_TIMEOUT, FIXED_TIMEOUT, Job
 from tests.helpers import make_db
 
 
@@ -92,6 +92,45 @@ class SeedAndPlanTest(unittest.TestCase):
         job = experiment.plan_pairing(a, b, RunOptions(games=1), Path("/tmp/run"))[0]
         self.assertEqual([], job.profiles)
         self.assertNotIn("seatmc", job.line())
+
+    def test_fixed_monte_carlo_reaches_the_job_line_and_gets_the_long_time_limit(self):
+        a, b = _entrants()
+        a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
+        whole = experiment.plan_pairing(a, b, RunOptions(games=1, monte_carlo="fixed", force_monte_carlo=True),
+                                        Path("/tmp/run"))[0]
+        fields = whole.line().split("\t")
+        self.assertIn("mc=fixed", fields)
+        self.assertIn(f"timeout={FIXED_TIMEOUT}", fields)
+        self.assertNotIn("seatmc", whole.line())
+        self.assertTrue(whole.uses_fixed_search())
+
+        a.ai_mc = "fixed"  # one deck only, as ``ai_mc`` in gauntlet.json
+        jobs = experiment.plan_pairing(a, b, RunOptions(games=2, fixed_timeout=700), Path("/tmp/run"))
+        self.assertEqual([["fixed", ""], ["", "fixed"]], [j.seat_monte_carlo for j in jobs])
+        self.assertIn("mc=off", jobs[0].line().split("\t"))
+        self.assertIn("seatmc=fixed\tseatmc=", jobs[0].line())
+        self.assertEqual([700, 700], [j.timeout for j in jobs])
+
+        b.ai_mc = "max"
+        forced_off = RunOptions(games=1, monte_carlo="off", force_monte_carlo=True)
+        job = experiment.plan_pairing(a, b, forced_off, Path("/tmp/run"))[0]
+        self.assertFalse(job.uses_fixed_search(), "--mc off overrides a deck's ai_mc")
+        self.assertEqual(DEFAULT_TIMEOUT, job.timeout)
+        a.ai_mc = ""
+        clocked = experiment.plan_pairing(a, b, RunOptions(games=1), Path("/tmp/run"))[0]
+        self.assertEqual(DEFAULT_TIMEOUT, clocked.timeout, "only the counted search gets the long limit")
+
+    def test_job_line_refuses_an_unknown_monte_carlo_setting(self):
+        with self.assertRaises(ValueError):
+            Job(id="a|b|0", seed=1, decks=["a", "b"], monte_carlo="fast").line()
+        with self.assertRaises(ValueError):
+            Job(id="a|b|0", seed=1, decks=["a", "b"], seat_monte_carlo=["", "fxied"]).line()
+        self.assertIn("seatmc=\tseatmc=fixed", Job(id="a|b|0", seed=1, decks=["a", "b"],
+                                                   seat_monte_carlo=["", "fixed"]).line())
+
+    def test_options_record_the_fixed_time_limit_only_for_fixed_runs(self):
+        self.assertNotIn("timeout_fixed", RunOptions().describe())
+        self.assertEqual(FIXED_TIMEOUT, RunOptions(monte_carlo="fixed").describe()["timeout_fixed"])
 
     def test_unique_keys(self):
         self.assertEqual(["mono-red", "mono-red-2", "deck", "a-b-s-c"],

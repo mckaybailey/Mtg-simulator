@@ -8,8 +8,9 @@ repository, but every run can be reproduced with the commands and seeds below.
 
 | Check | Result |
 |---|---|
-| Unit tests (no Forge needed) | 274 pass |
-| Integration tests (real games) | 6 pass |
+| Unit tests (no Forge needed) | 277 pass |
+| Integration tests (real games) | 7 pass |
+| `--mc fixed` (counted Monte Carlo) | replays: 40 of 40 games identical across 1 and 2 workers and on a second run; games without Monte Carlo unchanged (200 of 200); mirror 50.0% (40–60%); Azorius Control vs Boros Dwarves 32.0% against 26.0% with the default pilot, +6.0 points (−2.9 to +14.8), not reliable; about 9 times the engine time per searching seat; see below |
 | Same seed, different worker count | 40 of 40 games identical |
 | Interrupted run, then `--resume` | 80 of 80 games identical to an uninterrupted run; no orphan processes |
 | Mirror match (identical decks, 400 games) | 48.9%, 95% CI 44–54% (expected 50%) |
@@ -420,6 +421,88 @@ points from most other decks, Boros Dwarves (70.0% → 67.3% on the shared pairi
 Midrange (58.0% → 53.3%) among them. A deck the AI now pilots properly is one more creature deck
 the simulation overrates, which fits the reading above: the remaining gap is less about cards
 the AI cannot play than about game one without sideboards and about decks that need planning.
+
+## Monte Carlo with a fixed budget (`--mc fixed`)
+
+`--mc fixed` (and `ai_mc: fixed` per deck) is Forge's Flat Monte Carlo at its maximum-strength
+settings with the clock taken out (Forge patch 0020 plus the driver): the search is counted in
+rollouts, the AI timeout is out of reach, and nothing shrinks or pauses the search when the
+machine is slow. Measured on 14–15 November 2026 in a private `MTGSIM_HOME` built from the pinned
+Forge commit with patches 0001–0008 and 0020; all commands are `python3 -m mtgsim match` on
+`decks/standard/meta/azorius-control.txt` and `boros-dwarves.txt` unless stated.
+
+**The budget.** Per decision at most 3 plays the heuristics approve, 1 other target, 2 plays
+they rejected and "hold", each sampled in 4 rounds, plus 2 rounds for the lines still in the race
+after pruning; at most 100 rollouts per player per game turn. That is 28–42 rollouts for a full
+decision; in practice pruning and short candidate lists bring the average to 6.8. It was chosen
+to sit where `--mc max` lands on this machine, not tuned for strength: the same 40 games with
+`--mc max` on 4 workers used 6.1 rollouts per decision and 385 per game (fixed: 6.8 and 444), with
+47 decisions skipped for lack of turn budget and 13 cut short as too slow, the two things that
+make its games depend on the machine. The turn budget is not optional: without it 3 of 40 games ran
+into the 1,800 s time limit, because the search chose a play that could not be put on the stack
+(an equip aimed by the search) again and again, up to 30,000 rollouts in one game; the clocked
+modes are saved from this by their turn budget in seconds.
+
+**Replay.** `-n 40 --seed 7 --mc fixed`, both seats searching: once with
+2 workers, once with 1 and again with 2 (the last after a container restart, under a different machine load). All 40
+games of each run were identical to the first, field by field (`tools/compare_games.py`), and so
+were the rollout counts per game. No game timed out or had a failed rollout; Azorius Control won
+16 of 40 (26–55%). An earlier pair of runs without the turn budget also agreed on all 28 games
+both had finished.
+
+**Games without Monte Carlo are unchanged.** `-n 200 --seed 1` on a build without patch 0020
+with the previous driver, and on the build with 0020 and the new driver: 200 of 200 games
+identical (`tools/compare_games.py`; Azorius Control 52–148 both times).
+
+**Mirror.** Boros Dwarves against itself, `-n 100 --seed 5 --mc fixed`: 50–50 (50.0%, 40–60%),
+52% on the play.
+
+**Cost** (engine time per game is per worker; the machine was shared for part of these runs, so
+times are within about ±25%, counts are exact):
+
+| Games | Rollouts per game (mean / median / most) | Search time per rollout | Engine time per game (mean / median / longest) |
+|---|---|---|---|
+| Azorius Control vs Boros Dwarves, no Monte Carlo (200) | 0 | – | 2.3 s / 1.8 s / 12 s |
+| Azorius Control `fixed`, Boros Dwarves default (200) | 178 / 158 / 832 | 0.10 s | 21.3 s / 13.4 s / 195 s |
+| both `fixed` (40, three runs) | 444 / 370 / 1,834 | 0.08–0.11 s | 40–51 s / 25–32 s / 265–326 s |
+| Boros Dwarves mirror, both `fixed` (100) | 292 / 255 / 1,065 | 0.14 s | 42.9 s / 29.3 s / 311 s |
+| both `--mc max` (40, for comparison) | 385 / 350 / 780 | 0.10 s | 42.4 s / 37.8 s / 123 s |
+
+A searching seat costs about 9 times the engine time of the default AI in this matchup, both
+seats about 18–22 times; 86–93% of a game's time is search. The longest games are far below the
+1,800 s limit that games with a `fixed` seat get. Every game with Monte Carlo now logs
+`FlatMonteCarloStats.summary()` to its worker log and carries the counters in `games.jsonl`;
+`tools/mc_cost.py RUN_DIR` prints the table rows.
+
+**Pilot A/B: no reliable gain.** Azorius Control vs Boros Dwarves, `-n 200 --seed 1`, the same
+deals in both arms; the opponent always plays the default AI. The `fixed` arm sets
+`"ai_mc": "fixed"` for Azorius Control in a copy of the meta `gauntlet.json`.
+
+| Azorius Control piloted by | W–L | Win rate (95% CI) |
+|---|---|---|
+| default AI | 52–148 | 26.0% (20–32%) |
+| `fixed` Monte Carlo | 64–136 | 32.0% (26–39%) |
+
+Difference +6.0 points, 95% interval −2.9 to +14.8 (p = 0.19); paired over the 200 shared deals
+−1.0 to +13.0 (`tools/compare_arms.py`). Both intervals include zero, so this is not a measured
+gain. It points the same way as the earlier 40-game `--mc max` comparison (17.5% → 32.5%), made
+before the Empower patches lifted the default pilot in this matchup from 17.5% to 26%, and it is
+now a result that can be re-run and extended game for game: telling a 6-point gain from zero
+needs about 1,000 games per arm, roughly 3 hours on 4 idle cores for the `fixed` arm. Where the
+search changed the heuristics' play in the `fixed` arm: 132 of 665 responses, 41 of 482 end-step
+decisions, 16 of 93 after blocks, 8 of 447 attacks.
+
+**Limits.** One matchup. The search still relies on Forge's evaluator and heuristic playouts
+(`docs/stronger-ai.md`). Forge's `StormSolver` keeps a 4 s clock budget; it only runs for decks
+Forge classifies as tutor-storm combo, none of which were played here. Whether rollout failures
+replay was not observed (there were none in the 420 `fixed` games above). `fixed` needs a Java heap
+above 768 MB (the default is 2 GB) and is refused otherwise.
+
+These measurements were made on Forge with patches 0001–0008 and 0020. On the build that also
+carries 0009–0011 the two properties were checked again: `match azorius-control boros-dwarves
+-n 30 --seed 1` without Monte Carlo is identical, game for game, to the same pairing in the
+twelve-deck round robin played before 0020 was applied, and 8 of 8 `--mc fixed` games (seed 7)
+are identical with one and with four workers.
 
 ## The goldfish model
 

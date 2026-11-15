@@ -25,7 +25,7 @@ from typing import Callable, Dict, Iterable, List, Optional, Tuple
 from . import ai_profiles
 from .decks import Deck
 from .forge import ForgeInstall, patches_for_run
-from .runner import Job, run_jobs
+from .runner import DEFAULT_TIMEOUT, FIXED_TIMEOUT, Job, run_jobs
 
 
 class RunError(RuntimeError):
@@ -43,7 +43,7 @@ class Entrant:
     category: str = ""
     pilot: str = ""  # how well the AI plays this deck compared with people: "weak", "fair", "strong" or unknown
     ai_profile: str = ""  # Forge AI profile for this deck's seat ("" = the run's default)
-    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max" ("" = the run's default)
+    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max", "fixed" ("" = the run's default)
     dck_path: str = ""
 
     def describe(self) -> dict:
@@ -69,7 +69,8 @@ class Entrant:
 class RunOptions:
     games: int = 100  # games per pairing
     seed: int = 1
-    timeout: int = 180
+    timeout: int = DEFAULT_TIMEOUT
+    fixed_timeout: int = FIXED_TIMEOUT  # for games in which a seat plays Monte Carlo "fixed"
     workers: Optional[int] = None
     heap: str = "2g"
     monte_carlo: str = "off"
@@ -80,10 +81,13 @@ class RunOptions:
     save_logs: bool = False
 
     def describe(self) -> dict:
-        return {
+        info = {
             "games_per_pairing": self.games, "seed": self.seed, "timeout": self.timeout,
             "monte_carlo": self.monte_carlo, "ai_profile": self.ai_profile or "Default",
         }
+        if self.monte_carlo == "fixed":  # execute() also adds it when only a deck's ai_mc asks for "fixed"
+            info["timeout_fixed"] = self.fixed_timeout
+        return info
 
 
 def slug(text: str) -> str:
@@ -130,7 +134,7 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
         if options.save_logs:
             # absolute: the Forge JVMs run in Forge's own folder, where a relative path would land
             log_path = str(Path(run_dir).resolve() / "logs" / "games" / f"{a.key}__{b.key}__{i:04d}.log")
-        jobs.append(Job(
+        job = Job(
             id=job_id,
             seed=game_seed(options.seed, a.deck, b.deck, i),
             decks=[s.dck_path for s in seats],
@@ -140,7 +144,12 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
             profiles=_seat_profiles(seats, options),
             seat_monte_carlo=[] if options.force_monte_carlo else [s.ai_mc for s in seats],
             meta={"a": a.key, "b": b.key, "game": i, "seats": [s.key for s in seats]},
-        ))
+        )
+        if job.uses_fixed_search():
+            # No clock cuts a counted search short, so the game takes as long as it takes; stopping it at
+            # the usual limit would record a timeout where a replay is expected.
+            job.timeout = options.fixed_timeout
+        jobs.append(job)
     return jobs
 
 
@@ -213,6 +222,8 @@ def _record(job: Job, result: dict) -> dict:
     record["end_reason"] = result.get("endReason")
     record["ms"] = result.get("ms")
     record["players"] = result.get("players", [])
+    if result.get("mc") is not None:  # search counters, only reported for games with Monte Carlo
+        record["mc"] = result["mc"]
     if result.get("error"):
         record["error"] = str(result["error"])[:2000]
     return record
@@ -290,8 +301,11 @@ def execute(
 
     patches = patches_for_run(install, run_dir / "run.json", quiet=quiet)  # warns if not what mtgsim ships
     run_info = dict(meta or {})
+    described = options.describe()
+    if any(job.uses_fixed_search() for job in jobs):
+        described["timeout_fixed"] = options.fixed_timeout
     run_info.update({
-        "options": options.describe(),
+        "options": described,
         "entrants": [e.describe() for e in entrants],
         "pairings": [[a.key, b.key] for a, b in pairings],
         "forge": {"version": install.version, "path": str(install.root), "fingerprint": _engine_fingerprint(install),

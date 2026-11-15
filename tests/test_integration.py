@@ -44,11 +44,11 @@ class ForgeIntegrationTest(unittest.TestCase):
         self.assertEqual([], bears.errors + giants.errors)
         return [Entrant("bears", bears), Entrant("giants", giants)]
 
-    def _play(self, name, games=6, seed=3, workers=2):
+    def _play(self, name, games=6, seed=3, workers=2, **options):
         entrants = self._entrants()
         records = experiment.execute(
             self.install, self.tmp / name, entrants, [(entrants[0], entrants[1])],
-            RunOptions(games=games, seed=seed, workers=workers, timeout=120), quiet=True,
+            RunOptions(games=games, seed=seed, workers=workers, timeout=120, **options), quiet=True,
         )
         return sorted(records, key=lambda r: r["game"])
 
@@ -92,6 +92,23 @@ class ForgeIntegrationTest(unittest.TestCase):
         self.assertEqual(
             [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"]) for r in first],
             [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"]) for r in second],
+        )
+
+    def test_fixed_monte_carlo_replays_the_same_games(self):
+        # Monte Carlo "fixed" counts rollouts instead of reading the clock, so unlike "on" and "max"
+        # it must replay from the seed whatever the number of workers.
+        fixed = dict(monte_carlo="fixed", force_monte_carlo=True, fixed_timeout=600)
+        first = self._play("fixed-a", games=4, seed=9, workers=2, **fixed)
+        if any("Forge patch 0020" in (r.get("error") or "") for r in first):
+            self.skipTest("this Forge build lacks mtgsim's patch 0020; run `python3 -m mtgsim setup --build`")
+        second = self._play("fixed-b", games=4, seed=9, workers=1, **fixed)
+        for record in first + second:
+            self.assertEqual("ok", record["status"], record.get("error"))
+            self.assertEqual(0, record["mc"]["failures"])
+        self.assertGreater(sum(r["mc"]["rollouts"] for r in first), 0, "the search must really have run")
+        self.assertEqual(
+            [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"], r["mc"]) for r in first],
+            [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"], r["mc"]) for r in second],
         )
 
     def test_different_seeds_give_different_games(self):

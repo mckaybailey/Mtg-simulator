@@ -667,7 +667,9 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
         f"Forge {esc(forge.get('forgeVersion') or forge.get('version') or '?')}, AI profile {esc(opts.get('ai_profile', 'Default'))}"
         f"{'' if opts.get('monte_carlo', 'off') == 'off' else ', Monte Carlo ' + esc(opts.get('monte_carlo'))}; "
         f"{opts.get('games_per_pairing', '?')} games per pairing, best-of-one, no sideboarding; "
-        f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game. "
+        f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game"
+        + (f" ({int(opts['timeout_fixed'])}s for games with Monte Carlo fixed). " if isinstance(opts.get("timeout_fixed"), int) else ". ")
+        +
         f"{problems.get('timeouts', 0)} games hit the time limit and {problems.get('errors', 0)} failed in the engine; "
         "both are excluded from win rates."
         + (f" Total run time {elapsed / 60:.0f} min." if elapsed else "")

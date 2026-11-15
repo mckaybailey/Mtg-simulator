@@ -14,13 +14,17 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
   `FModel.initialize`, replacing Forge's `res/ai` set, and the ready line adds `aiProfileDir` and
   `aiProfiles` (count). A profile setting this Forge does not know is a fatal startup error.
 - stdin: one job per line, tab-separated `key=value`: `id`, `seed`, `timeout`, `format`,
-  `mc` (`off|on|max`, whole game), `log` (path or empty), repeated `deck=` (seat order),
+  `mc` (`off|on|max|fixed`, whole game), `log` (path or empty), repeated `deck=` (seat order),
   repeated `profile=`, repeated `seatmc=` (per seat; empty follows `mc`). `quit` ends the process.
+  Any other Monte Carlo value makes the game an `error`.
   Values may not contain tabs or newlines (`runner.Job.line` enforces it).
 - One result line per job: `status` (`ok|timeout|error`), `winner` and `first` (seat index or
   -1), `turns`, `endReason`, `ms`, `restart`, and per player `mainCount`, `mulligans`, `turns`,
   `lossReason`, `altWin`, `life`, `opening` / `drawn` / `played` card-name counts, and the
-  misplay fields below (all `null` when the game thread could not be stopped).
+  misplay fields below (all `null` when the game thread could not be stopped). Games in which a
+  seat used Monte Carlo also carry `mc`: `decisions`, `rollouts` and `failures` (rollouts or
+  decisions that ended in an exception) summed over both seats; games without it have no such
+  key, so their records are byte-for-byte what they were before the field existed.
 
 ### Misplay fields (per player; read by `mtgsim/misplay.py`)
 
@@ -57,7 +61,24 @@ the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay
 ## Behaviour that matters
 
 - `MyRandom` is seeded before anything that consumes randomness, so a seed replays a game
-  exactly, unless Monte Carlo is on (it thinks against a clock).
+  exactly, unless Monte Carlo is `on` or `max` (they think against a clock).
+- **Monte Carlo `fixed` replays from the seed.** A seat playing it gets Forge's maximum-strength
+  Flat Monte Carlo (`setFlatMonteCarloMaxOverride`) switched to a counted search with
+  `AiController.setFlatMonteCarloCountOnly(true)` (Forge patch 0020; a build without it makes the
+  game an `error` that names the patch), and the game's `AI_TIMEOUT` is raised to 1,000,000 s so
+  no AI decision of either seat, searched or heuristic, is ever cut short by the clock. The
+  budget is in the patch (`FlatMonteCarloPicker.Config.counted`): per decision at most 3 approved
+  plays + 1 other target + 2 discovered plays + holding, 4 rounds for every line and 2 more for
+  the lines still in the race, and at most 100 rollouts per player per game turn before the
+  rest of that turn goes to the heuristics (this counted turn budget is what ends a turn in which
+  the search keeps choosing a play that cannot be put on the stack). `fixed` is refused on a heap of 768 MB or less, where Forge
+  shrinks its search to phone size. What still reads the clock in such a game: the job's own
+  `timeout` (a game stopped by it is a `timeout`, not a replay; the runner gives fixed games
+  1,800 s), and Forge's `StormSolver` (only for decks whose plan Forge classifies as a tutor-storm combo, a 4 s budget; not exercised by the
+  measurements in `VALIDATION.md`).
+- After every game with Monte Carlo the driver prints `FlatMonteCarloStats.summary()` to stderr
+  (the worker log) under a `[mtgsim] Monte Carlo in game <id>` line; the counters are reset at
+  the start of each such game (one game at a time per JVM). `tools/mc_cost.py` adds them up.
 - Each job builds a new `Match`, so every game has its own coin flip.
 - A game runs on its own thread with a 64 MB stack. Past the timeout it is ended as a draw; if the
   thread will not stop, the result carries `restart: true` and the process exits with code 3,

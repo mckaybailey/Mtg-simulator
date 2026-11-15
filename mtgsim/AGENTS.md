@@ -57,8 +57,16 @@
   order and game g has the pairing's first deck in seat g % 2, exactly as `plan_pairing`, which is
   what makes `--import` of a `matrix` run valid; an import also needs the same patch set (a run
   recorded before patches were tracked counts as unpatched). If the driver ever changes how a game is played,
-  bump `CACHE_VERSION` in `tune.py`. With Monte Carlo on, cached games are valid samples but not
-  replays.
+  bump `CACHE_VERSION` in `tune.py`. With Monte Carlo `on` or `max`, cached games are valid samples
+  but not replays; with `fixed` they are replays.
+- **Monte Carlo `fixed` must never read the clock.** Its games replay from the seed because the
+  search is counted in rollouts (Forge patch 0020) and the driver puts `Game.AI_TIMEOUT` out of
+  reach (`bridge/AGENTS.md`). `runner.MONTE_CARLO_MODES` is the one list of settings (`Job.line`
+  refuses anything else); a job with a `fixed` seat gets `RunOptions.fixed_timeout`
+  (`runner.FIXED_TIMEOUT`, 1,800 s) because a game stopped at the time limit is not a replay.
+  Changing the counted budget in the patch changes every `fixed` game: re-measure and say so in
+  VALIDATION.md. Games without Monte Carlo must stay bit-identical through any change to this
+  path (`tools/compare_games.py` on a seeded match, old against new).
 - **Selection never sees held-out real win rates**, and the confirmation round uses game indices
   after the last selection round, so its numbers are not inflated by the choice.
 - If `Card` fields or their parsing change, bump `CACHE_VERSION` in `carddb.py` so stale caches

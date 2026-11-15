@@ -15,6 +15,7 @@ from .carddb import CardDatabase, load_database
 from .decks import Deck, DeckIssue, find_deck_files, load_deck
 from .experiment import Entrant, RunError, RunOptions
 from .forge import ForgeError
+from .runner import DEFAULT_TIMEOUT, FIXED_TIMEOUT, MONTE_CARLO_MODES
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_GAUNTLET = REPO_ROOT / "decks" / "standard" / "meta"
@@ -180,16 +181,20 @@ def _entrants(ctx: Context, groups: Sequence[Tuple[Sequence[str], str]]) -> Tupl
 def _mc_setting(value, deck_name: str) -> str:
     if value in (None, ""):
         return ""
-    if value not in ("off", "on", "max"):
-        raise UserError(f"ai_mc for {deck_name} must be off, on or max, not {value!r}")
+    if value not in MONTE_CARLO_MODES:
+        raise UserError(f"ai_mc for {deck_name} must be off, on, max or fixed, not {value!r}")
     return str(value)
 
 
 def _options(args: argparse.Namespace) -> RunOptions:
     if args.games < 1:
         raise UserError("--games must be at least 1")
+    if args.timeout is not None and args.timeout < 1:
+        raise UserError("--timeout must be at least 1 second")
     return RunOptions(
-        games=args.games, seed=args.seed, timeout=args.timeout, workers=args.workers,
+        games=args.games, seed=args.seed,
+        # without --timeout, games with a "fixed" Monte Carlo seat get the longer limit (see runner.FIXED_TIMEOUT)
+        timeout=args.timeout or DEFAULT_TIMEOUT, fixed_timeout=args.timeout or FIXED_TIMEOUT, workers=args.workers,
         heap=args.heap, monte_carlo=args.mc or "off", ai_profile=args.ai_profile or "", save_logs=args.save_logs,
         force_profile=bool(args.ai_profile), force_monte_carlo=args.mc is not None,
     )
@@ -776,10 +781,14 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
     p.add_argument("--out", help="directory for results (default: runs/<timestamp>-...)")
     p.add_argument("--resume", metavar="RUN_DIR", help="continue an interrupted run in this directory")
     p.add_argument("--strict", action="store_true", help="refuse to simulate decks that break format rules")
-    p.add_argument("--timeout", type=int, default=180, help="seconds before a game is stopped and counted as unfinished")
+    p.add_argument("--timeout", type=int, default=None,
+                   help=f"seconds before a game is stopped and counted as unfinished (default {DEFAULT_TIMEOUT}; "
+                        f"{FIXED_TIMEOUT} for games with Monte Carlo \"fixed\")")
     p.add_argument("--ai-profile", help="Forge AI profile for both players (Default, Reckless, Cautious, ...)")
-    p.add_argument("--mc", choices=("off", "on", "max"), default=None,
-                   help="Forge's Monte Carlo AI look-ahead: slower, and results are no longer exactly reproducible")
+    p.add_argument("--mc", choices=MONTE_CARLO_MODES, default=None,
+                   help="Forge's Monte Carlo AI look-ahead for every player: slower. on and max think against the "
+                        "clock, so their games do not replay from the seed; fixed searches a counted number of "
+                        "rollouts and does")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")
 
@@ -875,9 +884,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", help="directory for results (default: runs/<timestamp>-tune-...)")
     p.add_argument("--resume", metavar="RUN_DIR", help="continue a tuning run (its settings are read from tune.json)")
     p.add_argument("--strict", action="store_true", help="refuse decks that break format rules")
-    p.add_argument("--timeout", type=int, default=180, help="seconds before a game is stopped and counted as unfinished")
-    p.add_argument("--mc", choices=("off", "on", "max"), default=None,
-                   help="Monte Carlo search for every seat (default off; on makes the cache inexact)")
+    p.add_argument("--timeout", type=int, default=None,
+                   help=f"seconds before a game is stopped and counted as unfinished (default {DEFAULT_TIMEOUT}; "
+                        f"{FIXED_TIMEOUT} with --mc fixed)")
+    p.add_argument("--mc", choices=MONTE_CARLO_MODES, default=None,
+                   help="Monte Carlo search for every seat (default off; on and max make the cache inexact, "
+                        "fixed replays from the seed but is many times slower)")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.set_defaults(func=cmd_tune)
 

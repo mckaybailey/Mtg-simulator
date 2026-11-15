@@ -29,9 +29,9 @@ what was learned and what to do next.
 | Recalibration | `decks/standard/meta/gauntlet.json`, its README | twelve decks, eleven patches (`matrix decks/standard/meta -n 30 --seed 1`, 1,980 games): rank correlation 0.23 (noise 0.08–0.36), mean gap 11.4 points; on the eleven shared decks no change beyond noise from the eight-patch run |
 | Tuning harness | `mtgsim/tune.py`, `mtgsim/profiles/spaces/default.json` | works; the full meta search found no profile beating Default beyond noise, none shipped |
 | Design note | `docs/stronger-ai.md` | recommends a deterministic Flat Monte Carlo (`--mc fixed`) as first prototype |
-| `--mc fixed` prototype | worktree branch `worktree-agent-ac280bbe1bd6102b6` (local, not merged) | code written (driver, Forge patch 0020, cli); replay, mirror, cost and A/B checks were still running when this note was written |
+| `--mc fixed` prototype | Forge patch 0020, `mtgsim/bridge/ForgeBridge.java`, `--mc fixed` / `ai_mc: fixed`, `tools/mc_cost.py` | replays from the seed (40 of 40 games across worker counts), games without Monte Carlo unchanged, mirror 50.0%; one searching seat costs about 9 times the default AI. Azorius Control vs Boros Dwarves: 32.0% against 26.0% with the default pilot, +6.0 points (−2.9 to +14.8), not reliable at 200 games per arm |
 
-Tests: 280 (274 unit, 6 integration), all passing on the patched engine.
+Tests: 284 (277 unit, 7 integration), all passing on the patched engine.
 
 ## What was learned
 
@@ -69,9 +69,12 @@ Tests: 280 (274 unit, 6 integration), all passing on the patched engine.
 2. **Look for more mana sinks and wrong-phase activations** in the underrated decks: for each
    deck, compare play rates of its spells in games with and without each of its permanents that
    has an activated ability (the Ba Sing Se method), and read `logs/games/` where they differ.
-3. **Finish and merge the `--mc fixed` prototype** from `docs/stronger-ai.md`: definition of done
-   is in section 6 there (40 of 40 games identical across worker counts, mirror near 50%, cost
-   per rollout, Azorius Control vs Boros Dwarves at 200 games per arm).
+3. **Find out whether `--mc fixed` helps.** It is reproducible now, so it can be A/B tested:
+   Azorius Control with `ai_mc: fixed` against the default-piloted field needs about 1,000 games
+   per arm to tell 6 points from zero (roughly 3 hours for the fixed arm on 4 cores), then the
+   same for Jund Sacrifice and Dimir Uldaros. Only if the weak decks gain is a round robin with
+   `fixed` for them worth its 10+ hours. The search can still loop on a play that cannot be put
+   on the stack; the per-turn budget of 100 rollouts bounds that, it does not fix it.
 4. **Smaller AI leads from the logs** (each a Forge patch, measured as in
    `mtgsim/forge_patches/README.md`): the AI targets creatures with ward without keeping mana to
    pay (21 of 119 spells lost to Lavaspur Boots); `ComputerUtil.predictNextCombat` ignores
@@ -84,6 +87,8 @@ Tests: 280 (274 unit, 6 integration), all passing on the patched engine.
 
 ## Practical notes
 
+- `--mc fixed` games take 20–45 s each and have a 1,800 s time limit; a timed-out game is not a
+  replay.
 - Run one engine job at a time (4 cores). A 1,980-game round robin takes about 30 minutes; a
   1,000-game gauntlet arm about 15.
 - Pass an absolute `--out` or rely on the default; `--save-logs` now resolves the path itself.

@@ -32,6 +32,9 @@ not installed and must not be required.
   not set up. Its decks (Raging Goblin vs Grizzly Bears) were chosen because they cannot stall;
   Grizzly Bears vs Hill Giant can, and a stalled game hits the time limit and breaks the
   reproducibility check.
+  `test_fixed_monte_carlo_replays_the_same_games` plays four `--mc fixed` games with two workers
+  and with one and compares them, rollout counts included; it skips itself on a Forge build
+  without patch 0020. It is the slowest test (about a minute).
 - **`test_integration_profiles.py`** (a few seconds of real games, skipped without Forge) checks
   that a run-generated AI profile reaches the engine: 60 Forests mulligan under Default but never
   with MULLIGAN_THRESHOLD=8, and an unknown profile name is an error, not a silent fallback.

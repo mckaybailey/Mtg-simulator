@@ -59,12 +59,15 @@ Always pass on the limits with the numbers:
   report section) is a heuristic pointer to cards whose Forge AI logic is worth reading, not
   proof that the AI misplayed them.
 - `--mc on|max` (Monte Carlo search) plays better but ~6x slower, and its games are not
-  reproducible from the seed.
+  reproducible from the seed. `--mc fixed` (or `ai_mc: fixed` for one deck) is the same search
+  with a counted budget: its games do replay, it costs about 9 times the engine time per
+  searching player, and the one A/B so far (Azorius Control vs Boros Dwarves, 200 games per arm)
+  gave +6.0 points with an interval of −2.9 to +14.8, so do not present it as stronger.
 
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (280 tests, ~2 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (284 tests, ~4 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match
