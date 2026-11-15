@@ -16,7 +16,49 @@ measured and how far results can be trusted. Each folder with code or data has i
 `docs/stronger-ai.md` is a design note comparing ways to give mtgsim a stronger pilot than Forge's AI.
 `docs/ai-pilot-status.md` is the handoff note for the unfinished work on the AI pilot: what is done, what was
 learned and what to do next. Read it before working on the AI, patches or calibration.
-`tools/` holds the analysis scripts behind the calibration numbers in `VALIDATION.md` (see its README).
+`tools/` holds the analysis scripts behind the numbers in `VALIDATION.md` (see its README):
+calibration and arm comparisons, `mc_cost.py` for Monte Carlo runs, and `log_analysis/`, which
+parses the game logs of a `--save-logs` run. `mtgsim/forge_patches/README.md` lists every Forge
+patch with its cause and measurement.
+
+## The AI pilot: what is settled, so it is not repeated
+
+`docs/ai-pilot-status.md` has the detail and the ordered next steps; `VALIDATION.md` has every
+number. In short, as of 15 November 2026:
+
+- **The simulator's ranking of the meta decks does not match the real one, and fixing the AI's
+  mistakes has not changed that.** Twelve Forge patches ship. Three moved a deck a lot (Azorius
+  Control +25 points, Mono-Green Landfall +20, Azorius Momo +9); none moved the rank correlation
+  or the mean gap beyond noise. A deck the AI learns to pilot becomes one more overrated
+  creature deck.
+- **Tried and found to change nothing beyond noise:** AI profile settings (`tune`, 16
+  candidates, 12,010 games; do not rerun on the default space), per-deck `Cautious` / `Hardest`
+  profiles, casting Nova Hellkite and Chainsaw (patches 0009, 0010).
+- **Read and found sensible, no patch:** the AI's rules for Pinnacle Starcage, Day of Judgment,
+  Torch the Tower and Seam Rip; how opponents block and aim removal against Boros Dwarves and
+  Boros Dragons; those two decks' card scripts.
+- **Not established either way:** whether `--mc fixed` plays better (+6.0 points, interval −2.9
+  to +14.8, one pairing); whether best-of-one without sideboards explains the creature decks'
+  excess (the leading hypothesis, untested).
+- **Still unverified:** `decks/standard/meta/real-matchups-unverified.json` (mtgdecks.net refuses
+  automated requests) and the three melee.gg tournament lists. Real win rates, shares and the
+  nine aggregate lists were checked against the Magic.gg article.
+
+How the findings were made, for the next card or deck:
+
+- A card the AI holds: `python3 -m mtgsim misplays RUN_DIR`, then read the `ability/*Ai.java`
+  class for its effect and `AiController.checkETBEffects` (it refuses a permanent whose enter
+  trigger the AI would not use; `OptionalDecider$ You` on the trigger is the usual fix).
+- A mana sink or wrong-phase activation is invisible to `misplays`, because nothing is castable
+  at cleanup. Compare a deck's spell play rates in games with and without one of its own
+  permanents on the battlefield, then read `logs/games/` (Ba Sing Se was found this way).
+- Measure every patch as `mtgsim/forge_patches/README.md` says: the deck against the other meta
+  decks, 100 games each, seed 1, without and with (`tools/compare_arms.py` gives the paired
+  interval and how often the card was cast), plus a 200-game mirror. Card-script patches can be
+  measured on the shared Forge one at a time; Java patches in a private `MTGSIM_HOME`.
+- After patches change, replay `matrix decks/standard/meta -n 30 --seed 1` and update the
+  calibration (`tools/calibration.py`, `tools/calibration_diff.py`, `tools/update_calibration.py`,
+  the meta README table, the numbers in this file and `README.md`).
 
 ## Running simulations for the user
 
@@ -84,5 +126,10 @@ Always pass on the limits with the numbers:
   records that it had none. New AI profiles that mtgsim selects by name (for example one found
   by `tune`) are not Forge changes: they go in `mtgsim/profiles/`, under the same rule.
 - Commit to `main` and keep `claude/mtg-deck-simulator-h1pbfa` pointing at the same commit; push
-  both. Commit messages explain why, not just what.
+  both. Commit messages explain why, not just what. Exception: the AI pilot work is on
+  `claude/ai-decision-engine`, not yet merged into `main` (the sessions that wrote it could push
+  only that branch); merge it or open a pull request only when the user asks.
+- The cloud container restarts without warning and takes `runs/`, `/tmp` and background jobs
+  with it. Commit after each milestone, start long runs detached, and continue them with
+  `--resume RUN_DIR` (repeat the original arguments). Pass `--out` to keep run names predictable.
 - Never commit `runs/`, Forge itself, or anything from `~/.mtgsim`.

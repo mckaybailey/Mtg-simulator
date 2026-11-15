@@ -256,7 +256,7 @@ python -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --import runs/<m
   every round, the confirmation, the cross-validation and a statement of how much real data the
   result would need) and `RUN_DIR/best/tuned-<group>.json`.
 
-What it can and cannot tell you: with eleven decks, a rank correlation has a 95% interval of
+What it can and cannot tell you: with a dozen decks, a rank correlation has a 95% interval of
 roughly ±0.4 to ±0.6 from the choice of decks alone (0.24 means anything from −0.44 to 0.74), so
 no tuning can be validated against real data to better than that; `tune` prints how many decks or matchups would narrow it. A profile that wins
 here makes the simulator's *ranking* of these decks more like the real one; it does not make the
