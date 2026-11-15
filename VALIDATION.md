@@ -309,6 +309,31 @@ Jund Sacrifice, the best real deck, is still 20 points low, and Azorius Artifact
 partly because the repaired control deck now beats it. Fixing cards the AI could not cast at all
 is a correctness fix; what remains is how Forge's AI plays the cards it can cast.
 
+## Monte Carlo with a fixed budget (`--mc fixed`)
+
+`--mc fixed` (and `ai_mc: fixed` per deck) is Forge's Flat Monte Carlo at its maximum-strength
+settings with the clock taken out (Forge patch 0020 plus the driver): the search is counted in
+rollouts, the AI timeout is out of reach, and nothing shrinks or pauses the search when the
+machine is slow. Measured on 14–15 November 2026 in a private `MTGSIM_HOME` built from the pinned
+Forge commit with patches 0001–0008 and 0020; all commands are `python3 -m mtgsim match` on
+`decks/standard/meta/azorius-control.txt` and `boros-dwarves.txt` unless stated.
+
+**The budget.** Per decision at most 3 plays the heuristics approve, 1 other target, 2 plays
+they rejected and "hold", each sampled in 4 rounds, plus 2 rounds for the lines still in the race
+after pruning; at most 100 rollouts per player per game turn. That is 28–42 rollouts for a full
+decision; in practice pruning and short candidate lists bring the average to 6.8. It was chosen
+to sit where `--mc max` lands on this machine (a 1.5 s decision budget at roughly 10 rollouts a
+second), not tuned for strength. The turn budget is not optional: without it 3 of 40 games ran
+into the 1,800 s time limit, because the search chose a play that could not be put on the stack
+(an equip aimed by the search) again and again, up to 30,000 rollouts in one game; the clocked
+modes are saved from this by their turn budget in seconds.
+
+**Replay.** `-n 40 --seed 7 --mc fixed`, both seats searching: REPLAY_PLACEHOLDER
+
+**Games without Monte Carlo are unchanged.** `-n 200 --seed 1` on a build without patch 0020
+with the previous driver, and on the build with 0020 and the new driver: 200 of 200 games
+identical (`tools/compare_games.py`; Azorius Control 52–148 both times).
+
 ## The goldfish model
 
 Unit tests check the opening-hand land counts against the exact hypergeometric distribution
