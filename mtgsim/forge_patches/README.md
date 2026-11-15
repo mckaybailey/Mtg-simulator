@@ -23,6 +23,11 @@ other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
 | 0007 | Seasoned Cryomancer (Dimir Uldaros) | stun step has 0 legal targets when the cast is evaluated | card script |
 | 0008 | Practiced Offense (engine crash) | `PumpEffect` read a target from an empty list when the target left in response | Java |
 
+0020 is of another kind: it changes no card and no game played without Monte Carlo. It adds
+`AiController.setFlatMonteCarloCountOnly`, which the driver switches on for seats playing
+`--mc fixed`: Flat Monte Carlo with a budget counted in rollouts and no clock checks, so those
+games replay from the seed (`VALIDATION.md`, "Monte Carlo with a fixed budget").
+
 | Deck | Without | With its patches | Difference (95% CI) | Mirror, patched |
 |---|---|---|---|---|
 | Azorius Control (0001, 0002) | 22.4% (20–25%) | 47.8% (45–51%) | +25.4 (+21.3 to +29.4) | 54.0% (47–61%) |

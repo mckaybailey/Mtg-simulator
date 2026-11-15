@@ -7,7 +7,14 @@ Why: Forge's Flat Monte Carlo decides how much to sample by the clock (decision 
   seconds, and none of those clock checks run. The counted turn budget is needed: without it a
   play that cannot be put on the stack was chosen again and again until the game timed out
   (3 of 40 games).
-Measured: TO BE FILLED
+Measured: Forge 7db198d72e with patches 0001-0008, Azorius Control vs Boros Dwarves (meta lists).
+  Without Monte Carlo the patch changes nothing: `mtgsim match ... -n 200 --seed 1` gave 200 of
+  200 identical games without and with it. `-n 40 --seed 7 --mc fixed`: 40 of 40 games identical
+  with 1 and 2 workers and on a second run, no timeouts (before the turn budget: 3 of 40). Mirror
+  (Boros Dwarves, 100 games, seed 5): 50.0% (40-60). Azorius Control piloted `fixed` against the
+  default AI, 200 games, seed 1: 32.0% (26-39) against 26.0% (20-32) with the default pilot,
+  +6.0 points (95% interval -2.9 to +14.8): not a reliable gain. 0.08-0.14 s per rollout, 178
+  rollouts and 21 s per game for one searching seat (2.3 s without). See VALIDATION.md.
 
 diff --git a/forge-ai/src/main/java/forge/ai/AiController.java b/forge-ai/src/main/java/forge/ai/AiController.java
 index 0fd6cee9..f7dc2a67 100644
