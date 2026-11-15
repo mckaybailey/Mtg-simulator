@@ -1,68 +1,95 @@
 # AI pilot project: where it stands
 
-Handoff note for the next agent. Written 2026-11-13 at commit f587046 on branch
-`claude/ai-decision-engine`. The goal of the project: make mtgsim's Forge AI play more like real
-players, so simulated meta win rates track real ones. Numbers and methods are in `VALIDATION.md`;
-this note says what is done, what was learned and what to do next.
+Handoff note for the next agent. Rewritten 2026-11-15 on branch `claude/ai-decision-engine`. The
+goal of the project: make mtgsim's Forge AI play more like real players, so simulated meta win
+rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
+what was learned and what to do next.
 
 ## Branch state
 
-- All work is on `claude/ai-decision-engine`, pushed. It contains `main` as of 56151e6 (the other
-  session's per-deck Cautious/Hardest/Monte Carlo experiment, which changed nothing in
-  `gauntlet.json`). **It has not been merged into `main` and no pull request exists**: the session
-  that did this work was only allowed to push this branch. Ask the user before merging or opening
-  a PR.
-- The working tree was clean. `runs/` is git-ignored and lived in a container that is gone; every
-  run below can be replayed from its command and seed.
+- All work is on `claude/ai-decision-engine`, pushed. It contains `main` as of 56151e6. **It has
+  not been merged into `main` and no pull request exists**: the sessions that did this work were
+  only allowed to push this branch. Ask the user before merging or opening a PR.
+- `runs/` is git-ignored and does not survive the cloud container; every run below can be
+  replayed from its command and seed.
+- The cloud environment "Mtg-simulator" now allows `magic.gg` and `mtgdecks.net`. magic.gg works
+  with `curl`; mtgdecks.net answers automated requests with a Cloudflare 403.
 
 ## Done
 
 | Item | Where | Result |
 |---|---|---|
-| Misplay report | `mtgsim/misplay.py`, `misplays RUN_DIR`, report section | games unchanged by the tracking (1,650 of 1,650 identical); ranked every later-fixed card at the top of its deck |
+| Misplay report | `mtgsim/misplay.py`, `misplays RUN_DIR`, report section | games unchanged by the tracking; ranked every later-fixed dead card at the top of its deck |
 | Forge patch mechanism | `mtgsim/forge.py`, `mtgsim/forge_patches/README.md` | `setup --build` applies, records and rebuilds as designed |
-| Eight patches | `mtgsim/forge_patches/0001`–`0008` | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (−0.3 to +7.9, not reliable); mirrors 50–54% |
-| Recalibration | `decks/standard/meta/gauntlet.json`, its README | patched round robin (`matrix decks/standard/meta -n 30 --seed 1`): mean gap 13.0 → 10.8 points (clears noise), rank correlation 0.24 → 0.11 (within noise: ranking not improved) |
-| Tuning harness | `mtgsim/tune.py`, `mtgsim/profiles/spaces/default.json` | works; the full meta search (16 candidates, 12,010 games) found no profile beating Default beyond noise, so none shipped and `ai_profile` is unset |
-| Design note | `docs/stronger-ai.md` | recommends a deterministic, rollout-counted Flat Monte Carlo (`--mc fixed`) as first prototype; not built |
-| Analysis scripts | `tools/` | reproduce the calibration and patch-comparison numbers |
+| Patches 0001–0008 | `mtgsim/forge_patches/` | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable) |
+| Patches 0009–0011 | same | Nova Hellkite and Chainsaw are now cast, no win-rate change (+1.5 and −0.1, both inside noise); the Ba Sing Se fix gives Mono-Green Landfall +20.3 (+16.0 to +24.5) |
+| The other flagged cards read | `VALIDATION.md`, "More card fixes…" | Pinnacle Starcage, Day of Judgment, Torch the Tower, Seam Rip: the AI's rule is sensible, no patch |
+| Why creature decks win | same section, `tools/log_analysis/` | no blocking, removal or card-script flaw; results turn on how much removal the opponent draws, in game one without sideboards |
+| Source check | `decks/standard/meta/README.md` | real win rates, shares and the aggregate lists match the Magic.gg article; Four-Color Control added as a twelfth deck |
+| Recalibration | `decks/standard/meta/gauntlet.json`, its README | twelve decks, eleven patches (`matrix decks/standard/meta -n 30 --seed 1`, 1,980 games): rank correlation 0.23 (noise 0.08–0.36), mean gap 11.4 points; on the eleven shared decks no change beyond noise from the eight-patch run |
+| Tuning harness | `mtgsim/tune.py`, `mtgsim/profiles/spaces/default.json` | works; the full meta search found no profile beating Default beyond noise, none shipped |
+| Design note | `docs/stronger-ai.md` | recommends a deterministic Flat Monte Carlo (`--mc fixed`) as first prototype |
+| `--mc fixed` prototype | worktree branch `worktree-agent-ac280bbe1bd6102b6` (local, not merged) | code written (driver, Forge patch 0020, cli); replay, mirror, cost and A/B checks were still running when this note was written |
 
-Tests: 279 (273 unit, 6 integration), all passing on the patched engine.
+Tests: 280 (274 unit, 6 integration), all passing on the patched engine.
 
 ## What was learned
 
-- Fixing cards the AI never cast raises those decks a lot, but the ranking stays wrong: Boros
-  Dwarves (+19.8) and Boros Dragons (+18.7) are still overrated, Jund Sacrifice (−19.9), Dimir
-  Uldaros (−16.5) and Izzet Spellementals (−10.6) underrated.
-- AI profile settings (counter chances, trading, aggression) move no deck by more than 4 points.
-  Do not repeat the profile search on the default space; the gaps come from things no profile key
-  controls.
-- Eleven real win rates cannot validate a calibration: a rank correlation of 0.22 over 9 decks has
-  an interval of −0.54 to +0.78. About 94 decks would be needed for ±0.2.
-- Real deck-vs-deck data could not be verified: the network blocked every MTG site.
-  `decks/standard/meta/real-matchups-unverified.json` holds search-summary numbers only; do not
-  feed it to `tune --matchups` before verifying and de-duplicating it.
+- Fixing what the AI cannot do raises the affected deck a lot (Azorius Control +25, Landfall +20)
+  but does not make the ranking more real. Landfall went from 4 points under its real win rate to
+  14 over: a creature deck the AI pilots properly is a creature deck the simulation overrates.
+  Overrated now: Boros Dragons (+18.9), Boros Dwarves (+18.6), Mono-Green Landfall (+13.6), Orzhov
+  Lifegain (+12.5). Underrated: Jund Sacrifice (−19.4), Dimir Uldaros (−17.4), Izzet
+  Spellementals (−13.4), Four-Color Control (−10.3).
+- The opposing AI does not misblock or waste removal against Dwarves and Dragons. Dwarves win 72%
+  of games in which at most one removal spell is aimed at them and 45% with three or more. The
+  best-supported explanation for their excess is the format: game one, no sideboards. A 70%
+  game-one rate and 40% after sideboarding is a 50% match win rate. This is a hypothesis; it has
+  not been tested.
+- A mana sink activated before spells is invisible to the misplay report (nothing is "castable"
+  at cleanup). Ba Sing Se was found by comparing a deck's games with and without one of its own
+  cards on the battlefield; that comparison is worth running for every deck.
+- AI profile settings move no deck by more than 4 points. Do not repeat the profile search on the
+  default space.
+- Twelve real win rates cannot validate a calibration: the rank correlation's noise range from
+  the games alone is 0.08–0.36, and from the choice of decks far wider. About 94 decks would be
+  needed for ±0.2. The Magic.gg table has six more archetypes with win rates but no lists.
+- `real-matchups-unverified.json` is still unverified (mtgdecks.net refuses automated requests).
+  Do not feed it to `tune --matchups`.
 
 ## Next steps, in order of expected value
 
-1. **Read the AI logic for the other cards the misplay report flags** (hits per 100 games on the
-   unpatched round robin): Pinnacle Starcage (Azorius Artifacts, 22), Nova Hellkite (Boros
-   Dragons, 21), Torch the Tower (Jund Sacrifice, 17), Seam Rip (Azorius Control, 15). Re-run
-   `misplays` on a fresh patched round robin first; the list changes once dead cards are cast.
-   Each fix is a patch, measured as in `mtgsim/forge_patches/README.md` (deck vs the other ten,
-   100 games each, seed 1, with and without; plus a mirror).
-2. **Find out why the creature decks are overrated.** Nothing so far touches it. Look at how the
-   opposing AI blocks and spends removal against Dwarves and Dragons (`--save-logs`).
-3. **Build the `--mc fixed` prototype** from `docs/stronger-ai.md`.
-4. **Verify the matchup data** from a network that reaches mtgdecks.net and similar, and gather
-   more decks with real win rates.
-5. Merge into `main` or open a PR when the user asks.
+1. **Test the sideboard explanation.** Build post-board lists by hand for Boros Dwarves and its
+   five or six most-played opponents (their own 15 cards), run `match` at 200+ games per pairing
+   with main decks and with post-board lists (seed 1), and put the two rates into
+   p2·(2·p1 + p2 − 2·p1·p2). If post-board Dwarves fall towards 40–45%, most of the gap is the
+   format and the honest fix is a best-of-three mode with sideboard plans, not an AI change.
+   Check first that the AI casts the sweepers it is given (Day of Judgment sat castable in 43% of
+   Azorius Control's games).
+2. **Look for more mana sinks and wrong-phase activations** in the underrated decks: for each
+   deck, compare play rates of its spells in games with and without each of its permanents that
+   has an activated ability (the Ba Sing Se method), and read `logs/games/` where they differ.
+3. **Finish and merge the `--mc fixed` prototype** from `docs/stronger-ai.md`: definition of done
+   is in section 6 there (40 of 40 games identical across worker counts, mirror near 50%, cost
+   per rollout, Azorius Control vs Boros Dwarves at 200 games per arm).
+4. **Smaller AI leads from the logs** (each a Forge patch, measured as in
+   `mtgsim/forge_patches/README.md`): the AI targets creatures with ward without keeping mana to
+   pay (21 of 119 spells lost to Lavaspur Boots); `ComputerUtil.predictNextCombat` ignores
+   equipment that is on the battlefield but not attached, so the AI attacks into a lethal
+   re-equip; instant-speed removal is cast in the AI's own upkeep instead of in response to an
+   equip; 20- to 22-land decks mulligan in 51–63% of games (`simulation/OpeningHand.java`).
+5. **Verify the matchup data** by hand in a browser, and gather lists for the six extra
+   archetypes (melee.gg links are in the Magic.gg article).
+6. Merge into `main` or open a PR when the user asks.
 
 ## Practical notes
 
-- Run one engine job at a time (4 cores). A 1,650-game round robin takes about 20 minutes; a
-  1,000-game gauntlet arm about 12.
-- If the other session changes `gauntlet.json` `ai_*` fields, re-run the round robin with the
-  combined settings and update the calibration (`tools/update_calibration.py`, the meta README
-  table, `VALIDATION.md`).
+- Run one engine job at a time (4 cores). A 1,980-game round robin takes about 30 minutes; a
+  1,000-game gauntlet arm about 15.
+- Pass an absolute `--out` or rely on the default; `--save-logs` now resolves the path itself.
+- `--resume RUN_DIR` needs the original positional arguments again.
+- Java patches are developed in a private `MTGSIM_HOME` (see the patches README); after pulling a
+  new Java patch, `setup --build` rebuilds the shared Forge (about 2 minutes).
+- If `gauntlet.json` `ai_*` fields change, re-run the round robin and update the calibration
+  (`tools/update_calibration.py`, the meta README table, `VALIDATION.md`).
 - Delete this file once the branch is merged and the next steps have moved elsewhere.
