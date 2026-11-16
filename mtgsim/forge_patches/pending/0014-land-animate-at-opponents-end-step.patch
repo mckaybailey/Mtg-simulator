@@ -1,0 +1,31 @@
+Subject: Lands that become creatures for good: animate them at the end of the opponent's turn
+Why: AnimateAi.checkPhaseRestrictions lets every Duration$ Permanent animate through at any time,
+  so Great Hall of the Biblioplex ({5}: becomes a 2/4 Wizard creature, permanently; Four-Color
+  Control) was animated in the AI's own upkeep (398 times in a 30-games-per-pairing gauntlet of
+  Four-Color Control against the meta decks, seed 1, --save-logs), in the opponent's upkeep (123)
+  and in its own first main phase (111), and only 12 times in an end step. Mana spent in its own
+  upkeep stays tapped for that turn and the opponent's next: on turns 5 and later Four-Color
+  Control cast 0.32 spells over the two turns after an upkeep animate, against 1.23 on turns
+  without one. Now a land's permanent, instant-speed self-animate with a mana cost waits for the
+  opponent's end step, when the mana untaps next anyway.
+Measured: PENDING
+
+diff --git a/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java b/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
+index 11aeccc6..6c38129a 100644
+--- a/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
++++ b/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
+@@ -111,6 +111,14 @@ public class AnimateAi extends SpellAbilityAi {
+                 }
+             }
+         }
++        // A land that turns itself into a creature for good (Great Hall of the Biblioplex) can wait for the end of
++        // the opponent's turn, when the mana would go unused anyway; earlier it leaves the AI tapped out for its own
++        // turn and the opponent's.
++        if ("Permanent".equals(sa.getParam("Duration")) && "Self".equals(sa.getParamOrDefault("Defined", "Self"))
++                && source.isLand() && !source.isCreature() && sa.getPayCosts().hasManaCost()
++                && !isSorcerySpeed(sa, ai) && !sa.hasParam("ActivationPhases")) {
++            return ph.is(PhaseType.END_OF_TURN) && ph.isPlayerNextTurn(ai);
++        }
+         // Don't use instant speed animate abilities before AI's COMBAT_BEGIN
+         if (!ph.is(PhaseType.COMBAT_BEGIN) && ph.isPlayerTurn(ai) && !isSorcerySpeed(sa, ai)
+                 && !sa.hasParam("ActivationPhases") && !"Permanent".equals(sa.getParam("Duration"))) {

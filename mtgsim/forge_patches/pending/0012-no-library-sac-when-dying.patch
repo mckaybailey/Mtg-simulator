@@ -1,0 +1,51 @@
+Subject: Sacrifice outlets that only scry or surveil: do not pay with the board when about to die
+Why: ComputerUtil.getCardPreference ("SacCost") has a last resort for the declare blockers step:
+  when lifeInSeriousDanger, pay a sacrifice cost with anything, whatever the ability does. For
+  Umbral Collar Zealot (Jund Sacrifice; "Sacrifice another creature or artifact: Surveil 1") that
+  meant sacrificing creatures that were not in combat, one after another, for surveil 1 each,
+  which cannot change the combat. In a 30-games-per-pairing gauntlet of Jund Sacrifice against
+  the meta decks (seed 1, --save-logs) it did so in 33 of 510 games (75 creatures: Gene
+  Pollinator, Biotech Specialist, Greedy Freebooter, The Sackville-Bagginses, Smaug ...) and won
+  2 of them. Now, for an ability whose every step is Scry, Surveil, Mill or
+  RearrangeTopOfLibrary, that branch pays only with a creature this combat destroys anyway, or
+  not at all.
+Measured: PENDING
+
+diff --git a/forge-ai/src/main/java/forge/ai/ComputerUtil.java b/forge-ai/src/main/java/forge/ai/ComputerUtil.java
+index b7c7666e..74d70718 100644
+--- a/forge-ai/src/main/java/forge/ai/ComputerUtil.java
++++ b/forge-ai/src/main/java/forge/ai/ComputerUtil.java
+@@ -314,6 +314,18 @@ public class ComputerUtil {
+         return false;
+     }
+ 
++    /** True if every step of the ability only looks at, reorders or mills the library (Scry, Surveil, ...). */
++    private static boolean onlyLooksAtLibrary(SpellAbility sa) {
++        for (SpellAbility s = sa.getRootAbility(); s != null; s = s.getSubAbility()) {
++            final ApiType api = s.getApi();
++            if (api != ApiType.Scry && api != ApiType.Surveil && api != ApiType.Mill
++                    && api != ApiType.RearrangeTopOfLibrary) {
++                return false;
++            }
++        }
++        return true;
++    }
++
+     public static Card getCardPreference(final Player ai, final Card activate, final String pref, final CardCollection typeList) {
+         return getCardPreference(ai, activate, pref, typeList, null);
+     }
+@@ -429,6 +441,14 @@ public class ComputerUtil {
+             // try everything when about to die
+             if (PhaseType.COMBAT_DECLARE_BLOCKERS.equals(game.getPhaseHandler().getPhase()) && ComputerUtil.protectRecursion(sa,
+                         () -> ComputerUtilCombat.lifeInSeriousDanger(ai, game.getCombat()), false)) {
++                if (sa != null && onlyLooksAtLibrary(sa)) {
++                    // Scrying or surveilling cannot save the AI from this combat: pay only with a creature
++                    // that this combat destroys anyway, never with the rest of the board.
++                    final Combat combat = game.getCombat();
++                    final CardCollection doomed = CardLists.filter(typeList, c -> c.isCreature() && combat != null
++                            && ComputerUtilCombat.combatantWouldBeDestroyed(ai, c, combat));
++                    return doomed.isEmpty() ? null : ComputerUtilCard.getWorstAI(doomed);
++                }
+                 final CardCollection nonCreatures = CardLists.getNotType(typeList, "Creature");
+                 if (!nonCreatures.isEmpty()) {
+                     return ComputerUtilCard.getWorstAI(nonCreatures);
