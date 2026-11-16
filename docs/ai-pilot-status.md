@@ -5,7 +5,24 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 16 Nov 2026: best-of-three with sideboards, in progress (plan revised)
+## CHECKPOINT 16 Nov 2026: format and field ruled out; next is the pilot (step 4)
+
+**Where things stand:** steps 1–3 below are done. Best-of-three with Forge's sideboards (step 2)
+and a wider field of 13 "Other" decks (step 3) both leave the spread where it was (18 decks,
+share-weighted SD about 14.5–14.9 against a real 6.0; mean gap about 12). The gap is the pilot.
+**Start at step 4**, in this order (agreed with the user as the recommendation, not yet started):
+(i) one cheap pass for mana sinks and wrong-phase activations in the underrated decks (Jund
+Sacrifice, Dimir Uldaros, Izzet Spellementals, Four-Color Control, Dimir Excruciator), the Ba Sing
+Se method; (ii) the `--mc fixed` A/B, Azorius Control with `ai_mc: fixed` against the default
+field, about 1,000 games per arm, then Jund Sacrifice and Dimir Uldaros. Details under "Next
+steps, in order of expected value" (items 2 and 3).
+
+Runs behind the numbers (git-ignored, lost on a container restart, all replayable from seed 1):
+`runs/rr18-bo3` and `runs/rr18-bo3-nosb` (commands in step 2 below) and `runs/field/<deck>`
+(`tools/field_runs.sh`). Open issue: 2 of 4,590 game 1s did not replay, both Four-Color Control vs
+Grixis Reanimator (step 2 below).
+
+The history of this checkpoint follows.
 
 **Read this section first; it is where the last session stopped.**
 
@@ -142,7 +159,7 @@ advisor would be a Forge patch, measured like any other.
 - `decks/standard/fracture-2026-field/`: the 13 "Other" lists the Magic.gg article links (melee.gg,
   all pass `check`), 18.6% split evenly. The article links no more, so the field is 13, not 25.
 - `runs/field/<deck>`: each meta deck against the 13, 30 games, seed 1, 7,020 games, 0 errors
-  (`runs/field/run-all.sh` re-runs or resumes it). `tools/field_calibration.py "runs/rr18-bo3#game1" runs/field`.
+  (`tools/field_runs.sh` replays or resumes it into `runs/field/`). `tools/field_calibration.py "runs/rr18-bo3#game1" runs/field`.
 - 18 decks, share-weighted: SD 14.9 → 14.5, gap 12.2 → 12.0, Spearman 0.13 → 0.13 (all within
   noise; real SD 6.0). Numbers in `VALIDATION.md`, "The whole field".
 - The field decks repeat the bias: Mono-Red Aggro 68.9% and Selesnya Offense 63.1% against the meta
@@ -169,7 +186,7 @@ advisor would be a Forge patch, measured like any other.
    `--no-sideboard`), `tests/AGENTS.md`, and the meta README and `decks/AGENTS.md` (18 decks; the
    melee.gg lists are checked). Run the full test suite. Commit.
 
-2. **Experiments (a) and (b) in one run: the 18-deck round robin, best-of-three with sideboards.**
+2. **(Done, see above.) Experiments (a) and (b) in one run: the 18-deck round robin, best-of-three with sideboards.**
    - Before starting, give `tools/calibration.py` a switch to read `pairings_game1` instead of
      `pairings`, let `calibration_diff.py` compare the two from one run, and make both print the
      SD and the meta-share-weighted deck averages next to the equal-weighted ones (the real figures
@@ -189,7 +206,7 @@ advisor would be a Forge patch, measured like any other.
    - Record the numbers in `VALIDATION.md` and here. Keep in mind the sideboards are Forge's
      `SideboardAdvisor` (weak spots below): the result is "with Forge's sideboarding".
 
-3. **A small field of about 25 decks (experiment (c)), only after step 2.** It makes the field
+3. **(Done with 13 decks, see above.) A small field of about 25 decks (experiment (c)), only after step 2.** It makes the field
    realistic and answers the field question at a fraction of the cost; `field_bound.py` says it can
    lower the spread a few points at most.
    - Source: melee.gg (allowed in the network policy; plain `curl`, one request a second). The
