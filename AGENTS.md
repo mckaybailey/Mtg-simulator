@@ -21,13 +21,14 @@ calibration and arm comparisons, `mc_cost.py` for Monte Carlo runs, and `log_ana
 parses the game logs of a `--save-logs` run. `mtgsim/forge_patches/README.md` lists every Forge
 patch with its cause and measurement.
 
-**The goal of the current work is simulations whose win rates look like the real ones.** In progress:
-best-of-three matches with sideboards (`--bo3`) and a larger field of decks, both committed or planned
-but not yet run at scale. The extra decks are not a goal in themselves: they test whether the small,
-closed meta field makes the round robin zero-sum and pushes win rates apart, and whether a wide,
-realistically weighted field lets them settle near the real values. Judge every change by the spread
-and the mean gap of the 18 meta decks against their real win rates. Start from the "CHECKPOINT"
-section at the top of `docs/ai-pilot-status.md`.
+**The goal of the current work is simulations whose win rates look like the real ones.** Judge every
+change by the spread (SD) and the mean gap of the 18 meta decks against their real win rates. The
+plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`, committed, not yet
+run at scale) and add its tests; run the 18-deck round robin in best-of-three, whose game 1s are the
+best-of-one baseline; only then add a small field of about 25 "Other" decks. The earlier plan of
+about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
+near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
+"CHECKPOINT" section at the top of `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 

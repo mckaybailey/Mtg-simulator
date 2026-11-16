@@ -5,26 +5,34 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 16 Nov 2026: best-of-three with sideboards, in progress
+## CHECKPOINT 16 Nov 2026: best-of-three with sideboards, in progress (plan revised)
 
 **Read this section first; it is where the last session stopped.**
 
 **The goal (stated by the user, 16 Nov 2026): the simulations must give reasonable win rates, ones
-that look like the real ones.** Everything below serves that. Best-of-three with sideboards tests one
-explanation of why they do not (game one without sideboards favours creature decks). The extra decks
-are **not a goal in themselves**: they are there to test a second explanation, that a small closed field
-forces the results into a zero-sum game. In a round robin of 12 or 18 decks the deck averages must
-average 50%, every point one deck gains is taken from the few others, and a deck that beats or loses
-to two or three neighbours swings far. The real decks play a field of 1,810 lists, 18.6% of them
-"Other", so their win rates sit between 44% and 58% (Izzet Prowess's 30.6% is the exception, from
-about 25 players). If the simulator is sound, adding a wide, realistically weighted field should
-pull the simulated win rates of the 18 meta decks towards those values (a smaller spread and a
-smaller mean gap); if they stay as far apart, the problem is the pilot or the format, not the field.
-Judge every run by that: the spread and the gap of the 18 decks with real win rates, not by how
-many decks were added.
+that look like the real ones.** Judge every run by the spread (SD) and the mean gap of the 18 meta
+decks against their real win rates, plus the rank correlation with its noise range. Real: SD 4.0
+points (12 decks). Simulated now: SD 13.3, mean gap 11.4.
 
-The user asked for **about 100 more decks before running anything** (see "Next" below). Nothing
-below has been run at scale yet.
+**Plan revised 16 Nov 2026 (later the same day): best-of-three first, and a small field instead of
+100 decks.** The earlier plan added about 100 decks to test whether the small, closed field forces a
+zero-sum game that pushes win rates apart. `tools/field_bound.py runs/rr-final-12` shows that no
+field can fix it:
+
+- The zero-sum rule fixes the average, not the spread. The real win rates are zero-sum too (the
+  whole field averages 50%). The simulated spread comes from lopsided matchups (Dwarves win about
+  70% of their game ones), not from too few opponents. Game noise explains about 3 points of SD, not 13.
+- An outside field only changes the games played against it: 26.3% of real play for the 12 decks,
+  18.7% for the 18. Weighting the opponents by meta share alone gives SD 14.2 and gap 12.0, slightly
+  worse than equal weights. Adding a field that every deck beats exactly 50% of the time gives
+  SD 10.5 and gap 8.8, still more than double the real spread.
+- A perfect fit would need Boros Dragons and Boros Dwarves to win less than 0% of their games against
+  the field (−14 and −6) and Jund Sacrifice and Dimir Uldaros more than 100% (118 and 103). No set of
+  decks does that.
+- Several lists per big archetype add little: they play almost like the lists already in the gauntlet.
+
+So the field is kept small (about 25 decks, step 3 below) and the format is tested first. The
+user approved this plan and will run the steps one at a time.
 
 ### Done in this session (committed as work in progress, untested on full runs)
 
@@ -79,58 +87,70 @@ mention a graveyard, which is often (Azorius Control and Azorius Momo bring it a
 field). A result from these runs is "with Forge's sideboarding", not with a person's. Improving the
 advisor would be a Forge patch, measured like any other.
 
-### Next, in order
+### Next, in order (revised plan; one step per session is fine)
 
-1. **Verify the bo3 mechanics on real games** (the last command was interrupted before it ran):
+1. **Check the bo3 mechanics on real games, then add tests and docs.** `runs/chk-bo3` exists from an
+   earlier attempt; look at it, and if it is incomplete delete it and rerun:
    `python3 -m mtgsim match decks/standard/meta/azorius-control.txt decks/standard/meta/boros-dwarves.txt
-   -n 8 --seed 1 --bo3 --out $PWD/runs/chk-bo3`, then check that its game 1s equal the same ids in a
-   best-of-one run with the same seed (`runs/rr-final-12` has them if it survived), that every game 2/3
-   has `first_seat` 0 and `seats[0]` = previous loser, and that the match counts add up. Then add unit
-   tests (`tests/test_experiment.py`: planning of games 2/3 from fake records, seats, resume
-   re-planning; `tests/test_analysis*`: `summarize_matches`; job line with `first=0`/`sideboard=1`) and
-   an integration test (one bo3 match replays). Update `mtgsim/bridge/AGENTS.md` (protocol),
-   `mtgsim/AGENTS.md` (invariants: seats in games 2/3 are not by parity; game 1 = bo1 game), README
-   (`--bo3`), `tests/AGENTS.md`.
-2. **About 100 more decks, as a field (the user's request; purpose above).** They are opponents that
-   make the field look like the real one; they do not need real win rates of their own, and the
-   calibration is still measured on the 18 decks that have one. So pick them for coverage and weight
-   them by how often they were played:
-   - Source: the three events' melee.gg standings (tournaments 472270 Arena Championship 13,
-     440878 Spotlight Hartford, 457663 Spotlight Beijing; links in the Magic.gg article), which list
-     every player's decklist. Check how the standings page loads (it may be filled by a JSON
-     endpoint; read the page's scripts), stay polite (one request a second).
-   - Take several lists per big archetype (variation within an archetype matters too) and lists from
-     the "Other" 18.6% (Sultai Reanimator, Izzet Fling, Jeskai Planeswalkers, Jeskai Artifacts, Boros
-     Mobilize, Selesnya Offense, Dimir Control, Mardu Discard, Temur Omniscience, Azorius Prison,
-     Mono-Red Aggro, Dimir Oculus, Jeskai Control and more; the Magic.gg article links one list for
-     each). Give each list a `meta_share` so that the field's archetype shares match the real table.
-   - Keep each list's own match record from the standings as optional metadata (secondary check only:
-     ±12 points from ~15 matches).
-   - Run `mtgsim check` on every list; resolve unknown card names, never guess. Put them in a separate
-     folder (e.g. `decks/standard/fracture-2026-field/`) with its own `gauntlet.json`, so the 18-deck
-     meta gauntlet stays the default.
-   - Design: a gauntlet of each of the 18 meta decks against the whole field (18 x ~118 pairings,
-     linear) rather than a full round robin (6,903 pairings), and report each meta deck's
-     **meta-share-weighted** win rate (`summarize_field` already weights by `meta_share`). At 10 bo3
-     matches per pairing that is about 21,000 matches (~50,000 games, ~10 hours on 4 cores); 10
-     best-of-one games per pairing is ~21,000 games (~4 hours). Start with best-of-one, so the field
-     effect and the format effect can be told apart.
-3. **The experiments, each judged by the spread and the mean gap of the 18 meta decks against their
-   real win rates (and the rank correlation, with its noise range):**
-   (a) the 18-deck best-of-one round robin, the baseline (game 1s of (b));
-   (b) the 18-deck best-of-three round robin with sideboards: does the format move them towards the
-   real values?
-   (c) the 18 meta decks against the ~118-deck weighted field, best-of-one: does a realistic field
-   flatten the win rates (the zero-sum question)?
-   (d) if (b) or (c) helps, the two together.
-   For (b): `matrix decks/standard/meta -n 30 --seed 1 --bo3` (18 decks, 153 pairings; about
-   4,600 game 1s, which are the best-of-one round robin, plus about 6,700 later games; roughly 3 hours),
-   detached with `setsid nohup`, `--out` set, resumable. Then compare calibration of `matrix_game1`
-   (best-of-one) with the match results (`tools/calibration.py` reads `summary["pairings"]`; add a
-   switch for `pairings_game1`, and give `calibration_diff.py` both from one run). Also a
-   `--no-sideboard` bo3 run if time allows: best-of-three alone stretches win rates away from 50%,
-   so it separates the format from the sideboards. Report equal-weight and meta-share-weighted deck
-   averages (the real figures are against the field).
+   -n 8 --seed 1 --bo3 --out $PWD/runs/chk-bo3`. Check that:
+   - its game 1s equal the games with the same ids in a best-of-one run with the same seed
+     (`runs/rr-final-12` has them; `tools/compare_games.py` compares runs game by game);
+   - every game 2 or 3 has `first_seat` 0 and `seats[0]` = the previous game's loser;
+   - the match counts add up (two game wins take a match; three games without one are a draw).
+   Then add unit tests (`tests/test_experiment.py`: planning games 2/3 from fake records, seats,
+   resume re-planning, refusal to resume under another format; `tests/test_analysis*`:
+   `summarize_matches`; the job line with `first=0` / `sideboard=1`) and an integration test (one
+   bo3 match replays from its seed). Update `mtgsim/bridge/AGENTS.md` (protocol: `first`,
+   `sideboard`, `planonly`, the `sideboard` result field), `mtgsim/AGENTS.md` (invariants: seats in
+   games 2/3 are not by parity; game 1 of match *i* is best-of-one game *i*), `README.md` (`--bo3`,
+   `--no-sideboard`), `tests/AGENTS.md`, and the meta README and `decks/AGENTS.md` (18 decks; the
+   melee.gg lists are checked). Run the full test suite. Commit.
+
+2. **Experiments (a) and (b) in one run: the 18-deck round robin, best-of-three with sideboards.**
+   - Before starting, give `tools/calibration.py` a switch to read `pairings_game1` instead of
+     `pairings`, let `calibration_diff.py` compare the two from one run, and make both print the
+     SD and the meta-share-weighted deck averages next to the equal-weighted ones (the real figures
+     are against the field). `tools/field_bound.py` already prints SD and both weightings.
+   - Run detached, about 3 hours (153 pairings; about 4,600 game 1s plus about 6,700 later games):
+     `setsid nohup python3 -m mtgsim matrix decks/standard/meta -n 30 --seed 1 --bo3 --out $PWD/runs/rr18-bo3 > runs/rr18-bo3.log 2>&1 &`
+     and continue with `--resume runs/rr18-bo3` (same arguments) if the container restarts.
+   - (a) = the game 1s (`matrix_game1`): the 18-deck best-of-one baseline. (b) = the match results.
+     Report SD, mean gap and rank correlation for both, on the 18 decks and on the original 12.
+   - The question: do the creature decks (Dwarves, Dragons, Landfall, Lifegain) fall and the
+     underrated decks (Jund Sacrifice, Dimir Uldaros, Izzet Spellementals, Four-Color Control) rise?
+     Expect best-of-three alone to stretch win rates away from 50% (a 60% game rate is about a 65%
+     match rate), so a smaller spread in (b) is evidence for the sideboards, not the format.
+   - If time allows, the same run with `--no-sideboard` (`--out runs/rr18-bo3-nosb`): it separates
+     the format from the sideboards. Its game 1s equal (a)'s, so copy `games.jsonl` from
+     `runs/rr18-bo3` into the new run directory first and only the later games are played.
+   - Record the numbers in `VALIDATION.md` and here. Keep in mind the sideboards are Forge's
+     `SideboardAdvisor` (weak spots below): the result is "with Forge's sideboarding".
+
+3. **A small field of about 25 decks (experiment (c)), only after step 2.** It makes the field
+   realistic and answers the field question at a fraction of the cost; `field_bound.py` says it can
+   lower the spread a few points at most.
+   - Source: melee.gg (allowed in the network policy; plain `curl`, one request a second). The
+     Magic.gg article links one list for each "Other" archetype: Sultai Reanimator, Izzet Fling,
+     Jeskai Planeswalkers, Jeskai Artifacts, Boros Mobilize, Selesnya Offense, Dimir Control, Mardu
+     Discard, Temur Omniscience, Azorius Prison, Mono-Red Aggro, Dimir Oculus, Jeskai Control and
+     more. Take one list each, up to about 25; no extra lists of archetypes already in the gauntlet.
+     Only if those links are not enough, use the tournament standings (472270, 440878, 457663;
+     check whether the page is filled by a JSON endpoint).
+   - Give each a `meta_share` so the field's archetype shares match the real table (the "Other"
+     18.6%, split by the article's numbers or evenly if it gives none). They need no real win rate.
+   - `mtgsim check` every list; resolve unknown card names with the user, never guess. Put them in
+     `decks/standard/fracture-2026-field/` with its own `gauntlet.json`, so the 18-deck meta gauntlet
+     stays the default.
+   - Run each of the 18 meta decks against the 18 + 25 decks, best-of-one, about 30 games per
+     pairing, and report each meta deck's meta-share-weighted win rate (`summarize_field` weights by
+     `meta_share`): 18 x ~42 pairings x 30 = about 23,000 games, about 4.5 hours. Fewer games per
+     pairing against the field decks is fine (their shares are small).
+   - Judge by the SD and the mean gap against (a). If (b) helped, (d) = the same in best-of-three.
+
+4. **If neither the format nor the field closes the gap**, the problem is the pilot: go back to
+   "Next steps, in order of expected value" below (mana sinks and wrong-phase activations in the
+   underrated decks, then `--mc fixed`), and improve the sideboard advisor's weak spots as measured
+   Forge patches.
 
 ## Branch state
 
@@ -186,7 +206,7 @@ Tests: 284 (277 unit, 7 integration), all passing on the patched engine.
 
 ## Next steps, in order of expected value
 
-1. **Test the sideboard explanation.** Build post-board lists by hand for Boros Dwarves and its
+1. *(Superseded by `--bo3`, step 2 of the checkpoint plan.)* **Test the sideboard explanation.** Build post-board lists by hand for Boros Dwarves and its
    five or six most-played opponents (their own 15 cards), run `match` at 200+ games per pairing
    with main decks and with post-board lists (seed 1), and put the two rates into
    p2·(2·p1 + p2 − 2·p1·p2). If post-board Dwarves fall towards 40–45%, most of the gap is the

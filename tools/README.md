@@ -14,6 +14,7 @@ implementation of the same metrics.
 | `matchup_check.py RUN_DIR MATCHUPS_JSON` | a `matrix` run's pairing win rates against `decks/standard/meta/real-matchups-unverified.json` (unambiguous rows only, pooled per pairing) |
 | `compare_games.py RUN_A RUN_B [RUN_C RUN_D ...]` | game-by-game comparison of runs that should be identical (same seeds): status, winner, turns, first seat, seats, seed, and each player's opening hand, draws, plays, mulligans, turns, life and loss reason |
 | `mc_cost.py RUN_DIR [RUN_DIR ...]` | what Monte Carlo search cost in a run: engine time per game, rollouts and decisions per game (the `mc` counters in `games.jsonl`), and from the worker logs the search time per rollout and the decisions by kind |
+| `field_bound.py RUN_DIR [GAUNTLET_JSON]` | for a `matrix` run of meta decks: the spread (SD) and mean gap against real win rates with equal and meta-share-weighted opponents, and with an added outside field beaten 50% of the time by every deck; per deck, the win rate it would need against the outside field to match its real one (outside 0–100: no field can) |
 | `update_calibration.py RUN_DIR [GAUNTLET_JSON]` | writes `sim_win_rate` and `ai_pilot` into a `gauntlet.json` from a `matrix` run and prints the README table (edit the `calibration` string by hand) |
 
 `VALIDATION.md` quotes noise ranges and intervals from 1,000 resamples (`--reps 1000`); fewer
