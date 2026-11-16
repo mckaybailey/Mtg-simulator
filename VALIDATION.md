@@ -25,6 +25,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
 | Profile tuning on the meta (16 candidates, 12,010 games, 2 decks held out) | no profile beats Forge's default beyond noise (training rank correlation +0.18, noise −0.20 to +0.43; held-out gap −0.8 points, noise −5.8 to +4.7); none shipped |
+| Best-of-three with Forge's sideboarding, 18-deck round robin (16 Nov) | spread wider, not narrower: on the original 12 decks SD 19.0 and mean gap 16.7 in matches against 13.3 and 11.4 in their game 1s (real SD 4.0); in the sideboarded games 2 and 3 the game-level SD is 14.2 against 14.5 in game 1s; the creature decks do not fall; game 1s equal the best-of-one run game for game; see below |
 
 ## The pipeline behaves correctly
 
@@ -503,6 +504,45 @@ carries 0009–0011 the two properties were checked again: `match azorius-contro
 -n 30 --seed 1` without Monte Carlo is identical, game for game, to the same pairing in the
 twelve-deck round robin played before 0020 was applied, and 8 of 8 `--mc fixed` games (seed 7)
 are identical with one and with four workers.
+
+## Best-of-three with sideboards (16 November 2026)
+
+The leading hypothesis for the creature decks' excess was that games are best-of-one without
+sideboards: in the logs their results turn on how much removal the opponent draws, and sideboards
+are where the rest of it is. `matrix decks/standard/meta -n 30 --seed 1 --bo3 --out runs/rr18-bo3`
+played the 18 meta decks in a round robin of best-of-three matches, 30 per pairing (4,590 matches,
+11,174 games, 2.3 hours on 4 cores, 0 errors or time-outs). Before games 2 and 3 each deck
+sideboards against the other's main deck with Forge's `SideboardAdvisor`, and the loser of the
+previous game starts. Its game 1s are the best-of-one round robin with the same seeds (a); the
+match results are (b). On the original twelve decks the game 1s equal `runs/rr-final-12` game for
+game (identical metrics: Spearman 0.23, gap 11.41, SD 13.34).
+
+Metrics from `tools/calibration.py` (noise ranges in brackets; "weighted" weights opponents by
+meta share). Real SD: 4.0 points for the 12 decks, 6.0 for the 18 (the six new decks' real rates
+rest on 20–25 players each).
+
+| | Spearman | Mean gap | SD | Weighted gap | Weighted SD |
+|---|---|---|---|---|---|
+| 12 decks, game 1s (a) | 0.23 (0.08–0.36) | 11.4 (10.4–13.0) | 13.3 (12.2–14.9) | 12.1 | 14.2 |
+| 12 decks, matches (b) | 0.08 (0.01–0.23) | 16.7 (15.6–17.8) | 19.0 (18.1–20.3) | 17.6 | 20.1 |
+| 18 decks, game 1s (a) | 0.18 (0.08–0.23) | 12.1 (11.4–13.1) | 14.5 (13.9–15.6) | 12.2 | 14.9 |
+| 18 decks, matches (b) | 0.14 (0.04–0.16) | 16.0 (15.4–16.8) | 19.1 (18.5–19.8) | 16.6 | 19.8 |
+
+Matches stretch win rates away from 50%, as the format must (a 60% game rate is about a 65%
+match rate), so (b) alone cannot say whether the sideboards helped. The sideboarded games
+themselves can: per deck, the game-level win rate in games 2 and 3 has SD 14.2 and gap 11.5
+across the 18 decks, against 14.5 and 12.1 in the game 1s. The creature decks barely move (Boros
+Dwarves 72.2% → 71.7%, Boros Dragons 62.9 → 63.0, Mono-Green Landfall 68.4 → 66.4, Orzhov
+Lifegain 66.3 → 62.9) and of the underrated decks only Four-Color Control rises a little (39.0 →
+41.8); Jund Sacrifice falls (39.4 → 33.3). Games 2 and 3 are not a random sample (game 3s come
+mostly from close matches) and give the previous loser the play, which by itself pulls rates
+towards 50%, so if anything this overstates what the sideboards do.
+
+So with Forge's sideboarding, best-of-three does not bring the simulation closer to the real
+win rates: the per-game spread is unchanged and the match spread is wider. This does not
+rule out sideboards done the way people do them (the advisor's weak spots are in
+`docs/ai-pilot-status.md`). The same run without sideboarding (`--no-sideboard`,
+`runs/rr18-bo3-nosb`, game 1s shared) separates the format from the sideboards: PENDING.
 
 ## The goldfish model
 

@@ -114,6 +114,26 @@ advisor would be a Forge patch, measured like any other.
 
 **Start the next session at step 2.**
 
+### Step 2 (16 Nov 2026, later session): best-of-three run done, no-sideboard arm running
+
+- `tools/calibration.py` takes `--game1` (reads `pairings_game1`) and `--only SLUGS`; it and
+  `calibration_diff.py` (which reads `RUN#game1`) print SD and meta-share-weighted figures.
+- `runs/rr18-bo3` finished: 4,590 matches, 11,174 games, 2.3 h, 0 errors. Numbers in
+  `VALIDATION.md`, "Best-of-three with sideboards". In short: **the sideboards change nothing
+  beyond noise.** Game-level SD in the sideboarded games 2/3 is 14.2 against 14.5 in game 1s (gap
+  11.5 vs 12.1); Dwarves, Dragons, Landfall stay where they were; Jund Sacrifice falls. Matches
+  widen the spread as the format must (12 decks: SD 13.3 → 19.0, gap 11.4 → 16.7).
+- Game 1s on the 12 original decks equal `runs/rr-final-12` exactly.
+- `runs/rr18-bo3-nosb` (`--no-sideboard`, same seed) was started after it, with the 4,020 game 1s
+  copied (a filter bug skipped the 570 whose ids contain "|g" for Golgari/Grixis; those replay,
+  which checks determinism). If the container restarted, continue it with
+  `python3 -m mtgsim matrix decks/standard/meta -n 30 --seed 1 --bo3 --no-sideboard --resume runs/rr18-bo3-nosb`.
+  Then compare its later games and matches with `rr18-bo3`'s (`calibration_diff.py runs/rr18-bo3-nosb runs/rr18-bo3`)
+  and fill the PENDING line in `VALIDATION.md`.
+- Unless the no-sideboard arm changes the picture, best-of-three is not the explanation: the leading
+  hypothesis is weakened (with Forge's sideboarding). Step 3 (the field) cannot lower the spread
+  much (`field_bound.py`), so step 4 (the pilot) is where the gap is.
+
 ### Next, in order (revised plan; one step per session is fine)
 
 1. **(Done, see above.) Check the bo3 mechanics on real games, then add tests and docs.** `runs/chk-bo3` exists from an
