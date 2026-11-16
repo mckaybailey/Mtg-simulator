@@ -1,0 +1,40 @@
+Deck
+1 Deserted Beach
+1 Braided Net
+4 Simulacrum Synthesizer
+4 Perilous Snare
+3 Starting Town
+1 Torpor Orb
+1 Fomori Vault
+3 Floodfarm Verge
+3 Hallowed Fountain
+1 Sundown Pass
+1 Island
+3 Repurposing Bay
+4 Cryogen Relic
+2 The Enigma Jewel
+1 The Fire Crystal
+4 The Mind Stone
+2 Sacred Foundry
+2 Meticulous Archive
+2 Solitary Cell
+1 Warmaker Gunship
+1 White Auracite
+1 Spring-Loaded Sawblades
+1 Plains
+4 United Battlefront
+4 Castle Doom
+2 Steam Vents
+3 Pinnacle Starcage
+
+Sideboard
+1 Braided Net
+2 Negate
+2 Erode
+1 Rest in Peace
+2 Seam Rip
+2 Torpor Orb
+1 Tony Stark
+1 Chandra, Chill of Compliance
+1 Day of Judgment
+2 Voice of Victory

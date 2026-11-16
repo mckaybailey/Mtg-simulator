@@ -1,0 +1,22 @@
+Deck
+3 Lightning Strike
+2 Tomik, Izzet Sparkmage
+4 Emberheart Challenger
+4 Fanatical Firebrand
+4 Burst Lightning
+18 Mountain
+2 Rockface Village
+4 Stingcaster Mage
+4 Hired Claw
+3 Soulstone Sanctuary
+2 Hexing Squelcher
+2 Tersa Lightshatter
+4 Plasma Bolt
+4 Nova Hellkite
+
+Sideboard
+4 Sear
+2 Chandra, Torch of Defiance
+2 Hexing Squelcher
+4 Sunspine Lynx
+3 Magebane Lizard

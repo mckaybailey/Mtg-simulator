@@ -6,6 +6,10 @@
   16 November have no `sim_win_rate` / `ai_pilot` yet). Win rates and the nine aggregate lists were
   checked against the article, the nine melee.gg tournament lists against their melee.gg pages. `real-matchups-unverified.json` is
   second-hand matchup data (see that README); never use it as tuning data without verifying it.
+- `standard/fracture-2026-field/`: the thirteen "Other" archetypes (each below 1%, 18.6% together)
+  the same Magic.gg article links, one melee.gg list each, `meta_share` split evenly, no real win
+  rates. Used by `tools/field_calibration.py` to rate the meta decks against the whole field; not a
+  default gauntlet.
 - `standard/casual/`: five one-colour decks built from Foundations commons and uncommons, as
   kitchen-table opponents. Written for mtgsim, not tournament lists.
 - `brews/` (create when needed): user decks worth keeping.

@@ -1,0 +1,29 @@
+Deck
+4 Likeness Looter
+4 Seasoned Cryomancer
+4 Swamp
+2 Chart a Course
+1 Qarsi Revenant
+4 Starting Town
+2 Liliana the Repentant
+4 Ral Zarek, Guest Lecturer
+4 Abhorrent Oculus
+1 Yuriko, Hope from the Shadows
+4 Dark Matter Manipulator
+4 Bitter Triumph
+1 Shipwreck Marsh
+3 Multiversal Passage
+2 Undercity Sewers
+4 Moonshadow
+4 Watery Grave
+4 Gloomlake Verge
+4 Overlord of the Balemurk
+
+Sideboard
+3 Kaito, Bane of Nightmares
+2 Strategic Betrayal
+1 Qarsi Revenant
+3 Duress
+2 Requiting Hex
+2 Quantum Riddler
+2 Soul-Guide Lantern

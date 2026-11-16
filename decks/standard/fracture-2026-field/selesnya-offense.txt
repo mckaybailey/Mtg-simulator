@@ -1,0 +1,32 @@
+Deck
+3 Surrak, Elusive Hunter
+1 Gathering Place
+4 Temple Garden
+7 Forest
+2 Seam Rip
+4 Llanowar Elves
+4 Practiced Offense
+4 Brightglass Gearhulk
+3 Bejeweled Warg
+1 Meltstrider's Resolve
+3 Multiversal Passage
+1 Skateboard
+4 Hushwood Verge
+4 Leatherhead, Swamp Stalker
+2 Jennifer Walters
+2 Abandoned Air Temple
+1 Goldvein Hydra
+3 Pawpatch Recruit
+3 Spider Manifestation
+2 Plains
+2 Ouroboroid
+
+Sideboard
+2 Erode
+2 Sheltered by Ghosts
+3 Torpor Orb
+1 Meltstrider's Resolve
+1 Soul-Guide Lantern
+2 Elspeth, Storm Slayer
+3 Rest in Peace
+1 Garruk, Curse Breaker
