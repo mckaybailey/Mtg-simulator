@@ -25,8 +25,8 @@ patch with its cause and measurement.
 change by the spread (SD) and the mean gap of the 18 meta decks against their real win rates. The
 plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`; done 16 Nov);
 run the 18-deck round robin in best-of-three (done 16 Nov: the format widens the spread and Forge's
-sideboards do not pull it back beyond noise, so best-of-one is not the explanation); optionally a
-small field of about 25 "Other" decks; then the pilot. The earlier plan of
+sideboards do not pull it back beyond noise, so best-of-one is not the explanation); a field of
+the 13 "Other" decks (done 16 Nov: SD 14.9 → 14.5, within noise); now the pilot. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
 "CHECKPOINT" section at the top of `docs/ai-pilot-status.md`.
@@ -54,6 +54,9 @@ number. In short, as of 15 November 2026:
   the same spread as game 1s (SD 14.2 vs 14.5) and match results with and without sideboards
   differ by −0.5 points of SD (−1.5 to +0.4). Only a sideboarder much better than Forge's
   `SideboardAdvisor` could revive it.
+- **Tested and rejected (16 Nov):** that the closed 18-deck field explains it. Adding the 13
+  "Other" decks (`decks/standard/fracture-2026-field/`, 18.6% of the field) moves the share-weighted
+  SD from 14.9 to 14.5 and the gap from 12.2 to 12.0; the field decks show the same bias.
 - **Still unverified:** `decks/standard/meta/real-matchups-unverified.json` (mtgdecks.net refuses
   automated requests) and the three melee.gg tournament lists. Real win rates, shares and the
   nine aggregate lists were checked against the Magic.gg article.

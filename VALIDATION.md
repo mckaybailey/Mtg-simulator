@@ -25,6 +25,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
 | Profile tuning on the meta (16 candidates, 12,010 games, 2 decks held out) | no profile beats Forge's default beyond noise (training rank correlation +0.18, noise −0.20 to +0.43; held-out gap −0.8 points, noise −5.8 to +4.7); none shipped |
+| The meta decks against the whole field (13 "Other" decks added, 7,020 games, 16 Nov) | spread 14.9 → 14.5 and mean gap 12.2 → 12.0 (18 decks, share-weighted; real SD 6.0), within noise; the field decks show the same creature-deck bias; see below |
 | Best-of-three with Forge's sideboarding, 18-deck round robin (16 Nov) | matches spread wider than games, all from the format: 18 decks SD 19.1 with sideboards, 19.6 without (difference −0.5, −1.5 to +0.4), against 14.5 in game 1s (real 6.0); sideboarded games 2 and 3 have SD 14.2, unsideboarded 14.6; the creature decks do not fall; game 1s replay 4,588 of 4,590 (both differences in Four-Color Control vs Grixis Reanimator); see below |
 
 ## The pipeline behaves correctly
@@ -564,6 +565,34 @@ turns in one run and 42 in the other, and two fresh replays of that pairing with
 gave seat 1 in 27 turns, identical to each other. So that pairing's games depend on something
 besides the seed, most likely state a worker keeps from its earlier games; every other pairing
 replayed exactly. Not yet traced.
+
+## The whole field: the meta decks against the "Other" decks (16 November 2026)
+
+Real win rates are against the whole field, of which the 18 meta decks are 81.3%. The other 18.6%
+("Other", archetypes below 1% each, 45.7% match win rate together) is stood in for by the thirteen
+lists the Magic.gg article links (`decks/standard/fracture-2026-field/`, share split evenly). Each
+meta deck played each of them, best-of-one, 30 games, seed 1 (`runs/field/<deck>`, 7,020 games, 1.8
+hours, 0 errors or time-outs); the meta-vs-meta games are the game 1s of `runs/rr18-bo3`.
+`tools/field_calibration.py "runs/rr18-bo3#game1" runs/field` weights every opponent by meta share:
+
+| | Spearman | Mean gap | SD |
+|---|---|---|---|
+| 18 decks, against the meta decks only | 0.13 (0.08–0.24) | 12.2 (11.4–13.5) | 14.9 (14.1–16.2) |
+| 18 decks, against the meta decks + field | 0.13 (0.10–0.23) | 12.0 (11.3–13.0) | 14.5 (13.8–15.5) |
+| 12 decks, meta only | 0.14 (0.04–0.30) | 11.9 (10.9–13.4) | 14.1 (13.0–15.7) |
+| 12 decks, meta + field | 0.14 (0.08–0.31) | 11.6 (10.7–12.7) | 13.6 (12.8–14.9) |
+
+(Real SD 6.0 for the 18, 4.0 for the 12.) The field moves the spread by less than half a point, as
+`tools/field_bound.py` predicted: it only changes a fifth of each deck's games. The meta decks win
+56.6% of their games against it on average, and the field decks 43.4%, close to the real "Other"
+45.7%. Inside the field the AI's usual bias shows again: Mono-Red Aggro wins 68.9% against the meta
+decks, Selesnya Offense 63.1%, while Temur Omniscience (24.4%), Izzet Fling (23.5%) and Jeskai Control
+(26.9%) lose most games. Against the field Jund Sacrifice does best of the underrated decks (53.1%)
+and Azorius Momo gains 2 points; no deck's verdict changes.
+
+**The closed field is not the explanation either.** With best-of-three (above) also ruled out, the
+spread comes from the pilot: Forge's AI plays creature decks far better, relative to people, than
+decks that win through planning.
 
 ## The goldfish model
 

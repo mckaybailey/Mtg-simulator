@@ -112,7 +112,7 @@ advisor would be a Forge patch, measured like any other.
   sideboarding work), `mtgsim/AGENTS.md` (bo3 invariants), `README.md` (`--bo3`, `--no-sideboard`,
   18 decks), `tests/AGENTS.md`, the meta README and `decks/AGENTS.md` (18 decks; melee.gg lists checked).
 
-**Step 2 is done (below); start the next session at step 3 or 4 (ask the user).**
+**Steps 2 and 3 are done (below); start the next session at step 4, the pilot.**
 
 ### Step 2 done (16 Nov 2026, later session): best-of-three does not explain the gap
 
@@ -136,6 +136,19 @@ advisor would be a Forge patch, measured like any other.
 - **Next: step 3 is optional now.** `field_bound.py` says a field lowers the spread a few points at
   most, and best-of-three did not help, so the gap is the pilot (step 4). Ask the user whether to run
   step 3 anyway (cheap, about 4.5 h) or go straight to step 4.
+
+### Step 3 done (16 Nov 2026): the whole field does not narrow the spread
+
+- `decks/standard/fracture-2026-field/`: the 13 "Other" lists the Magic.gg article links (melee.gg,
+  all pass `check`), 18.6% split evenly. The article links no more, so the field is 13, not 25.
+- `runs/field/<deck>`: each meta deck against the 13, 30 games, seed 1, 7,020 games, 0 errors
+  (`runs/field/run-all.sh` re-runs or resumes it). `tools/field_calibration.py "runs/rr18-bo3#game1" runs/field`.
+- 18 decks, share-weighted: SD 14.9 → 14.5, gap 12.2 → 12.0, Spearman 0.13 → 0.13 (all within
+  noise; real SD 6.0). Numbers in `VALIDATION.md`, "The whole field".
+- The field decks repeat the bias: Mono-Red Aggro 68.9% and Selesnya Offense 63.1% against the meta
+  decks, Temur Omniscience 24.4%, Izzet Fling 23.5%, Jeskai Control 26.9%. Field decks average 43.4%
+  (real "Other" 45.7%).
+- **With format and field both ruled out, the gap is the pilot: go to step 4.**
 
 ### Next, in order (revised plan; one step per session is fine)
 
