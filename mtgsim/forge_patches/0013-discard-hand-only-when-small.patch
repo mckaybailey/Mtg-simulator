@@ -9,7 +9,14 @@ Why: DiscardAi.checkApiLogic has a comment for spells that make the AI discard i
   than it draws, counting nonland cards, and lands too once five are on the battlefield.
   The same rule applies to Dangerous Wager, Change of Fortune, Contract from Below and Blood
   for the Blood God.
-Measured: PENDING
+Measured: `mtgsim gauntlet decks/standard/meta/izzet-spellementals.txt --vs <the other 17 meta
+  decks> -n 100 --seed 1`, default AI, Forge 7db198d72e, on 16 Nov 2026, both arms built on
+  0001-0011 plus a candidate 0012 that was later dropped (it touches only Umbral Collar Zealot
+  sacrifices). Without this patch: 32.9% (95% CI 31-35%, 560-1140). With it: 36.2% (34-39%,
+  616-1084). Difference +3.3 points, 95% CI +0.1 to +6.5 (paired over the same 1,700 seeds:
+  +1.6 to +5.0; 136 losses became wins, 80 wins became losses). Casts of the Hearth Elemental
+  card (both halves) fell from 2,951 to 2,169. Mirror with the patch (`match izzet-spellementals
+  izzet-spellementals -n 200 --seed 1`): 51.0% (44-58%).
 
 diff --git a/forge-ai/src/main/java/forge/ai/ability/DiscardAi.java b/forge-ai/src/main/java/forge/ai/ability/DiscardAi.java
 index f1b70865..8beab300 100644

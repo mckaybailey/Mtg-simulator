@@ -13,8 +13,7 @@ games run on it.
 
 | Patch | Deck | Measured on top of |
 |---|---|---|
-| 0013-discard-hand-only-when-small | Izzet Spellementals (Stoke Genius) | 0001–0012 |
-| 0014-land-animate-at-opponents-end-step | Four-Color Control (Great Hall of the Biblioplex) | 0001–0013 |
+| 0014-land-animate-at-opponents-end-step | Four-Color Control (Great Hall of the Biblioplex) | 0001–0011, 0013 (and the dropped 0012) |
 
 ## Dropped
 
@@ -30,3 +29,5 @@ not only a surveil, it also triggers Biotech Specialist (2 damage per artifact) 
 Sackville-Bagginses (1 life per token), so the last-ditch sacrifices sometimes win the race. Not
 shipped. 0013 and 0014 were measured on builds that included it in both arms; it changes 16 of
 1,700 of Jund's games and no other deck casts the Zealot.
+
+0013 was measured and moved up to the shipped series (Izzet Spellementals +3.3 points, paired 95% CI +1.6 to +5.0).
