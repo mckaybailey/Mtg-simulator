@@ -8,14 +8,20 @@ not installed and must not be required.
   `carddb.parse_card_script`, or use `helpers.make_db()`.
 - **`helpers.py`**: `make_db()` (a dozen cards with set printings, for legality tests) and
   `game(a, b, index, winner=…, first=…, status=…)`, which builds a stored game record with the
-  correct seat alternation. Use it rather than hand-writing records. `signals(...)` builds a
+  correct seat alternation. Use it rather than hand-writing records. `later_game(a, b, index,
+  number, starter, winner=…)` builds game 2 or 3 of a best-of-three match, with `starter` in seat 0. `signals(...)` builds a
   player's fields as a driver with misplay tracking records them; pass it as `a_extra=`.
 - `test_misplay.py` covers every misplay signal on synthetic records, old runs without the
   fields, the report section's escaping and the `misplays` command (with `MTGSIM_HOME` pointed
   at an empty directory, so no Forge is involved).
 - Anything that touches `MTGSIM_HOME` must point it at a temporary directory.
 - `test_experiment.py` replaces `experiment.run_jobs` with a fake to test planning, storage and
-  resume without Java.
+  resume without Java. `BestOfThreeTest` covers `--bo3`: game 1s are the best-of-one jobs, later
+  games seat the loser first with `first=0` / `sideboard=1` and store the driver's swaps, no game 3
+  after 2-0, re-planning on resume, refusal to resume under another format, the job-line fields.
+  Its fake picks the winner per job; note that `"|g"` also matches deck keys such as `green`, so
+  find later games by the `|g2` / `|g3` suffix. `test_analysis.py` `MatchTest` covers
+  `summarize_matches` (wins, draws, unfinished matches, game-1 and later-game splits).
 - `test_tune.py` covers `ai_profiles.py` (Forge's file-reading rules, overrides, the run's
   profile folder) and `tune.py` with a fake `runner.run_jobs` whose outcomes depend on the seed
   and each seat's profile: cache reuse, resume, successive halving, hold-out isolation,
@@ -28,10 +34,13 @@ not installed and must not be required.
   `forge.build_from_source` on it with `forge._maven_build` replaced by a fake that writes a jar
   (no network, Forge or Maven; skipped if `git` is missing). It also checks that every shipped
   patch in `mtgsim/forge_patches/` has `Subject:`, `Why:` and `Measured:` lines.
-- **`test_integration.py`** plays real games (about 2 minutes) and skips itself when Forge is
+- **`test_integration.py`** plays real games (about 4 minutes) and skips itself when Forge is
   not set up. Its decks (Raging Goblin vs Grizzly Bears) were chosen because they cannot stall;
   Grizzly Bears vs Hill Giant can, and a stalled game hits the time limit and breaks the
   reproducibility check.
+  `test_best_of_three_matches_replay_and_seat_the_loser_first` plays three bo3 matches with
+  two workers and with one (same games, sideboard swaps included), checks that the loser starts
+  the next game and that the game 1s equal the best-of-one games with the same seed.
   `test_fixed_monte_carlo_replays_the_same_games` plays four `--mc fixed` games with two workers
   and with one and compares them, rollout counts included; it skips itself on a Forge build
   without patch 0020. It is the slowest test (about a minute).

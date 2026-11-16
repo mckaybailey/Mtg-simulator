@@ -314,6 +314,8 @@ def _record(job: Job, result: dict) -> dict:
     record["players"] = result.get("players", [])
     if result.get("mc") is not None:  # search counters, only reported for games with Monte Carlo
         record["mc"] = result["mc"]
+    if result.get("sideboard") is not None:  # each seat's "out>in" swaps, only for sideboarded games
+        record["sideboard"] = result["sideboard"]
     if result.get("error"):
         record["error"] = str(result["error"])[:2000]
     return record
@@ -395,7 +397,10 @@ def execute(
             before = json.loads(previous.read_text(encoding="utf-8")).get("options", {})
         except ValueError:
             before = {}
-        if (before.get("match_format", "bo1"), before.get("sideboard", True)) != (options.match_format, options.sideboard):
+        def played_as(fmt: str, sideboard: bool) -> tuple:
+            return (fmt, sideboard if fmt == "bo3" else None)  # best-of-one games never sideboard
+        if played_as(before.get("match_format", "bo1"), before.get("sideboard", True)) != \
+                played_as(options.match_format, options.sideboard):
             raise RunError(f"{run_dir} was played as {before.get('match_format', 'bo1')}"
                            + ("" if before.get("match_format", "bo1") == "bo1" else
                               " with" + ("" if before.get("sideboard", True) else "out") + " sideboarding")

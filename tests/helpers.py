@@ -58,3 +58,17 @@ def game(a, b, index, winner=None, first="a", status="ok", turns=6, a_extra=None
             "status": status, "winner_seat": seat[winner] if status == "ok" else -1,
             "first_seat": seat[first], "turns": turns * 2, "end_reason": "AllOpponentsLost", "ms": 1000,
             "players": players}
+
+
+def later_game(a, b, index, number, starter, winner=None, status="ok", turns=6):
+    """Game ``number`` (2 or 3) of best-of-three match ``index``: ``starter`` ("a" or "b") has seat 0 and
+    plays first, as experiment.plan_match_game seats the previous game's loser. ``winner`` is "a", "b" or None."""
+    record = game(a, b, 0, winner=winner, first="a", status=status, turns=turns)  # index 0: a in seat 0
+    if starter == "b":
+        record["seats"].reverse()
+        record["players"].reverse()
+        if record["winner_seat"] in (0, 1):
+            record["winner_seat"] = 1 - record["winner_seat"]
+    record.update({"game": index, "match_game": number, "first_seat": 0, "id": f"{a}|{b}|{index}|g{number}",
+                   "seed": 1000 * number + index})
+    return record

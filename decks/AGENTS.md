@@ -1,9 +1,10 @@
 # Decks
 
-- `standard/meta/`: twelve Standard archetypes, a snapshot of the Magic.gg metagame table of
-  5 November 2026 (73.7% of the field). Its `README.md` gives sources, what was and was not
-  verified, and the AI-pilot calibration table. Win rates and the nine aggregate lists were
-  checked against the article; the three melee.gg tournament lists were not. `real-matchups-unverified.json` is
+- `standard/meta/`: eighteen Standard archetypes, a snapshot of the Magic.gg metagame table of
+  5 November 2026 (81.3% of the field). Its `README.md` gives sources, what was and was not
+  verified, and the AI-pilot calibration table (still the first twelve decks; the six added on
+  16 November have no `sim_win_rate` / `ai_pilot` yet). Win rates and the nine aggregate lists were
+  checked against the article, the nine melee.gg tournament lists against their melee.gg pages. `real-matchups-unverified.json` is
   second-hand matchup data (see that README); never use it as tuning data without verifying it.
 - `standard/casual/`: five one-colour decks built from Foundations commons and uncommons, as
   kitchen-table opponents. Written for mtgsim, not tournament lists.

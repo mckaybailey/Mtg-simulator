@@ -40,8 +40,9 @@ What you can do with it:
   the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
   therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
-- **Games are best-of-one with no sideboarding.** Sideboards are read and checked but never
-  played.
+- **Games are best-of-one with no sideboarding unless you pass `--bo3`.** With `--bo3`, games 2
+  and 3 are sideboarded by Forge's own advisor, which picks cards by their rules text, not the way
+  a person would. How well best-of-three tracks real results has not been measured yet.
 - **Sample size matters.** At 100 games a win rate is only known to about ±10 points, at 400
   games about ±5. Every number in the report comes with an interval; a matchup is only
   clearly good or bad when the whole interval is on one side of 50%.
@@ -144,6 +145,8 @@ are warnings unless you pass `--strict`.
 | `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`, or one of yours from `~/.mtgsim/profiles`); overrides per-deck settings |
 | `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting) for every player: slower, and because it thinks against a clock the same seed no longer replays the same game; overrides per-deck settings |
 | `--mc fixed` | the same look-ahead with a budget counted in playouts instead of milliseconds, so the same seed replays the same games on any machine and with any `-j`. About 9 times the engine time for each searching player (some 20 s a game with one, 45 s with both); a gain in play strength over the default AI has not been shown yet (`VALIDATION.md`). Needs the Forge build made by `setup --build` (patch 0020) |
+| `--bo3` | best-of-three matches (`match`, `gauntlet`, `matrix`): `-n` counts matches. Game 1 of each match is exactly the best-of-one game with the same seed; in games 2 and 3 the previous game's loser goes first and both decks sideboard against each other's main deck (Forge's `SideboardAdvisor`: at most 7 swaps, chosen from the cards' text). Win rates count matches (two game wins; three games without one is a draw); the report also shows game-1 and later-game results. About 2.5 games per match |
+| `--no-sideboard` | with `--bo3`: play games 2 and 3 with the main decks |
 | `--save-logs` | keep Forge's full play-by-play log of every game |
 
 ### How long it takes
@@ -154,9 +157,10 @@ each of the twelve meta decks takes roughly a quarter of an hour.
 
 ## How results are produced
 
-- Every game is its own fresh match with its own seed and its own coin flip for who goes
-  first. (Forge's built-in simulator lets the previous loser go first, which drags measured
-  win rates towards 50%.)
+- In best-of-one every game is its own fresh match with its own seed and its own coin flip for
+  who goes first. (Forge's built-in simulator lets the previous loser go first, which drags
+  measured win rates towards 50%.) With `--bo3` that rule applies to game 1 only; the loser of
+  game 1 (and of game 2) goes first in the next game, as in real matches.
 - Seeds depend on the decks' contents, not their file names, so re-running a matchup
   replays the same games and editing a deck gives it new ones.
 - Win rates use decided games only; draws, timeouts and engine failures are counted and
@@ -274,8 +278,9 @@ folder; mtgsim never changes Forge's.
 
 ## Included decks
 
-- `decks/standard/meta/` – twelve of the most-played Standard archetypes as of early
-  November 2026, with metagame shares. See the README in that folder for sources and limits.
+- `decks/standard/meta/` – eighteen of the most-played Standard archetypes as of early
+  November 2026 (81% of the field), with metagame shares and real win rates; twelve of them
+  have been calibrated against those win rates so far. See the README in that folder for sources and limits.
 - `decks/standard/casual/` – five simple one-colour decks built from Foundations commons and
   uncommons, as kitchen-table opponents.
 

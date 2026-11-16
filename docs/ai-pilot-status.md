@@ -87,9 +87,36 @@ mention a graveyard, which is often (Azorius Control and Azorius Momo bring it a
 field). A result from these runs is "with Forge's sideboarding", not with a person's. Improving the
 advisor would be a Forge patch, measured like any other.
 
+### Step 1 done (16 Nov 2026, later session): bo3 mechanics checked, tests and docs added
+
+- `runs/chk-bo3` was empty (no games); deleted and rerun: Azorius Control vs Boros Dwarves, 8 matches,
+  seed 1, 20 games. Dwarves won 6 matches, Control 2, no draws; 4 matches went to game 3.
+- **Game 1s are the best-of-one games:** all 8 identical (`tools/compare_games.py`) to a fresh
+  best-of-one run with the same seed (`runs/chk-bo1`), and to the same ids in `runs/rr-final-12`
+  (played before patch 0020, which only touches `--mc fixed`).
+- Every game 2 and 3 had `first_seat` 0 and the previous game's loser in seat 0; match counts add up.
+- **Bug found and fixed:** `experiment._record` dropped the driver's `sideboard` field, so the swaps
+  were never stored. Records of sideboarded games now carry them.
+- **Fixed:** the resume check compared `sideboard` for best-of-one runs too, so a bo1 run planned
+  with `sideboard=False` (not possible from the CLI) would have refused its own resume.
+- What the advisor did in that pairing: Azorius Control made no change (as `sideboard_plans.py`
+  showed); **Boros Dwarves took out 2 Chainsaw and 2 Basilisk Collar for 2 Rest in Peace and 2 Seam
+  Rip** against Azorius Control. Rest in Peace in an aggro deck against a control deck is the
+  advisor's graveyard pattern misfiring. Keep it in mind when reading step 2; an advisor patch
+  would be measured like any other.
+- Tests: `BestOfThreeTest` in `tests/test_experiment.py` (9 tests), `MatchTest` in
+  `tests/test_analysis.py` (4), `helpers.later_game`, and the integration test
+  `test_best_of_three_matches_replay_and_seat_the_loser_first` (three bo3 matches replay with 1 and
+  2 workers; game 1s equal best-of-one). 298 tests pass.
+- Docs updated: `mtgsim/bridge/AGENTS.md` (protocol fields, `sideboard` result, how `first=0` and
+  sideboarding work), `mtgsim/AGENTS.md` (bo3 invariants), `README.md` (`--bo3`, `--no-sideboard`,
+  18 decks), `tests/AGENTS.md`, the meta README and `decks/AGENTS.md` (18 decks; melee.gg lists checked).
+
+**Start the next session at step 2.**
+
 ### Next, in order (revised plan; one step per session is fine)
 
-1. **Check the bo3 mechanics on real games, then add tests and docs.** `runs/chk-bo3` exists from an
+1. **(Done, see above.) Check the bo3 mechanics on real games, then add tests and docs.** `runs/chk-bo3` exists from an
    earlier attempt; look at it, and if it is incomplete delete it and rerun:
    `python3 -m mtgsim match decks/standard/meta/azorius-control.txt decks/standard/meta/boros-dwarves.txt
    -n 8 --seed 1 --bo3 --out $PWD/runs/chk-bo3`. Check that:

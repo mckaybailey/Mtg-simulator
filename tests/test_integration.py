@@ -111,6 +111,43 @@ class ForgeIntegrationTest(unittest.TestCase):
             [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"], r["mc"]) for r in second],
         )
 
+    def test_best_of_three_matches_replay_and_seat_the_loser_first(self):
+        # A sideboard, so the driver's sideboarding (Forge's SideboardAdvisor) has something to consider.
+        def entrants():
+            bears = deck_from_text("20 Forest\n40 Grizzly Bears\n\nSideboard\n15 Llanowar Elves\n", "bears", self.db)
+            giants = deck_from_text("20 Mountain\n40 Raging Goblin\n", "giants", self.db)
+            self.assertEqual([], bears.errors + giants.errors)
+            return [Entrant("bears", bears), Entrant("giants", giants)]
+
+        def play(name, workers, match_format="bo3"):
+            es = entrants()
+            records = experiment.execute(
+                self.install, self.tmp / name, es, [(es[0], es[1])],
+                RunOptions(games=3, seed=9, workers=workers, timeout=120, match_format=match_format), quiet=True)
+            return sorted(records, key=lambda r: r["id"])
+
+        first, second = play("bo3-a", 2), play("bo3-b", 1)
+        keys = ("id", "seats", "winner_seat", "first_seat", "turns", "players", "sideboard")
+        self.assertEqual([[r.get(k) for k in keys] for r in first], [[r.get(k) for k in keys] for r in second])
+        by_id = {r["id"]: r for r in first}
+        later = [r for r in first if r.get("match_game")]
+        self.assertTrue(later, "every match has a game 2")
+        for r in first:
+            self.assertEqual("ok", r["status"], r.get("error"))
+        for r in later:
+            prev_id = r["id"].rsplit("|", 1)[0] if r["match_game"] == 2 else r["id"][:-1] + "2"
+            prev = by_id[prev_id]
+            self.assertEqual(0, r["first_seat"])
+            self.assertEqual(prev["seats"][1 - prev["winner_seat"]], r["seats"][0], "the loser starts")
+            self.assertEqual(2, len(r["sideboard"]))
+            self.assertEqual([60, 60], [p["mainCount"] for p in r["players"]])
+        game1 = {r["id"]: r for r in play("bo3-bo1", 2, "bo1")}
+        for i in range(3):
+            g = by_id[f"bears|giants|{i}"]
+            self.assertEqual((g["seed"], g["seats"], g["winner_seat"], g["turns"], g["players"]),
+                             tuple(game1[g["id"]][k] for k in ("seed", "seats", "winner_seat", "turns", "players")),
+                             "game 1 of a match is the best-of-one game")
+
     def test_different_seeds_give_different_games(self):
         first = self._play("seed-a", seed=1)
         second = self._play("seed-b", seed=2)

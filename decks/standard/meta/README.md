@@ -1,12 +1,12 @@
 # Standard meta gauntlet
 
-Twelve of the most-played Standard archetypes, used as the default opponents for
+Eighteen of the most-played Standard archetypes, used as the default opponents for
 `python -m mtgsim gauntlet` and `python -m mtgsim ab`.
 
 **Snapshot: 5 November 2026.** Metagame shares come from the Magic.gg "Metagame Mentor"
 table published that day, which combines Arena Championship 13 and the Magic Spotlight:
-Fracture events (about 1,810 decklists from late October 2026). The twelve decks cover
-73.7% of that field. The snapshot predates the Star Trek set and World Championship 32,
+Fracture events (about 1,810 decklists from late October 2026). The eighteen decks cover
+81.3% of that field (the first twelve 73.7%). The snapshot predates the Star Trek set and World Championship 32,
 so expect it to drift; replace the lists whenever you want a fresher field.
 
 | Deck | Type | Share | List |
@@ -23,16 +23,24 @@ so expect it to drift; replace the lists whenever you want a fresher field.
 | Azorius Artifacts | control | 3.5% | aggregate |
 | Boros Dwarves | aggro | 2.3% | aggregate |
 | Azorius Momo | tempo | 2.1% | aggregate |
+| Dimir Excruciator | control | 1.4% | LiShuhao, Magic Spotlight: Fracture (Beijing) |
+| Rakdos Lizards | aggro | 1.4% | EddieWong, Magic Spotlight: Fracture (Beijing) |
+| Izzet Prowess | tempo | 1.4% | 梁 Liang, 辰 Chen (as melee.gg gives it), Magic Spotlight: Fracture (Beijing) |
+| Mono-Black Aggro | aggro | 1.3% | Jeremy Fraser, Magic Spotlight: Fracture (Hartford) |
+| Golgari Midrange | midrange | 1.1% | wgzzg, Magic Spotlight: Fracture (Beijing) |
+| Grixis Reanimator | combo | 1.0% | Amin Ebady, Magic Spotlight: Fracture (Hartford) |
 
 "Aggregate" lists are the composite lists printed in the Magic.gg article (built by its
 author's algorithm from tournament lists), not one player's 75. Source links and dates for
-every list are in `gauntlet.json`. The archetype types are a judgement call in a few cases
+every list are in `gauntlet.json`. The last six were added on 16 November 2026: for each, the
+melee.gg decklist the Magic.gg article links for the archetype. Their real win rates rest on
+only about 20–25 players each (1.0–1.4% of the field), so they are noisy (roughly ±7 points). The archetype types are a judgement call in a few cases
 (Dimir Uldaros, Azorius Artifacts, Boros Dragons).
 
 ## How well the AI plays each deck
 
 Results against this gauntlet depend heavily on how well Forge's AI pilots each opponent.
-To measure that, all twelve decks were played against each other in the simulator (1,980
+To measure that, the first twelve decks were played against each other in the simulator (1,980
 games, 30 per pairing, seed 1) and each deck's simulated win rate was set beside its real-world
 match win rate from the same Magic.gg table. "Simulated" is on Forge with mtgsim's eleven Forge
 patches (`mtgsim/forge_patches/`); the last column is the eleven-deck round robin played with
@@ -96,15 +104,17 @@ format `mtgsim tune --matchups` expects, deliberately: verify and de-duplicate i
   Dwarves, Azorius Momo) are identical to the article's, main deck and sideboard. Four-Color
   Control was copied from the article directly.
 - Mono-Green Landfall, Jund Sacrifice and Orzhov Lifegain are single tournament lists from
-  melee.gg, transcribed from search results and not checked against their pages (melee.gg is not
-  reachable). The article prints aggregate lists for these too, which differ by a few cards, as
-  one player's list would.
+  melee.gg, first transcribed from search results. On 16 November 2026 (melee.gg allowed in the
+  network policy) all three were checked against their melee.gg pages: identical, main deck and
+  sideboard. The article prints aggregate lists for these too, which differ by a few cards, as
+  one player's list would. The six decks added that day were taken from their melee.gg pages
+  directly.
 - Every list totals exactly 60 main / 15 sideboard, every card name resolves in Forge, and
   every card is Standard-legal and unbanned according to Forge's format file.
-- There is no dedicated combo deck: none of the top twelve archetypes is one. The article's
-  table gives win rates for six more archetypes (Dimir Excruciator 46.0%, Rakdos Lizards 42.9%,
-  Izzet Prowess 30.6%, Mono-Black Aggro 42.6%, Golgari Midrange 47.5%, Grixis Reanimator 52.7%,
-  each 1.0–1.4% of the field) but prints no lists for them.
+- The only combo-like deck is Grixis Reanimator (1.0%). The six smaller archetypes' real win
+  rates are Dimir Excruciator 46.0%, Rakdos Lizards 42.9%, Izzet Prowess 30.6%, Mono-Black Aggro
+  42.6%, Golgari Midrange 47.5% and Grixis Reanimator 52.7%. They have no `sim_win_rate` or
+  `ai_pilot` yet: the 18-deck round robin has not been run.
 - Forge's AI pilots these decks, and it is much better with the creature decks than with Jund
   Sacrifice, Dimir Uldaros, the spell-heavy Izzet deck and Four-Color Control. Results against
   those four say more about the AI than the matchup.

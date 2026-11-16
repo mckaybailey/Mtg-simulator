@@ -11,7 +11,7 @@
 | `legality.py` | deck size, copy limits and format legality from Forge's `res/formats` files |
 | `ai_profiles.py` | AI profiles: Forge's `res/ai`, shipped `profiles/*.ai|*.json`, the user's `MTGSIM_HOME/profiles`; builds a run's own profile folder |
 | `runner.py` | pool of long-lived Forge JVMs (one game at a time each), fed jobs over stdin |
-| `experiment.py` | plan pairings, per-game seeds, write `games.jsonl`, resume |
+| `experiment.py` | plan pairings (and games 2/3 of best-of-three matches), per-game seeds, write `games.jsonl`, resume |
 | `tune.py` | `tune`: search AI profile settings against real win rates; game cache, successive halving, hold-out, CV, noise |
 | `analysis.py`, `stats.py` | win rates, Wilson intervals, A/B tests, matrix, card stats, clock |
 | `misplay.py` | likely AI misplays per card (cards left in hand, castable but never cast, poor removal targets, unused counterspell windows, rarely cast) from the driver's misplay fields; its docstring defines every signal and the ranking score; old runs fall back to "seen but never cast" |
@@ -23,7 +23,19 @@
 
 - **Seats alternate by game index.** Even games put the pairing's first deck in seat 0, odd
   games in seat 1 (`analysis.seat_of_a`). Who plays first is the engine's coin flip, recorded
-  as `first_seat`. Every game is a fresh match; never let the previous loser go first.
+  as `first_seat`. In best-of-one every game is a fresh match; never let the previous loser go first.
+- **Best-of-three (`--bo3`) adds games 2 and 3 to those game 1s; it changes nothing in them.**
+  Game 1 of match *i* has the id `a|b|i`, the best-of-one seed and seats, so it *is* best-of-one
+  game *i* (an old run's `games.jsonl` can be copied into a new bo3 run directory to reuse them;
+  `analysis.first_games` and `matrix_game1` / `pairings_game1` read them as the best-of-one
+  result). Games 2 and 3 (`a|b|i|g2`, `a|b|i|g3`, `match_game` 2/3, their own seeds from
+  `experiment.match_game_seed`) do **not** follow the parity rule: the previous game's loser gets
+  seat 0 and starts (`first=0`; after a game without a winner, whoever started it starts again),
+  so read their seats from `seats` (`analysis.seat_of_a` does). They are planned from the results
+  recorded so far (`next_match_games`), in a round after all game 1s and another after all game
+  2s; a resumed run re-plans them, and `execute` refuses to resume a run under another format.
+  A match is won with two game wins; three games without one is a draw. Card and misplay
+  statistics use the first games only, since later games are sideboarded.
 - **Seeds come from deck contents** (`experiment.game_seed`: base seed + sorted main-deck
   fingerprints + game index), not names or argument order. Same decks and seed = same games.
 - **Win rates use decided games only**; draws, timeouts and engine errors are counted and shown

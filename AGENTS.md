@@ -23,8 +23,8 @@ patch with its cause and measurement.
 
 **The goal of the current work is simulations whose win rates look like the real ones.** Judge every
 change by the spread (SD) and the mean gap of the 18 meta decks against their real win rates. The
-plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`, committed, not yet
-run at scale) and add its tests; run the 18-deck round robin in best-of-three, whose game 1s are the
+plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`; done 16 Nov: checked
+on real games, tested, not yet run at scale); run the 18-deck round robin in best-of-three, whose game 1s are the
 best-of-one baseline; only then add a small field of about 25 "Other" decks. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
@@ -118,7 +118,7 @@ Always pass on the limits with the numbers:
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (284 tests, ~4 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (298 tests, ~4.5 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match

@@ -16,7 +16,12 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
 - stdin: one job per line, tab-separated `key=value`: `id`, `seed`, `timeout`, `format`,
   `mc` (`off|on|max|fixed`, whole game), `log` (path or empty), repeated `deck=` (seat order),
   repeated `profile=`, repeated `seatmc=` (per seat; empty follows `mc`). `quit` ends the process.
-  Any other Monte Carlo value makes the game an `error`.
+  Any other Monte Carlo value makes the game an `error`. Three optional fields serve games 2 and 3
+  of a best-of-three match (`experiment.plan_match_game`); without them the job is what it always
+  was: `first=0` (seat 0 starts; any other value is an `error`), `sideboard=1` (both seats
+  sideboard before the game, see below; needs exactly two decks), `planonly=1` (with
+  `sideboard=1`: report the swaps and play nothing, status `plan`; used by
+  `tools/sideboard_plans.py`).
   Values may not contain tabs or newlines (`runner.Job.line` enforces it).
 - One result line per job: `status` (`ok|timeout|error`), `winner` and `first` (seat index or
   -1), `turns`, `endReason`, `ms`, `restart`, and per player `mainCount`, `mulligans`, `turns`,
@@ -24,7 +29,9 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
   misplay fields below (all `null` when the game thread could not be stopped). Games in which a
   seat used Monte Carlo also carry `mc`: `decisions`, `rollouts` and `failures` (rollouts or
   decisions that ended in an exception) summed over both seats; games without it have no such
-  key, so their records are byte-for-byte what they were before the field existed.
+  key, so their records are byte-for-byte what they were before the field existed. Games with
+  `sideboard=1` carry `sideboard`: per seat, the swaps made as `"out>in"` strings (one per copy;
+  an empty list when the advisor changed nothing). The runner stores it in the record.
 
 ### Misplay fields (per player; read by `mtgsim/misplay.py`)
 
@@ -79,7 +86,17 @@ the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay
 - After every game with Monte Carlo the driver prints `FlatMonteCarloStats.summary()` to stderr
   (the worker log) under a `[mtgsim] Monte Carlo in game <id>` line; the counters are reset at
   the start of each such game (one game at a time per JVM). `tools/mc_cost.py` adds them up.
-- Each job builds a new `Match`, so every game has its own coin flip.
+- Each job builds a new `Match`, so every game has its own coin flip, unless `first=0`: then the
+  driver sets the match's `lastOutcome` (reflection) to an empty `GameOutcome(Draw, [])`, Forge
+  asks the first non-winner in seat order, seat 0, and its AI always chooses to play.
+- `sideboard=1`: each seat's deck is changed against the other seat's **main** deck by Forge's own
+  `forge.ai.SideboardAdvisor` (card roles read from Oracle text, at most 7 swaps, creature for
+  creature, cost within 1), on copies of the cached decks, using a throwaway `Match` to create
+  the card objects. Then `MyRandom` is re-seeded with the job's seed, so a sideboarded game replays
+  from its seed like any other. Boarding is always from the main decks, not from the previous
+  game's lists, and the advisor knows nothing of the previous game's result. Its plans are by text
+  pattern and sometimes odd (Boros Dwarves boards Rest in Peace in against Azorius Control;
+  Azorius Control changes nothing against Dwarves): results are "with Forge's sideboarding".
 - A game runs on its own thread with a 64 MB stack. Past the timeout it is ended as a draw; if the
   thread will not stop, the result carries `restart: true` and the process exits with code 3,
   and the runner starts a fresh JVM.
