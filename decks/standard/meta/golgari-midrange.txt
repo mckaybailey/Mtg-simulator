@@ -1,0 +1,39 @@
+Deck
+3 Emeritus of Abundance
+3 Forest
+3 Environmental Scientist
+4 Restless Cottage
+1 Virtue of Persistence
+1 Ral Zarek, Guest Lecturer
+2 Deadly Cover-Up
+1 Mosswood Dreadknight
+2 Duress
+5 Swamp
+4 Wastewood Verge
+1 Maelstrom Pulse
+1 Bitter Triumph
+3 Professor Dellian Fel
+4 Overgrown Tomb
+1 Shoot the Sheriff
+2 Ba Sing Se
+3 Requiting Hex
+1 Garruk, Veiled Butcher
+4 Vraska, the Cutting Glare
+1 Doctor Doom
+4 Simulacrum Shaper
+1 Strategic Betrayal
+3 Witherbloom Charm
+2 Deathcap Glade
+
+Sideboard
+2 Strategic Betrayal
+2 Qarsi Revenant
+1 Liliana, Dreadhorde General
+1 Ghost Vacuum
+1 Cruelclaw's Heist
+2 Terminal Criticism
+1 Urgent Necropsy
+1 The Rise of Sozin
+2 Vicious Rivalry
+1 The End
+1 Outrageous Robbery

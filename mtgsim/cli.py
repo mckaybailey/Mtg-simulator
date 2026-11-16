@@ -191,13 +191,30 @@ def _options(args: argparse.Namespace) -> RunOptions:
         raise UserError("--games must be at least 1")
     if args.timeout is not None and args.timeout < 1:
         raise UserError("--timeout must be at least 1 second")
+    bo3 = bool(getattr(args, "bo3", False))
+    if getattr(args, "no_sideboard", False) and not bo3:
+        raise UserError("--no-sideboard only applies to --bo3 (best-of-one games never sideboard)")
     return RunOptions(
+        match_format="bo3" if bo3 else "bo1", sideboard=not getattr(args, "no_sideboard", False),
         games=args.games, seed=args.seed,
         # without --timeout, games with a "fixed" Monte Carlo seat get the longer limit (see runner.FIXED_TIMEOUT)
         timeout=args.timeout or DEFAULT_TIMEOUT, fixed_timeout=args.timeout or FIXED_TIMEOUT, workers=args.workers,
         heap=args.heap, monte_carlo=args.mc or "off", ai_profile=args.ai_profile or "", save_logs=args.save_logs,
         force_profile=bool(args.ai_profile), force_monte_carlo=args.mc is not None,
     )
+
+
+def _pairing(records: List[dict], a_key: str, b_key: str, options: RunOptions) -> dict:
+    """Results of one pairing: games for best-of-one, matches for best-of-three (analysis.summarize_matches)."""
+    if options.match_format == "bo3":
+        return analysis.summarize_matches(records, a_key, b_key)
+    return analysis.summarize_pairing(records, a_key, b_key)
+
+
+def _units(options: RunOptions) -> str:
+    if options.match_format == "bo1":
+        return "games"
+    return "best-of-three matches" + (" (sideboarding before games 2 and 3)" if options.sideboard else " (no sideboarding)")
 
 
 def _run_dir(args: argparse.Namespace, kind: str, label: str) -> Path:
@@ -276,7 +293,9 @@ def _add_misplays(summary: dict, ctx: Context, entrants: List[Entrant], records:
 
     lands = {name for e in entrants for name in e.deck.main
              if ctx.db.get(name) is not None and ctx.db.get(name).is_land}
-    summary["misplays"] = misplay.analyze(records, {e.key: e.describe() for e in entrants}, lands=lands)
+    # later games of a best-of-three match are played with sideboarded decks; misplays are read from first games
+    summary["misplays"] = misplay.analyze(analysis.first_games(records), {e.key: e.describe() for e in entrants},
+                                          lands=lands)
     print(f"\nLikely AI misplays, card by card:  python -m mtgsim misplays {run_dir}")
 
 
@@ -444,9 +463,9 @@ def cmd_match(args: argparse.Namespace) -> int:
     a, b = entrants
     options = _options(args)
     run_dir = _run_dir(args, "match", f"{a.deck.name}-vs-{b.deck.name}")
-    print(f"{a.deck.name} vs {b.deck.name}: {options.games} games (Forge {ctx.install.version})")
+    print(f"{a.deck.name} vs {b.deck.name}: {options.games} {_units(options)} (Forge {ctx.install.version})")
     records = experiment.execute(ctx.install, run_dir, entrants, [(a, b)], options, meta={"kind": "match"})
-    pairing = analysis.summarize_pairing(records, a.key, b.key)
+    pairing = _pairing(records, a.key, b.key, options)
     names = {e.key: e.deck.name for e in entrants}
     print()
     _print_pairing_rows([pairing], names, label=f"{a.deck.name} vs")
@@ -455,7 +474,7 @@ def cmd_match(args: argparse.Namespace) -> int:
         ahead = a.deck.name if (pairing["win_rate"] or 0) > 0.5 else b.deck.name
         print("\n" + (f"A real edge for {ahead}: an even matchup would rarely produce this result "
                       if even < 0.05 else "This is consistent with an even matchup ") + f"(p = {even:.3f}).")
-    cards = _card_tables(entrants, records, ("hero",))
+    cards = _card_tables(entrants, analysis.first_games(records), ("hero",))
     if a.key != b.key:
         for e in entrants:
             _print_cards(cards[e.key], e.deck.name)
@@ -481,11 +500,11 @@ def cmd_gauntlet(args: argparse.Namespace) -> int:
     hero, opponents = entrants[0], entrants[1:]
     options = _options(args)
     run_dir = _run_dir(args, "gauntlet", hero.deck.name)
-    print(f"{hero.deck.name} vs {len(opponents)} opponents: {options.games} games each, "
+    print(f"{hero.deck.name} vs {len(opponents)} opponents: {options.games} {_units(options)} each, "
           f"{options.games * len(opponents)} in total (Forge {ctx.install.version})")
     pairs = [(hero, o) for o in opponents]
     records = experiment.execute(ctx.install, run_dir, entrants, pairs, options, meta={"kind": "gauntlet"})
-    pairings = [analysis.summarize_pairing(records, hero.key, o.key) for o in opponents]
+    pairings = [_pairing(records, hero.key, o.key, options) for o in opponents]
     weights = {o.key: o.weight for o in opponents}
     field = analysis.summarize_field(hero.key, pairings, weights)
     names = {e.key: e.deck.name for e in entrants}
@@ -493,7 +512,7 @@ def cmd_gauntlet(args: argparse.Namespace) -> int:
     _print_pairing_rows(sorted(pairings, key=lambda p: -(p["win_rate"] or 0)), names)
     _print_pilot_note(opponents)
     _print_field(field)
-    cards = _card_tables(entrants, records, ("hero",))
+    cards = _card_tables(entrants, analysis.first_games(records), ("hero",))
     _print_cards(cards[hero.key], hero.deck.name)
     summary = _base_summary("gauntlet", f"{hero.deck.name} vs the field", ctx, run_dir, entrants, records, notes)
     summary.update({"hero": hero.key, "pairings": pairings, "field": {hero.key: field}, "cards": cards,
@@ -581,10 +600,10 @@ def cmd_matrix(args: argparse.Namespace) -> int:
     options = _options(args)
     pairs = [(entrants[i], entrants[j]) for i in range(len(entrants)) for j in range(i + 1, len(entrants))]
     run_dir = _run_dir(args, "matrix", f"{len(entrants)}-decks")
-    print(f"Round robin: {len(entrants)} decks, {len(pairs)} pairings, {options.games} games each, "
+    print(f"Round robin: {len(entrants)} decks, {len(pairs)} pairings, {options.games} {_units(options)} each, "
           f"{options.games * len(pairs)} in total (Forge {ctx.install.version})")
     records = experiment.execute(ctx.install, run_dir, entrants, pairs, options, meta={"kind": "matrix"})
-    pairings = [analysis.summarize_pairing(records, a.key, b.key) for a, b in pairs]
+    pairings = [_pairing(records, a.key, b.key, options) for a, b in pairs]
     matrix = analysis.summarize_matrix([e.key for e in entrants], pairings)
     names = {e.key: e.deck.name for e in entrants}
     rows = [[str(i + 1), names[r["key"]], _pct(r["mean_win_rate"]), _ci(r["ci"]), f"{r['wins']}-{r['decided'] - r['wins']}"]
@@ -592,7 +611,13 @@ def cmd_matrix(args: argparse.Namespace) -> int:
     print()
     print(_table(["#", "Deck", "Avg win rate", "95% CI", "W-L"], rows, right=(0, 2, 3, 4)))
     summary = _base_summary("matrix", f"Round robin of {len(entrants)} decks", ctx, run_dir, entrants, records, notes)
-    summary.update({"pairings": pairings, "matrix": matrix, "cards": _card_tables(entrants, records, ("hero",))})
+    summary.update({"pairings": pairings, "matrix": matrix,
+                    "cards": _card_tables(entrants, analysis.first_games(records), ("hero",))})
+    if options.match_format == "bo3":
+        # the same run's first games are the best-of-one round robin with the same seeds
+        game1 = [analysis.summarize_pairing(analysis.first_games(records), a.key, b.key) for a, b in pairs]
+        summary["matrix_game1"] = analysis.summarize_matrix([e.key for e in entrants], game1)
+        summary["pairings_game1"] = game1
     _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
@@ -719,7 +744,7 @@ def cmd_misplays(args: argparse.Namespace) -> int:
         raise UserError(f"{run_dir} is not a run directory (no run.json)")
     info = json.loads(info_path.read_text(encoding="utf-8"))
     entrants = {e["key"]: e for e in info.get("entrants", []) if isinstance(e, dict) and "key" in e}
-    records = experiment.read_games(run_dir)
+    records = analysis.first_games(experiment.read_games(run_dir))  # later games of a match are sideboarded
     if not records:
         raise UserError(f"{run_dir} has no recorded games")
     keys = list(entrants)
@@ -793,6 +818,13 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")
 
 
+def _add_match_format(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--bo3", action="store_true",
+                   help="play best-of-three matches (-n counts matches): the loser of a game starts the next, and "
+                        "both decks sideboard before games 2 and 3 with Forge's SideboardAdvisor")
+    p.add_argument("--no-sideboard", action="store_true", help="with --bo3: keep the main decks for every game")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mtgsim",
@@ -823,12 +855,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("deck_a")
     p.add_argument("deck_b")
     _add_common(p)
+    _add_match_format(p)
     p.set_defaults(func=cmd_match)
 
     p = sub.add_parser("gauntlet", help="play one deck against a field of opponents")
     p.add_argument("deck")
     p.add_argument("--vs", nargs="+", metavar="PATH", help="opponent decklists or folders (default: decks/standard/meta)")
     _add_common(p)
+    _add_match_format(p)
     p.set_defaults(func=cmd_gauntlet)
 
     p = sub.add_parser("ab", help="compare two versions of a deck against the same field")
@@ -842,6 +876,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("matrix", help="round robin: every deck against every other deck")
     p.add_argument("decks", nargs="+", help="decklist files or folders")
     _add_common(p)
+    _add_match_format(p)
     p.set_defaults(func=cmd_matrix)
 
     p = sub.add_parser("goldfish", help="solo consistency analysis (mana, curve, colours) without the engine")

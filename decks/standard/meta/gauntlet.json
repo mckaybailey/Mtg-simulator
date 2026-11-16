@@ -158,6 +158,72 @@
    "real_win_rate": 48.8,
    "sim_win_rate": 50.3,
    "ai_pilot": "fair"
+  },
+  {
+   "file": "dimir-excruciator.txt",
+   "name": "Dimir Excruciator",
+   "category": "control",
+   "meta_share": 1.4,
+   "list_type": "tournament list",
+   "pilot": "LiShuhao, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Dimir Control)",
+   "source_url": "https://melee.gg/Decklist/View/64690f57-80b3-4931-971c-b4f3009982fb",
+   "source_date": "2026-11-05",
+   "real_win_rate": 46.0
+  },
+  {
+   "file": "rakdos-lizards.txt",
+   "name": "Rakdos Lizards",
+   "category": "aggro",
+   "meta_share": 1.4,
+   "list_type": "tournament list",
+   "pilot": "EddieWong, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Rakdos Aggro)",
+   "source_url": "https://melee.gg/Decklist/View/fb8785e7-aefe-414c-a6ae-b4f3001e7e65",
+   "source_date": "2026-11-05",
+   "real_win_rate": 42.9
+  },
+  {
+   "file": "izzet-prowess.txt",
+   "name": "Izzet Prowess",
+   "category": "tempo",
+   "meta_share": 1.4,
+   "list_type": "tournament list",
+   "pilot": "梁 Liang, 辰 Chen, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Temur)",
+   "source_url": "https://melee.gg/Decklist/View/1ffec100-e981-4831-94ee-b4f3009b1ca1",
+   "source_date": "2026-11-05",
+   "real_win_rate": 30.6
+  },
+  {
+   "file": "mono-black-aggro.txt",
+   "name": "Mono-Black Aggro",
+   "category": "aggro",
+   "meta_share": 1.3,
+   "list_type": "tournament list",
+   "pilot": "Fraser, Jeremy, Magic Spotlight: Fracture (Hartford); the list Magic.gg links for the archetype (melee.gg calls it Mono-Black Aggro)",
+   "source_url": "https://melee.gg/Decklist/View/428574bc-8312-4a3b-abfb-b4ec0128588b",
+   "source_date": "2026-11-05",
+   "real_win_rate": 42.6
+  },
+  {
+   "file": "golgari-midrange.txt",
+   "name": "Golgari Midrange",
+   "category": "midrange",
+   "meta_share": 1.1,
+   "list_type": "tournament list",
+   "pilot": "wgzzg, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Golgari Control)",
+   "source_url": "https://melee.gg/Decklist/View/1fe0f367-19e2-4fd9-b67c-b4f100d429c8",
+   "source_date": "2026-11-05",
+   "real_win_rate": 47.5
+  },
+  {
+   "file": "grixis-reanimator.txt",
+   "name": "Grixis Reanimator",
+   "category": "combo",
+   "meta_share": 1.0,
+   "list_type": "tournament list",
+   "pilot": "Ebady, Amin 🦎, Magic Spotlight: Fracture (Hartford); the list Magic.gg links for the archetype (melee.gg calls it Grixis Reanimator)",
+   "source_url": "https://melee.gg/Decklist/View/aa1117a5-b136-43ee-86fd-b4ec018542d7",
+   "source_date": "2026-11-05",
+   "real_win_rate": 52.7
   }
  ],
  "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05 (checked against the article on 2026-11-14). sim_win_rate is its average win rate against the other eleven decks in a 1,980-game mtgsim round robin (30 games per pairing, seed 1, Forge AI on both sides, Forge commit 7db198d72e with mtgsim's eleven Forge patches, combined hash d213be512ff8, applied; measured 2026-11-15). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."

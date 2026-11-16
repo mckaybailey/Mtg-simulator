@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections import Counter
 import re
 import sys
 import time
@@ -79,12 +80,19 @@ class RunOptions:
     force_profile: bool = False
     force_monte_carlo: bool = False
     save_logs: bool = False
+    # "bo1": every game is its own match. "bo3": ``games`` matches per pairing, each played to two game wins
+    # (see execute_matches); ``sideboard`` lets both decks sideboard before games 2 and 3.
+    match_format: str = "bo1"
+    sideboard: bool = True
 
     def describe(self) -> dict:
         info = {
             "games_per_pairing": self.games, "seed": self.seed, "timeout": self.timeout,
             "monte_carlo": self.monte_carlo, "ai_profile": self.ai_profile or "Default",
         }
+        if self.match_format != "bo1":  # best-of-one runs keep the description they always had
+            info.update({"match_format": self.match_format, "sideboard": self.sideboard,
+                         "matches_per_pairing": self.games})
         if self.monte_carlo == "fixed":  # execute() also adds it when only a deck's ai_mc asks for "fixed"
             info["timeout_fixed"] = self.fixed_timeout
         return info
@@ -150,6 +158,88 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
             # the usual limit would record a timeout where a replay is expected.
             job.timeout = options.fixed_timeout
         jobs.append(job)
+    return jobs
+
+
+def match_game_seed(base_seed: int, first: Deck, second: Deck, match: int, number: int) -> int:
+    """Seed of game ``number`` (2 or 3) of a best-of-three match. Game 1 uses ``game_seed``, so it is the
+    best-of-one game with the same index."""
+    prints = sorted([first.fingerprint(), second.fingerprint()])
+    digest = hashlib.sha256(f"{base_seed}|{prints[0]}|{prints[1]}|{match}|g{number}".encode()).digest()
+    return int.from_bytes(digest[:8], "big") >> 1
+
+
+def match_game_number(record: dict) -> int:
+    """Which game of its match a record is (1 for best-of-one games and for game 1 of a match)."""
+    return int(record.get("match_game") or 1)
+
+
+def plan_match_game(a: Entrant, b: Entrant, match: int, number: int, previous: dict,
+                    options: RunOptions, run_dir: Path) -> Job:
+    """Game ``number`` (2 or 3) of best-of-three match ``match`` between ``a`` and ``b``.
+
+    The loser of the previous game starts (Forge's AI always chooses to play first, as most players do): it gets
+    seat 0 and the driver is told that seat 0 starts. After a game without a winner (a draw, a time-out or an engine
+    error) the player who started that game starts again. With ``options.sideboard`` both decks sideboard against
+    each other's main deck before the game (the driver uses Forge's SideboardAdvisor).
+    """
+    by_key = {a.key: a, b.key: b}
+    seats_before = previous["seats"]
+    winner = previous.get("winner_seat", -1) if previous.get("status") == "ok" else -1
+    if winner in (0, 1):
+        starter = seats_before[1 - winner]
+    elif previous.get("first_seat") in (0, 1):
+        starter = seats_before[previous["first_seat"]]
+    else:
+        starter = seats_before[0]
+    other = b.key if starter == a.key else a.key
+    seats = [by_key[starter], by_key[other]]
+    log_path = ""
+    if options.save_logs:
+        log_path = str(Path(run_dir).resolve() / "logs" / "games" / f"{a.key}__{b.key}__{match:04d}_g{number}.log")
+    job = Job(
+        id=f"{a.key}|{b.key}|{match}|g{number}",
+        seed=match_game_seed(options.seed, a.deck, b.deck, match, number),
+        decks=[s.dck_path for s in seats],
+        timeout=options.timeout,
+        monte_carlo=options.monte_carlo,
+        log_path=log_path,
+        profiles=_seat_profiles(seats, options),
+        seat_monte_carlo=[] if options.force_monte_carlo else [s.ai_mc for s in seats],
+        first_seat=0,
+        sideboard=options.sideboard,
+        meta={"a": a.key, "b": b.key, "game": match, "match_game": number, "seats": [s.key for s in seats]},
+    )
+    if job.uses_fixed_search():
+        job.timeout = options.fixed_timeout
+    return job
+
+
+def next_match_games(a: Entrant, b: Entrant, by_id: Dict[str, dict], options: RunOptions,
+                     run_dir: Path, number: int) -> List[Job]:
+    """The game-``number`` jobs still needed for the pairing's matches, given the games recorded so far.
+
+    A match goes on while neither deck has two wins and fewer than three games were played; a match whose
+    previous game is missing (not played yet) gets nothing yet.
+    """
+    jobs = []
+    for i in range(options.games):
+        games = []
+        for n in range(1, number):
+            rid = f"{a.key}|{b.key}|{i}" if n == 1 else f"{a.key}|{b.key}|{i}|g{n}"
+            if rid not in by_id:
+                break
+            games.append(by_id[rid])
+        if len(games) != number - 1:
+            continue
+        wins = Counter()
+        for g in games:
+            w = g.get("winner_seat", -1)
+            if g.get("status") == "ok" and w in (0, 1):
+                wins[g["seats"][w]] += 1
+        if max(wins.values(), default=0) >= 2:
+            continue
+        jobs.append(plan_match_game(a, b, i, number, games[-1], options, run_dir))
     return jobs
 
 
@@ -232,8 +322,8 @@ def _record(job: Job, result: dict) -> dict:
 class Progress:
     """A single-line progress display on a terminal, periodic lines otherwise."""
 
-    def __init__(self, total: int, already: int = 0, stream=None, quiet: bool = False):
-        self.total, self.done, self.quiet = total, already, quiet
+    def __init__(self, total: int, already: int = 0, stream=None, quiet: bool = False, label: str = "games"):
+        self.total, self.done, self.quiet, self.label = total, already, quiet, label
         self.stream = stream or sys.stderr
         self.started = time.time()
         self.fresh = 0
@@ -253,7 +343,7 @@ class Progress:
         elapsed = now - self.started
         rate = self.fresh / elapsed if elapsed > 0 else 0.0
         remaining = (self.total - self.done) / rate if rate > 0 else 0.0
-        text = (f"  {self.done}/{self.total} games  "
+        text = (f"  {self.done}/{self.total} {self.label}  "
                 f"{rate * 60:.0f} games/min  about {_duration(remaining)} left")
         if self._tty:
             self.stream.write("\r" + text.ljust(70))
@@ -299,6 +389,17 @@ def execute(
     have = {g["id"] for g in read_games(run_dir) if g["status"] in ("ok", "timeout")}
     todo = [job for job in jobs if job.id not in have]
 
+    previous = run_dir / "run.json"
+    if previous.is_file():
+        try:
+            before = json.loads(previous.read_text(encoding="utf-8")).get("options", {})
+        except ValueError:
+            before = {}
+        if (before.get("match_format", "bo1"), before.get("sideboard", True)) != (options.match_format, options.sideboard):
+            raise RunError(f"{run_dir} was played as {before.get('match_format', 'bo1')}"
+                           + ("" if before.get("match_format", "bo1") == "bo1" else
+                              " with" + ("" if before.get("sideboard", True) else "out") + " sideboarding")
+                           + "; resume it with the same --bo3 / --no-sideboard options")
     patches = patches_for_run(install, run_dir / "run.json", quiet=quiet)  # warns if not what mtgsim ships
     run_info = dict(meta or {})
     described = options.describe()
@@ -316,27 +417,46 @@ def execute(
     (run_dir / "run.json").write_text(json.dumps(run_info, indent=1), encoding="utf-8")
 
     expected_main = {e.key: e.deck.main_count for e in entrants}
-    progress = Progress(len(jobs), already=len(jobs) - len(todo), quiet=quiet)
     started = time.time()
+    engine: dict = {}
 
-    with open(run_dir / "games.jsonl", "a", encoding="utf-8") as out:
-        def on_result(job: Job, result: dict) -> None:
-            record = _record(job, result)
-            for seat, player in enumerate(record["players"]):
-                key = record["seats"][seat]
-                loaded = player.get("mainCount")
-                if loaded is not None and loaded != expected_main[key]:
-                    raise RunError(
-                        f"Forge loaded {loaded} main-deck cards for \"{key}\" but the list has "
-                        f"{expected_main[key]}: the engine did not recognise some card names. "
-                        "Results for this deck would be wrong, so the run was stopped."
-                    )
-            out.write(json.dumps(record, separators=(",", ":")) + "\n")
-            out.flush()
-            progress.tick()
+    def run_round(round_jobs: List[Job], todo_jobs: List[Job], label: str = "games") -> None:
+        progress = Progress(len(round_jobs), already=len(round_jobs) - len(todo_jobs), quiet=quiet, label=label)
+        if not todo_jobs:
+            return
+        with open(run_dir / "games.jsonl", "a", encoding="utf-8") as out:
+            def on_result(job: Job, result: dict) -> None:
+                record = _record(job, result)
+                for seat, player in enumerate(record["players"]):
+                    key = record["seats"][seat]
+                    loaded = player.get("mainCount")
+                    if loaded is not None and loaded != expected_main[key]:
+                        raise RunError(
+                            f"Forge loaded {loaded} main-deck cards for \"{key}\" but the list has "
+                            f"{expected_main[key]}: the engine did not recognise some card names. "
+                            "Results for this deck would be wrong, so the run was stopped."
+                        )
+                out.write(json.dumps(record, separators=(",", ":")) + "\n")
+                out.flush()
+                progress.tick()
 
-        engine = run_jobs(install, todo, on_result, workers=options.workers, heap=options.heap,
-                          log_dir=run_dir / "logs", profile_dir=run_dir / "ai")
+            info = run_jobs(install, todo_jobs, on_result, workers=options.workers, heap=options.heap,
+                            log_dir=run_dir / "logs", profile_dir=run_dir / "ai")
+            if info:
+                engine.update(info)
+
+    run_round(jobs, todo, "games" if options.match_format == "bo1" else "games 1 of each match")
+    if options.match_format == "bo3":
+        # Games 2 and 3 depend on the results before them (who starts, whether game 3 is needed), so they are
+        # played in two more rounds; a resumed run re-plans them from the games already recorded.
+        for number in (2, 3):
+            by_id = {g["id"]: g for g in read_games(run_dir)}
+            round_jobs: List[Job] = []
+            for a, b in pairings:
+                round_jobs.extend(next_match_games(a, b, by_id, options, run_dir, number))
+            wanted.update(job.id for job in round_jobs)
+            have = {g["id"] for g in read_games(run_dir) if g["status"] in ("ok", "timeout")}
+            run_round(round_jobs, [job for job in round_jobs if job.id not in have], f"games {number} of the matches")
 
     if engine:
         run_info["forge"].update(engine)

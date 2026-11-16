@@ -54,7 +54,9 @@ import com.google.common.eventbus.Subscribe;
 import forge.GuiDesktop;
 import forge.LobbyPlayer;
 import forge.ai.AiProfileUtil;
+import forge.ai.SideboardAdvisor;
 import forge.ai.simulation.FlatMonteCarloStats;
+import forge.deck.CardPool;
 import forge.deck.Deck;
 import forge.deck.DeckSection;
 import forge.deck.io.DeckSerializer;
@@ -81,6 +83,7 @@ import forge.game.spellability.StackItemView;
 import forge.game.zone.ZoneType;
 import forge.gui.GuiBase;
 import forge.item.IPaperCard;
+import forge.item.PaperCard;
 import forge.localinstance.properties.ForgePreferences.FPref;
 import forge.model.FModel;
 import forge.player.GamePlayerUtil;
@@ -223,6 +226,12 @@ public final class ForgeBridge {
         final List<String> decks = new ArrayList<>();
         final List<String> profiles = new ArrayList<>();
         final List<String> seatMonteCarlo = new ArrayList<>();
+        /** -1: the engine's coin flip decides who starts; 0: seat 0 starts (the loser of a match's previous game). */
+        int firstSeat = -1;
+        /** Games after the first of a match: each seat sideboards against the other seat's main deck first. */
+        boolean sideboard = false;
+        /** Only report the sideboarding of {@link #sideboard}; no game is played (mtgsim sideboard). */
+        boolean planOnly = false;
 
         static Job parse(final String line) {
             final Job job = new Job();
@@ -243,6 +252,9 @@ public final class ForgeBridge {
                     case "deck": job.decks.add(value); break;
                     case "profile": job.profiles.add(value); break;
                     case "seatmc": job.seatMonteCarlo.add(value); break;
+                    case "first": job.firstSeat = Integer.parseInt(value); break;
+                    case "sideboard": job.sideboard = "1".equals(value); break;
+                    case "planonly": job.planOnly = "1".equals(value); break;
                     default: break;
                 }
             }
@@ -289,11 +301,35 @@ public final class ForgeBridge {
         rules.setGamesPerMatch(1);
         rules.setSimTimeout(job.timeoutSeconds);
 
-        final List<RegisteredPlayer> seats = new ArrayList<>();
+        if (job.firstSeat != -1 && job.firstSeat != 0) {
+            throw new IllegalArgumentException("first=" + job.firstSeat + ": only seat 0 can be told to start");
+        }
         final List<Deck> decks = new ArrayList<>();
         for (int i = 0; i < job.decks.size(); i++) {
-            final Deck deck = loadDeck(job.decks.get(i));
-            decks.add(deck);
+            decks.add(loadDeck(job.decks.get(i)));
+        }
+        List<List<String>> swaps = null;
+        if (job.sideboard) {
+            if (decks.size() != 2) {
+                throw new IllegalArgumentException("sideboarding needs exactly two decks");
+            }
+            swaps = new ArrayList<>();
+            final List<Deck> boarded = sideboardDecks(rules, decks, job, swaps);
+            if (job.planOnly) {
+                final StringBuilder plan = new StringBuilder("{\"type\":\"result\",\"id\":").append(quote(job.id));
+                plan.append(",\"status\":\"plan\",\"winner\":-1,\"sideboard\":").append(swapsJson(swaps));
+                plan.append(",\"ms\":").append(System.currentTimeMillis() - started).append('}');
+                return new Result(plan.toString(), false);
+            }
+            decks.clear();
+            decks.addAll(boarded);
+            // the advisor built throwaway card objects; start the game's random stream exactly where an unboarded game would
+            MyRandom.setRandom(new Random(job.seed));
+        }
+
+        final List<RegisteredPlayer> seats = new ArrayList<>();
+        for (int i = 0; i < decks.size(); i++) {
+            final Deck deck = decks.get(i);
             final RegisteredPlayer rp = type == GameType.Commander
                     ? RegisteredPlayer.forCommander(deck) : new RegisteredPlayer(deck);
             final String profile = i < job.profiles.size() ? job.profiles.get(i) : "";
@@ -302,6 +338,9 @@ public final class ForgeBridge {
         }
 
         final Match match = new Match(rules, seats, "mtgsim");
+        if (job.firstSeat == 0) {
+            forceSeatZeroFirst(match);
+        }
         final Game game = match.createGame();
         invokeIfPresent(game, "setNoGUIUser");
         if (!MC_MODES.contains(job.monteCarlo)) {
@@ -390,6 +429,9 @@ public final class ForgeBridge {
             System.err.println("[mtgsim] Monte Carlo in game " + job.id + " (" + (System.currentTimeMillis() - started)
                     + " ms, status " + status + "):\n" + FlatMonteCarloStats.summary());
         }
+        if (swaps != null) {
+            sb.append(",\"sideboard\":").append(swapsJson(swaps));
+        }
         if (failure[0] != null) {
             sb.append(",\"error\":").append(quote(stackTrace(failure[0])));
         }
@@ -433,6 +475,93 @@ public final class ForgeBridge {
             writeGameLog(game, job.logPath);
         }
         return new Result(sb.toString(), tainted);
+    }
+
+    /**
+     * Makes seat 0 start the game, as the loser of the previous game of a match does (and Forge's AI always chooses
+     * to play first). Forge lets the player who did not win the match's last game start; an outcome with no players
+     * in it has no winner, so the first player in seat order, seat 0, is asked and starts. Nothing else reads it before
+     * the game ends: sideboarding between games keys on the match's list of finished games, which stays empty.
+     */
+    private static void forceSeatZeroFirst(final Match match) throws Exception {
+        final Field f = Match.class.getDeclaredField("lastOutcome");
+        f.setAccessible(true);
+        f.set(match, new GameOutcome(GameEndReason.Draw, Collections.<Player>emptyList()));
+    }
+
+    /**
+     * Each seat's deck after sideboarding against the other seat's main deck, with Forge's own SideboardAdvisor (what
+     * its AI does between games when it plays with Monte Carlo; it reads cards by their text, never by name). The
+     * decks loaded from disk are cached and left untouched. {@code swaps} gets each seat's changes as "out>in".
+     */
+    private static List<Deck> sideboardDecks(final GameRules rules, final List<Deck> decks, final Job job,
+                                             final List<List<String>> swaps) throws Exception {
+        final List<RegisteredPlayer> tmpSeats = new ArrayList<>();
+        for (int i = 0; i < decks.size(); i++) {
+            final RegisteredPlayer rp = new RegisteredPlayer(decks.get(i));
+            rp.setPlayer(createAi("Seat" + (i + 1), i < job.profiles.size() ? job.profiles.get(i) : ""));
+            tmpSeats.add(rp);
+        }
+        // the advisor only needs a player to create card objects with
+        final Game tmp = new Match(rules, tmpSeats, "mtgsim-sideboard").createGame();
+        final List<Deck> out = new ArrayList<>();
+        for (int i = 0; i < decks.size(); i++) {
+            final Deck own = decks.get(i);
+            final Deck other = decks.get(1 - i);
+            final Deck copy = copyDeck(own);
+            final List<String> mine = new ArrayList<>();
+            final CardPool side = own.get(DeckSection.Sideboard);
+            if (side != null && !side.isEmpty()) {
+                Player owner = null;
+                for (final Player p : tmp.getPlayers()) {
+                    if (p.getRegisteredPlayer() == tmpSeats.get(i)) {
+                        owner = p;
+                    }
+                }
+                final SideboardAdvisor.Result plan = SideboardAdvisor.advise(owner, own.getMain().toFlatList(),
+                        side.toFlatList(), Collections.singletonList(other.getMain().toFlatList()),
+                        Collections.singletonList("Seat" + (2 - i)), SideboardAdvisor.maxSwapsFor(own.getMain().countAll()));
+                for (final SideboardAdvisor.Swap swap : plan.swaps) {
+                    if (copy.getMain().count(swap.out) > 0 && copy.get(DeckSection.Sideboard).count(swap.in) > 0) {
+                        copy.getMain().remove(swap.out, 1);
+                        copy.getMain().add(swap.in, 1);
+                        copy.get(DeckSection.Sideboard).remove(swap.in, 1);
+                        copy.get(DeckSection.Sideboard).add(swap.out, 1);
+                        mine.add(swap.out.getName() + ">" + swap.in.getName());
+                    }
+                }
+            }
+            swaps.add(mine);
+            out.add(copy);
+        }
+        return out;
+    }
+
+    private static String swapsJson(final List<List<String>> swaps) {
+        final StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < swaps.size(); i++) {
+            sb.append(i > 0 ? "," : "").append('[');
+            for (int j = 0; j < swaps.get(i).size(); j++) {
+                sb.append(j > 0 ? "," : "").append(quote(swaps.get(i).get(j)));
+            }
+            sb.append(']');
+        }
+        return sb.append(']').toString();
+    }
+
+    private static Deck copyDeck(final Deck deck) {
+        final Deck copy = new Deck(deck.getName());
+        for (final Map.Entry<PaperCard, Integer> e : deck.getMain()) {
+            copy.getMain().add(e.getKey(), e.getValue());
+        }
+        final CardPool side = deck.get(DeckSection.Sideboard);
+        final CardPool newSide = copy.getOrCreate(DeckSection.Sideboard);
+        if (side != null) {
+            for (final Map.Entry<PaperCard, Integer> e : side) {
+                newSide.add(e.getKey(), e.getValue());
+            }
+        }
+        return copy;
     }
 
     private static Deck loadDeck(final String path) {

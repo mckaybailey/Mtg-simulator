@@ -33,3 +33,7 @@ creature decks win"). Run from the repository root, with the run in `MTGSIM_RUN`
 and win rate by amount), `equip` (equipment, and when removal was cast), `ward` (spells lost to
 Lavaspur Boots' ward). Deck names and several card lists are written for Boros Dwarves and Boros
 Dragons; treat the output as a pointer to logs worth reading, not as exact counts.
+
+`sideboard_plans.py [FOLDER] [--json OUT]` prints, for every pairing of a deck folder, the swaps Forge's
+SideboardAdvisor makes (what games 2 and 3 of a `--bo3` run are played with); it uses the driver's
+plan-only job and plays no games.

@@ -5,6 +5,101 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
+## CHECKPOINT 16 Nov 2026: best-of-three with sideboards, in progress
+
+**Read this section first; it is where the last session stopped.** The user asked for a best-of-three
+simulation with sideboards on more decks, to test the leading hypothesis (game one without sideboards
+favours creature decks). The user then asked for **about 100 more decks before running anything**
+(see "Next" below). Nothing below has been run at scale yet.
+
+### Done in this session (committed as work in progress, untested on full runs)
+
+- **Six decks added** to `decks/standard/meta/` (now 18, 81.3% of the field): Dimir Excruciator,
+  Rakdos Lizards, Izzet Prowess, Mono-Black Aggro, Golgari Midrange, Grixis Reanimator, with
+  `meta_share` and `real_win_rate` from the Magic.gg Metagame Mentor table (5 Nov 2026) in
+  `gauntlet.json`. Their lists are the melee.gg decklists that article links per archetype; all pass
+  `mtgsim check`. Their real win rates rest on roughly 20–25 players each (1.0–1.4% of 1,810), so
+  they are noisy (about ±7 points). They have no `sim_win_rate` / `ai_pilot` yet.
+- **melee.gg is reachable** (allowed in the environment's network policy this session). Plain `curl`
+  works; a browser `User-Agent` got 403 once. A decklist page holds the Arena text in
+  `<pre ... id="decklist-mtga-text">`, the pilot in `<meta name="description">` ("Deck - Player -
+  ...") and the event in the first `href="/Tournament/View/<id>"`. With it the three tournament
+  lists (Mono-Green Landfall, Orzhov Lifegain, Jund Sacrifice) were checked: identical, main and
+  sideboard. The meta README and `decks/AGENTS.md` still say twelve decks and "melee lists not
+  checked": update them.
+- **Driver** (`mtgsim/bridge/ForgeBridge.java`), three new job fields, all off by default so old job
+  lines and games are unchanged:
+  - `first=0`: seat 0 starts. Done by setting `Match.lastOutcome` (reflection) to an empty
+    `GameOutcome(Draw, [])`: Forge then lets the first non-winner in seat order, seat 0, choose,
+    and its AI always chooses to play. Tested: 6 of 6 games had seat 0 first.
+  - `sideboard=1`: before the game each seat sideboards against the other seat's main deck with
+    Forge's own `forge.ai.SideboardAdvisor` (card roles read from Oracle text, at most 7 swaps,
+    creature for creature, cost within 1). Built on copies of the cached decks in a throwaway
+    `Match`, then `MyRandom` is re-seeded. The result line gets `"sideboard":[[seat 0 "out>in"...],[...]]`.
+  - `planonly=1` (with `sideboard=1`): return only the swaps, status `"plan"`, no game.
+- **Python**: `runner.Job.first_seat / sideboard / plan_only`; `experiment.RunOptions.match_format`
+  (`bo1`/`bo3`) and `.sideboard`; `plan_match_game`, `next_match_games`, `match_game_seed`;
+  `execute()` plays bo3 in three rounds (all game 1s, then the game 2s, then the game 3s still
+  needed) and re-plans rounds 2–3 from `games.jsonl` on `--resume`, and refuses to resume a run
+  under a different format. Game 1 of match *i* has id `a|b|i` and the best-of-one seed, so it **is**
+  best-of-one game *i* (copy an old run's `games.jsonl` into a new bo3 run directory to reuse them);
+  games 2/3 have ids `a|b|i|g2`, `a|b|i|g3`, their own seeds, `match_game` 2/3 and explicit
+  `seats` (loser of the previous game in seat 0). `analysis.seat_of_a` now reads `seats`;
+  `analysis.summarize_matches` gives match-level wins (two game wins; three games without that is a
+  draw) plus `game1`, `later_games`, `game_wins`, `match_lengths`; `analysis.first_games` feeds
+  card statistics and misplays (later games are sideboarded). CLI: `--bo3` and `--no-sideboard`
+  on `match`, `gauntlet`, `matrix`; `matrix --bo3` also stores `matrix_game1` / `pairings_game1`
+  (the best-of-one numbers from the same run). The report states the format.
+- `tools/sideboard_plans.py [FOLDER]` prints the advisor's plan for every pairing.
+- 277 unit tests pass. The integration tests were not re-run.
+
+### What the sideboard plans look like (18 decks, `tools/sideboard_plans.py`)
+
+1–6 swaps per matchup. Against Boros Dwarves most decks bring in removal or sweepers (Azorius
+Artifacts 2 Day of Judgment and 2 Seam Rip, Orzhov Lifegain 2 Seam Rip and 2 Pyrrhic Strike, Izzet
+decks Fire Magic and Broadside Barrage), which is what the hypothesis needs. Weak spots, all from
+the advisor's text patterns: Azorius Control makes no change against Dwarves (Pinnacle Starcage's
+"exile all artifacts and creatures with mana value 2 or less" matches none of its patterns, but it
+does come in against Dragons); Rest in Peace comes in whenever the opponent has four cards that
+mention a graveyard, which is often (Azorius Control and Azorius Momo bring it against half the
+field). A result from these runs is "with Forge's sideboarding", not with a person's. Improving the
+advisor would be a Forge patch, measured like any other.
+
+### Next, in order
+
+1. **Verify the bo3 mechanics on real games** (the last command was interrupted before it ran):
+   `python3 -m mtgsim match decks/standard/meta/azorius-control.txt decks/standard/meta/boros-dwarves.txt
+   -n 8 --seed 1 --bo3 --out $PWD/runs/chk-bo3`, then check that its game 1s equal the same ids in a
+   best-of-one run with the same seed (`runs/rr-final-12` has them if it survived), that every game 2/3
+   has `first_seat` 0 and `seats[0]` = previous loser, and that the match counts add up. Then add unit
+   tests (`tests/test_experiment.py`: planning of games 2/3 from fake records, seats, resume
+   re-planning; `tests/test_analysis*`: `summarize_matches`; job line with `first=0`/`sideboard=1`) and
+   an integration test (one bo3 match replays). Update `mtgsim/bridge/AGENTS.md` (protocol),
+   `mtgsim/AGENTS.md` (invariants: seats in games 2/3 are not by parity; game 1 = bo1 game), README
+   (`--bo3`), `tests/AGENTS.md`.
+2. **About 100 more decks (the user's request).** The Magic.gg table has real win rates for only 18
+   archetypes, and all 18 are now in. For more decks with a real win rate, use individual lists and
+   their own tournament records: the three events' melee.gg standings (tournaments 472270 Arena
+   Championship 13, 440878 Spotlight Hartford, 457663 Spotlight Beijing; links in the Magic.gg
+   article) give each player's decklist and match record. A per-list win rate from one event is very
+   noisy (±12 points from ~15 matches), so pool lists by archetype where possible, keep each deck's
+   `real_win_rate` with its match count, and weight by it in the calibration. Check how the standings
+   page loads (it may be filled by a JSON endpoint; look at the page's scripts), stay polite (one
+   request a second), run `mtgsim check` on every list and resolve unknown card names rather than
+   guessing. Put them in a separate folder (e.g. `decks/standard/fracture-2026/`) with its own
+   `gauntlet.json`, so the 18-deck meta gauntlet stays the default. Mind the cost: a round robin grows
+   with the square of the deck count (118 decks = 6,903 pairings; at 10 bo3 matches each, about
+   17,000 games, roughly 4–5 hours on 4 cores). A gauntlet of each new deck against the 18 meta decks
+   is linear and may be the better design.
+3. **The experiment.** `matrix decks/standard/meta -n 30 --seed 1 --bo3` (18 decks, 153 pairings; about
+   4,600 game 1s, which are the best-of-one round robin, plus about 6,700 later games; roughly 3 hours),
+   detached with `setsid nohup`, `--out` set, resumable. Then compare calibration of `matrix_game1`
+   (best-of-one) with the match results (`tools/calibration.py` reads `summary["pairings"]`; add a
+   switch for `pairings_game1`, and give `calibration_diff.py` both from one run). Also a
+   `--no-sideboard` bo3 run if time allows: best-of-three alone stretches win rates away from 50%,
+   so it separates the format from the sideboards. Report equal-weight and meta-share-weighted deck
+   averages (the real figures are against the field).
+
 ## Branch state
 
 - All work is on `claude/ai-decision-engine`, pushed. It contains `main` as of 56151e6. **It has

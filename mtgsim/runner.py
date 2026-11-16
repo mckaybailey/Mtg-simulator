@@ -46,6 +46,11 @@ class Job:
     log_path: str = ""
     profiles: List[str] = field(default_factory=list)
     seat_monte_carlo: List[str] = field(default_factory=list)  # per seat; "" follows ``monte_carlo``
+    # Games after the first of a best-of-three match (experiment.plan_match_game): seat 0 starts, and both seats
+    # sideboard against the other's main deck. Left at their defaults, the job line is what it always was.
+    first_seat: int = -1  # -1: the engine's coin flip; 0: seat 0 starts
+    sideboard: bool = False
+    plan_only: bool = False  # with ``sideboard``: only report the swaps, play nothing (status "plan")
     meta: dict = field(default_factory=dict)
 
     def uses_fixed_search(self) -> bool:
@@ -65,6 +70,16 @@ class Job:
         parts += [f"profile={p}" for p in self.profiles]
         if any(self.seat_monte_carlo):
             parts += [f"seatmc={m}" for m in self.seat_monte_carlo]
+        if self.first_seat not in (-1, 0):
+            raise ValueError(f"first_seat must be -1 or 0, not {self.first_seat!r}")
+        if self.first_seat == 0:
+            parts.append("first=0")
+        if self.sideboard:
+            parts.append("sideboard=1")
+        if self.plan_only:
+            if not self.sideboard:
+                raise ValueError("plan_only needs sideboard")
+            parts.append("planonly=1")
         for part in parts:
             if "\t" in part or "\n" in part:
                 raise ValueError(f"job field may not contain tabs or newlines: {part!r}")

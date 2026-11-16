@@ -641,6 +641,10 @@ def _section_clock(summary: dict, names: Dict[str, str]) -> str:
 
 def _section_decks(summary: dict, names: Dict[str, str]) -> str:
     out = ['<section class="card"><h2>Decks and run details</h2>']
+    run_opts = summary.get("options", {})
+    side_note = ("(not used in these best-of-one games)" if run_opts.get("match_format", "bo1") == "bo1"
+                 else "(sideboarded before games 2 and 3)" if run_opts.get("sideboard", True)
+                 else "(not used: best-of-three without sideboarding)")
     notes = summary.get("deck_notes") or {}
     if notes:
         out.append("<h3>Deck check notes</h3>")
@@ -657,7 +661,7 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
         out.append(f'<details{" open" if info.get("role") in ("hero", "variant") else ""}>'
                    f'<summary>{esc(info["name"])} — {esc(role)}, {info["main_count"]} cards</summary>'
                    f'<div class="decklist">{main}</div>'
-                   + (f'<p class="note">Sideboard (not used in these best-of-one games)</p><div class="decklist">{side}</div>' if side else "")
+                   + (f'<p class="note">Sideboard {side_note}</p><div class="decklist">{side}</div>' if side else "")
                    + "</details>")
     opts, forge = summary.get("options", {}), summary.get("forge", {})
     problems = summary.get("problems", {})
@@ -666,8 +670,13 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
         "<h3>How this was run</h3><p class=\"note\">"
         f"Forge {esc(forge.get('forgeVersion') or forge.get('version') or '?')}, AI profile {esc(opts.get('ai_profile', 'Default'))}"
         f"{'' if opts.get('monte_carlo', 'off') == 'off' else ', Monte Carlo ' + esc(opts.get('monte_carlo'))}; "
-        f"{opts.get('games_per_pairing', '?')} games per pairing, best-of-one, no sideboarding; "
-        f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game"
+        + (f"{opts.get('games_per_pairing', '?')} games per pairing, best-of-one, no sideboarding; "
+           if opts.get("match_format", "bo1") == "bo1" else
+           f"{opts.get('games_per_pairing', '?')} best-of-three matches per pairing (win rates count matches; "
+           "play/draw, turns and mulligans count games; card statistics and misplays are from the first games), "
+           + ("both decks sideboarding before games 2 and 3 with Forge's SideboardAdvisor; " if opts.get("sideboard", True)
+              else "no sideboarding; "))
+        + f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game"
         + (f" ({int(opts['timeout_fixed'])}s for games with Monte Carlo fixed). " if isinstance(opts.get("timeout_fixed"), int) else ". ")
         +
         f"{problems.get('timeouts', 0)} games hit the time limit and {problems.get('errors', 0)} failed in the engine; "
@@ -701,7 +710,9 @@ def render(summary: dict) -> str:
     body += _section_goldfish(summary, names)
     body += _section_decks(summary, names)
     opts = summary.get("options", {})
-    sub = (f"{esc(summary.get('format', ''))} · {opts.get('games_per_pairing', '?')} games per pairing · "
+    per = ("games per pairing" if opts.get("match_format", "bo1") == "bo1"
+           else "best-of-three matches per pairing" + (", sideboarding" if opts.get("sideboard", True) else ""))
+    sub = (f"{esc(summary.get('format', ''))} · {opts.get('games_per_pairing', '?')} {per} · "
            f"Forge AI on both sides · {esc(summary.get('created', ''))}")
     return (
         "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"

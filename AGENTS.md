@@ -21,6 +21,10 @@ calibration and arm comparisons, `mc_cost.py` for Monte Carlo runs, and `log_ana
 parses the game logs of a `--save-logs` run. `mtgsim/forge_patches/README.md` lists every Forge
 patch with its cause and measurement.
 
+**Work in progress:** best-of-three matches with sideboards (`--bo3`) and six more meta decks are
+committed but not yet run at scale. Start from the "CHECKPOINT" section at the top of
+`docs/ai-pilot-status.md`.
+
 ## The AI pilot: what is settled, so it is not repeated
 
 `docs/ai-pilot-status.md` has the detail and the ordered next steps; `VALIDATION.md` has every
