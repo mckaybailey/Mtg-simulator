@@ -1,0 +1,27 @@
+Deck
+3 Conspiracy Unraveler
+4 Dark Matter Manipulator
+4 Does Machines
+4 Gloomlake Verge
+4 Hidden Grotto
+3 Island
+1 Multiversal Passage
+3 North Wind Avatar
+4 Omniscience
+2 Shipwreck Marsh
+18 Sphinx's Approach
+4 Theorix Charm
+1 Uldaros Theorix
+2 Undercity Sewers
+4 Watery Grave
+
+Sideboard
+1 Into the Flood Maw
+1 Jeskai Revelation
+2 Marang River Regent
+1 North Wind Avatar
+1 Refute
+1 River's Rebuke
+1 Season of Weaving
+1 Step Between Worlds
+1 Terror of the Peaks

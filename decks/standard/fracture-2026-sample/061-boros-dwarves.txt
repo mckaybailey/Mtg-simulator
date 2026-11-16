@@ -1,0 +1,28 @@
+Deck
+2 Basilisk Collar
+2 Chainsaw
+4 Dáin's Company
+4 Dragonfire Blade
+2 Dwalin, Weaponmaster
+4 Dwarven Mauler
+4 Thorin, Mountain-king
+2 Erode
+4 Kíli the Resourceful
+4 Lavaspur Boots
+4 Leyline Axe
+1 Skateboard
+4 Sacred Foundry
+3 Plains
+4 Inspiring Vantage
+4 Cavern of Souls
+4 The Lonely Mountain
+4 Sunbillow Verge
+
+Sideboard
+2 Seam Rip
+2 Rest in Peace
+4 Shattered Acolyte
+2 Sheltered by Ghosts
+1 Anzrag's Rampage
+2 Fire Magic
+2 Sunspine Lynx

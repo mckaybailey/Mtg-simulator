@@ -1,0 +1,40 @@
+Deck
+1 Theorist's Sanctum
+1 Thundering Falls
+2 Erode
+3 Starting Town
+2 Torch the Tower
+4 Floodfarm Verge
+1 Seam Rip
+3 Hallowed Fountain
+4 Get Lost
+2 Consult the Star Charts
+2 Island
+1 No More Lies
+4 Ajani Unrelenting
+4 Countersculpt
+2 Day of Judgment
+3 Sacred Foundry
+4 The Theorist, Jace Beleren
+4 Chandra, Chill of Compliance
+1 Meticulous Archive
+1 Elspeth, Storm Slayer
+1 Plains
+3 Riverpyre Verge
+3 Way of the Pyromancer
+3 Steam Vents
+1 Petrified Hamlet
+
+Sideboard
+1 Disdainful Stroke
+1 Flashfreeze
+1 Wan Shi Tong, Librarian
+1 Annul
+1 Exorcise
+2 Rest in Peace
+1 Captain Marvel, Earth's Protector
+2 Doorkeeper Thrull
+1 Day of Judgment
+1 Negate
+2 Voice of Victory
+1 Pinnacle Starcage

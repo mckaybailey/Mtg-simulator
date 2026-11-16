@@ -1,0 +1,36 @@
+Deck
+2 Cavern of Souls
+4 Gloomlake Verge
+1 Island
+4 Restless Reef
+4 Shipwreck Marsh
+3 Swamp
+2 Undercity Sewers
+4 Watery Grave
+3 Duress
+3 Requiting Hex
+3 Bitter Triumph
+1 Strategic Betrayal
+3 Theorix Charm
+2 Winternight Stories
+4 Seasoned Cryomancer
+1 Null Summoner
+4 Superior Spider-Man
+2 Emeritus of Ideation
+3 Overlord of the Balemurk
+1 Deadly Cover-Up
+4 Deceit
+2 Uldaros Theorix
+
+Sideboard
+1 Disdainful Stroke
+2 Flashfreeze
+1 Negate
+1 Duress
+1 Strategic Betrayal
+2 Qarsi Revenant
+1 Garruk, Veiled Butcher
+1 M.O.D.O.K.
+2 Doomsday Excruciator
+2 Day of Black Sun
+1 Null Summoner

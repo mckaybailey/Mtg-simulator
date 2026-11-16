@@ -1,0 +1,33 @@
+Deck
+4 Biotech Specialist
+1 Blazemire Verge
+3 Blood Crypt
+4 Blooming Marsh
+1 Forest
+4 Gene Pollinator
+4 Greedy Freebooter
+4 Lively Dirge
+2 Magda, the Hoardmaster
+1 Mountain
+4 Obsessive Pursuit
+4 Overgrown Tomb
+2 Requiting Hex
+1 Smaug the Magnificent
+4 Starting Town
+3 Stomping Ground
+1 Swamp
+2 The Misty Mountains Cold
+4 The Sackville-Bagginses
+2 Torch the Tower
+4 Umbral Collar Zealot
+1 Wolverine, Fierce Fighter
+
+Sideboard
+3 Duress
+1 Glorious Decay
+1 Professor Dellian Fel
+1 Seedship Impact
+2 Shoot the Sheriff
+4 Strategic Betrayal
+1 The Misty Mountains Cold
+2 Vicious Rivalry

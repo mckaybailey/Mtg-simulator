@@ -1,0 +1,40 @@
+Deck
+3 Bleachbone Verge
+4 Blood Crypt
+4 Great Hall of the Biblioplex
+1 Hallowed Fountain
+1 Mistrise Village
+1 Plains
+3 Riverpyre Verge
+2 Sacred Foundry
+2 Shattered Sanctum
+2 Starting Town
+1 Steam Vents
+1 Swamp
+1 Watery Grave
+2 Duress
+2 Strategic Betrayal
+4 Stock Up
+2 Deadly Cover-Up
+1 Together as One
+2 Fire Magic
+2 Firebending Lesson
+2 Flashback
+3 Consult the Star Charts
+1 Shoot the Sheriff
+4 Inevitable Defeat
+4 Jeskai Revelation
+4 Tablet of Discovery
+1 Get Lost
+
+Sideboard
+2 Duress
+2 Fire Magic
+1 Spell Snare
+1 Disdainful Stroke
+1 Flashfreeze
+1 Negate
+1 Outrageous Robbery
+2 Strategic Betrayal
+2 Torpor Orb
+2 Abrade

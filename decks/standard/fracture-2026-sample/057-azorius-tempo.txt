@@ -1,0 +1,30 @@
+Deck
+4 Voice of Victory
+4 Aang, Swift Savior
+4 Aven Interrupter
+3 Skycoach Conductor
+1 Captain Marvel, Earth's Protector
+3 Quantum Riddler
+4 Spell Snare
+3 Get Lost
+3 Avatar's Wrath
+2 Airbender Ascension
+4 High Noon
+2 Abandoned Air Temple
+4 Floodfarm Verge
+4 Hallowed Fountain
+4 Island
+2 Multiversal Passage
+4 Plains
+1 Restless Anchorage
+4 Starting Town
+
+Sideboard
+2 King T'Challa
+2 Annul
+2 Disdainful Stroke
+3 No More Lies
+1 Settle the Wreckage
+1 Seam Rip
+2 Rest in Peace
+2 Sheltered by Ghosts

@@ -1,0 +1,29 @@
+Deck
+13 Forest
+4 Fabled Passage
+4 Earthbender Ascension
+1 Escape Tunnel
+2 Elven Passage
+2 Esper Origins
+1 Demolition Field
+1 Cryptic Caves
+2 Shared Roots
+4 Icetill Explorer
+4 Llanowar Elves
+1 Meltstrider's Resolve
+3 Mightform Harmonizer
+4 Carnivorous Cultivator
+1 Pit of Offerings
+3 Ba Sing Se
+4 Sazh's Chocobo
+3 Mossborn Hydra
+3 Sapling Nursery
+
+Sideboard
+3 Meltstrider's Resolve
+2 Torpor Orb
+2 Origin of Metalbending
+3 Soul-Guide Lantern
+2 Sandman, Shifting Scoundrel
+2 Surrak, Elusive Hunter
+1 Warg Tactics

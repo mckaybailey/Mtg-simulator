@@ -1,0 +1,28 @@
+Deck
+1 Abandoned Air Temple
+1 Ba Sing Se
+4 Bejeweled Warg
+4 Brightglass Gearhulk
+7 Forest
+1 Guiding Hydra
+4 Hushwood Verge
+2 Leatherhead, Swamp Stalker
+4 Llanowar Elves
+2 Meltstrider's Resolve
+2 Multiversal Passage
+4 Ouroboroid
+4 Pawpatch Recruit
+4 Plains
+4 Practiced Offense
+2 Seam Rip
+3 Spider Manifestation
+3 Surrak, Elusive Hunter
+4 Temple Garden
+
+Sideboard
+2 Defend the Rider
+3 Elspeth, Storm Slayer
+2 Erode
+3 Karn, Argent Defender
+3 Rest in Peace
+2 Sheltered by Ghosts

@@ -1,0 +1,32 @@
+Deck
+4 Seasoned Cryomancer
+2 Forest
+4 Starting Town
+1 Wistfulness
+4 Llanowar Elves
+4 Bringer of the Last Gift
+4 Breeding Pool
+1 Ardyn, the Usurper
+4 Superior Spider-Man
+3 Wastewood Verge
+2 Cavern of Souls
+4 Rapid Rescue
+3 Overgrown Tomb
+4 Oblivious Bookworm
+2 Watery Grave
+1 Spider Manifestation
+2 Botanical Sanctum
+3 Ouroboroid
+4 Formidable Speaker
+4 Overlord of the Balemurk
+
+Sideboard
+2 Deep-Cavern Bat
+2 Strategic Betrayal
+2 Keen-Eyed Curator
+1 Day of Black Sun
+2 Professor Dellian Fel
+2 Wistfulness
+2 Requiting Hex
+1 Sunset Saboteur
+1 Frenzied Baloth

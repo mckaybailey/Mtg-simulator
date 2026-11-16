@@ -1,0 +1,35 @@
+Deck
+2 Bitter Triumph
+4 Dream Beavers
+4 Enduring Curiosity
+1 Faebloom Trick
+4 Floodpits Drowner
+1 Fountainport
+4 Gloomlake Verge
+4 Island
+4 Kaito, Bane of Nightmares
+2 Multiversal Passage
+3 Requiting Hex
+2 Restless Reef
+2 Shipwreck Marsh
+2 Shoot the Sheriff
+2 Soulstone Sanctuary
+4 Spyglass Siren
+2 Strategic Betrayal
+3 Swamp
+1 The Wondrous Wasp
+2 Tishana's Tidebinder
+1 Wan Shi Tong, Librarian
+4 Watery Grave
+2 We Say Thee Nay!
+
+Sideboard
+2 Day of Black Sun
+3 Duress
+1 Flashfreeze
+1 Ghost Vacuum
+1 M.O.D.O.K.
+2 Negate
+2 Strategic Betrayal
+1 The Theorist, Jace Beleren
+2 Torpor Orb

@@ -1,0 +1,32 @@
+Deck
+1 Abandoned Air Temple
+1 Assemble the Players
+4 Aurelia's Vindicator
+2 Ba Sing Se
+2 Enduring Innocence
+3 Erode
+8 Forest
+3 Gathering Place
+4 Hide in Plain Sight
+4 Hushwood Verge
+1 Jennifer Walters
+4 Llanowar Elves
+4 Overgrown Zealot
+2 Plains
+4 Practiced Offense
+4 Temple Garden
+4 Threats Around Every Corner
+1 Ugin, Eye of the Storms
+4 Unyielding Gatekeeper
+
+Sideboard
+1 Bilbo's Gambit
+4 Doorkeeper Thrull
+1 Erode
+1 Get Lost
+1 Jennifer Walters
+2 Keen-Eyed Curator
+2 Rest in Peace
+1 Seam Rip
+1 Season of Gathering
+1 Settle the Wreckage

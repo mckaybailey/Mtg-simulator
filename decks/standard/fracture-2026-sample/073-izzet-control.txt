@@ -1,0 +1,35 @@
+Deck
+4 Stormcarved Coast
+3 Ajani Unrelenting
+4 Riverpyre Verge
+4 Spirebluff Canal
+4 Steam Vents
+3 Island
+3 Avengers Disassembled
+2 Burst Lightning
+3 Multiversal Passage
+2 Theorist's Sanctum
+4 The Theorist, Jace Beleren
+4 Way of the Pyromancer
+3 Countersculpt
+2 Soul-Guide Lantern
+3 Chandra, Chill of Compliance
+2 Consult the Star Charts
+1 Chandra, Torch of Defiance
+2 Ral, Crackling Wit
+1 Fire Magic
+3 Prismari Charm
+2 Spell Snare
+1 Broadside Barrage
+
+Sideboard
+3 Flashfreeze
+2 Annul
+2 Broadside Barrage
+2 Soul-Guide Lantern
+1 Countersculpt
+1 Spell Snare
+1 Jace, Reality Sculptor
+1 Fire Magic
+1 Ill-Timed Explosion
+1 Disdainful Stroke

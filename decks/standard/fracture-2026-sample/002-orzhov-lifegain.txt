@@ -1,0 +1,27 @@
+Deck
+4 Enlightened Confidant
+3 Erode
+4 Multiversal Passage
+4 Concealed Courtyard
+3 Moseo, Vein's New Dean
+2 Aunt May
+4 Lunar Convocation
+4 Starting Town
+4 Hinterland Sanctifier
+4 Plains
+2 Liliana the Faultless
+4 Amalia Benavides Aguirre
+4 Starscape Cleric
+4 Haliya, Guided by Light
+4 Case of the Uneaten Feast
+4 Godless Shrine
+2 Great Arashin City
+
+Sideboard
+4 Sheltered by Ghosts
+1 Strategic Betrayal
+1 M.O.D.O.K.
+2 Curious Farm Animals
+1 Pyrrhic Strike
+4 Duress
+2 Ghost Vacuum

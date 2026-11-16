@@ -1,0 +1,52 @@
+Deck
+1 Cori Mountain Monastery
+1 Swamp
+2 Starting Town
+1 Stormcarved Coast
+1 Extrapolate the Impossible
+4 Inevitable Defeat
+2 Flashback
+1 Hallowed Fountain
+1 Avengers Disassembled
+4 Jeskai Revelation
+2 Duress
+2 Sear
+1 Multiversal Passage
+2 Firebending Lesson
+2 Sacred Foundry
+1 Watery Grave
+1 Together as One
+4 Tablet of Discovery
+1 Steam Vents
+1 Mistrise Village
+2 Shattered Sanctum
+4 Great Hall of the Biblioplex
+2 Consult the Star Charts
+1 Island
+1 Spell Snare
+2 Deadly Cover-Up
+4 Stock Up
+1 Blazemire Verge
+1 Bleachbone Verge
+1 Riverpyre Verge
+1 Strategic Betrayal
+3 Blood Crypt
+1 Godless Shrine
+1 Fire Magic
+
+Sideboard
+1 Uldaros Theorix
+1 Avengers Disassembled
+1 Thor, God of Thunder
+1 Negate
+1 Strategic Betrayal
+1 Flashfreeze
+1 Rest in Peace
+1 Torpor Orb
+1 Ancient Vendetta
+1 Deadly Cover-Up
+1 Arcane Omens
+1 Outrageous Robbery
+1 Fire Magic
+1 Doorkeeper Thrull
+1 Disdainful Stroke

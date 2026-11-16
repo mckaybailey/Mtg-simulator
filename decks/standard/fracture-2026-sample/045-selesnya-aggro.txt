@@ -1,0 +1,35 @@
+Deck
+3 Forest
+3 Optimistic Scavenger
+4 Sheltered by Ghosts
+2 Hunter's Talent
+4 Temple Garden
+1 Get Lost
+4 Ethereal Armor
+2 Seam Rip
+1 Fountainport
+1 Restless Prairie
+1 Shardmage's Rescue
+4 Enduring Innocence
+4 Voice of Victory
+3 Toadstool Admirer
+1 Meltstrider's Resolve
+4 Multiversal Passage
+4 Hushwood Verge
+1 Overlord of the Mistmoors
+4 Plains
+3 Pawpatch Recruit
+1 Royal Treatment
+2 Cosmogrand Zenith
+2 Vigorbloom Charm
+1 Ouroboroid
+
+Sideboard
+2 Aven Interrupter
+2 Authority of the Consuls
+3 Rest in Peace
+2 Heritage Reclamation
+2 Bilbo's Gambit
+2 Doorkeeper Thrull
+1 Erode
+1 Elspeth, Storm Slayer

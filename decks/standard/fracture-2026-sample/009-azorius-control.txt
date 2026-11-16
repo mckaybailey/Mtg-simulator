@@ -1,0 +1,40 @@
+Deck
+2 Island
+2 Pinnacle Starcage
+2 Seam Rip
+2 Multiversal Passage
+2 Aang, Swift Savior
+2 Erode
+2 Petrified Hamlet
+2 Countersculpt
+3 Plains
+3 Deserted Beach
+3 Get Lost
+3 Restless Anchorage
+3 No More Lies
+3 Consult the Star Charts
+3 Sphinx of False Conclusions
+4 Hallowed Fountain
+4 Floodfarm Verge
+4 The Theorist, Jace Beleren
+4 Fatehold Charm
+1 High Noon
+1 Aven Interrupter
+1 Three Steps Ahead
+1 Elspeth, Storm Slayer
+1 Mistrise Village
+1 Captain Marvel, Earth's Protector
+1 Theorist's Sanctum
+
+Sideboard
+2 Flashfreeze
+2 Rest in Peace
+2 Voice of Victory
+2 Negate
+1 Day of Judgment
+1 Spell Snare
+1 Torpor Orb
+1 Settle the Wreckage
+1 Doorkeeper Thrull
+1 High Noon
+1 Seam Rip

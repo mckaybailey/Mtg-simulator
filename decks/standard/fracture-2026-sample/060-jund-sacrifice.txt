@@ -1,0 +1,40 @@
+Deck
+1 Swamp
+4 Greedy Freebooter
+1 Umbral Collar Zealot
+4 Obsessive Pursuit
+1 Forest
+4 Lively Dirge
+4 Starting Town
+1 Fanatical Offering
+2 Stomping Ground
+4 Gene Pollinator
+1 Mountain
+2 Callous Inspector
+1 Smaug the Magnificent
+2 The Misty Mountains Cold
+4 Biotech Specialist
+4 Blooming Marsh
+1 Wastewood Verge
+1 Wolverine, Fierce Fighter
+3 Overgrown Tomb
+4 The Sackville-Bagginses
+2 Requiting Hex
+3 Blazemire Verge
+2 Deadly Precision
+2 Blood Crypt
+2 Rottenmouth Viper
+
+Sideboard
+1 Vengeful Tracker
+1 Strategic Betrayal
+1 Requiting Hex
+1 Guerrilla Gorilla
+1 Leatherhead, Swamp Stalker
+3 Duress
+1 Maelstrom Pulse
+1 Professor Dellian Fel
+1 The Ooze
+2 Vicious Rivalry
+1 Shoot the Sheriff
+1 Karn, Argent Defender

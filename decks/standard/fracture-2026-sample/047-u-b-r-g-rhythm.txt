@@ -1,0 +1,37 @@
+Deck
+1 Swamp
+4 Seasoned Cryomancer
+1 Elektra, Daughter of the Hand
+4 Starting Town
+2 Wistfulness
+2 Deceit
+3 Town Greeter
+2 Overgrown Tomb
+2 Breeding Pool
+4 Bringer of the Last Gift
+2 Ardyn, the Usurper
+4 Superior Spider-Man
+2 Multiversal Passage
+1 Shipwreck Marsh
+4 Rapid Rescue
+1 Blooming Marsh
+4 Cavern of Souls
+2 Wastewood Verge
+3 Oblivious Bookworm
+3 Watery Grave
+2 Terror of the Peaks
+1 Botanical Sanctum
+4 Formidable Speaker
+2 Overlord of the Balemurk
+
+Sideboard
+2 Intimidation Tactics
+1 Keen-Eyed Curator
+1 Crystal Barricade
+2 Awaken the Honored Dead
+2 Duress
+2 Requiting Hex
+1 M.O.D.O.K.
+2 Witherbloom Charm
+1 Emeritus of Ideation
+1 Quantum Riddler

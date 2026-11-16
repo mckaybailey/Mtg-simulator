@@ -1,0 +1,31 @@
+Deck
+4 Blood Crypt
+4 Bloodghast
+1 Carnage, Crimson Chaos
+3 Concealed Courtyard
+4 Cool but Rude
+4 Dark Matter Manipulator
+2 Erode
+3 Godless Shrine
+4 Hardened Academic
+2 Inspiring Vantage
+1 Inti, Seneschal of the Sun
+4 Iron-Shield Elf
+4 Marauding Mako
+4 Moonshadow
+1 Mountain
+1 Multiversal Passage
+4 Practiced Offense
+2 Requiting Hex
+4 Sacred Foundry
+3 Starting Town
+1 Swamp
+
+Sideboard
+2 Day of Judgment
+2 Doorkeeper Thrull
+2 Duress
+2 Ghost Vacuum
+3 Monument to Endurance
+2 Shoot the Sheriff
+2 Strategic Betrayal

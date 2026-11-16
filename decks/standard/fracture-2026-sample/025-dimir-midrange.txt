@@ -1,0 +1,33 @@
+Deck
+4 Floodpits Drowner
+4 Dream Beavers
+4 Kaito, Bane of Nightmares
+1 Wan Shi Tong, Librarian
+2 Restless Reef
+2 We Say Thee Nay!
+5 Swamp
+4 Island
+1 Spell Snare
+1 The Wondrous Wasp
+1 Spell Pierce
+4 Enduring Curiosity
+2 Bitter Triumph
+2 Shoot the Sheriff
+4 Requiting Hex
+4 Spyglass Siren
+2 Tishana's Tidebinder
+4 Watery Grave
+2 Soulstone Sanctuary
+3 Hidden Lair
+4 Gloomlake Verge
+
+Sideboard
+1 Disdainful Stroke
+1 Vren, the Relentless
+3 Strategic Betrayal
+1 Wan Shi Tong, Librarian
+2 Qarsi Revenant
+2 Duress
+2 Day of Black Sun
+2 Flashfreeze
+1 Karn, Argent Defender

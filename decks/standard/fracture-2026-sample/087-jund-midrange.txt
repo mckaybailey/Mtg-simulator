@@ -1,0 +1,37 @@
+Deck
+1 Swamp
+4 Greedy Freebooter
+3 Umbral Collar Zealot
+1 Forest
+4 Obsessive Pursuit
+4 Lively Dirge
+4 Starting Town
+3 Stomping Ground
+3 Torch the Tower
+1 Llanowar Elves
+2 Overgrown Tomb
+4 Gene Pollinator
+1 Mountain
+1 Smaug the Magnificent
+4 Biotech Specialist
+4 Blooming Marsh
+1 Thornspire Verge
+3 The Misty Mountains Cold
+1 Requiting Hex
+4 The Sackville-Bagginses
+1 Blazemire Verge
+4 Blood Crypt
+1 Deadly Precision
+1 Rottenmouth Viper
+
+Sideboard
+1 Vengeful Tracker
+3 Strategic Betrayal
+1 Guerrilla Gorilla
+1 Leatherhead, Swamp Stalker
+3 Duress
+1 Maelstrom Pulse
+1 Professor Dellian Fel
+1 Shoot the Sheriff
+1 Heritage Reclamation
+2 Fire Magic
