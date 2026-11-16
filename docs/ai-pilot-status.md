@@ -112,27 +112,30 @@ advisor would be a Forge patch, measured like any other.
   sideboarding work), `mtgsim/AGENTS.md` (bo3 invariants), `README.md` (`--bo3`, `--no-sideboard`,
   18 decks), `tests/AGENTS.md`, the meta README and `decks/AGENTS.md` (18 decks; melee.gg lists checked).
 
-**Start the next session at step 2.**
+**Step 2 is done (below); start the next session at step 3 or 4 (ask the user).**
 
-### Step 2 (16 Nov 2026, later session): best-of-three run done, no-sideboard arm running
+### Step 2 done (16 Nov 2026, later session): best-of-three does not explain the gap
 
 - `tools/calibration.py` takes `--game1` (reads `pairings_game1`) and `--only SLUGS`; it and
   `calibration_diff.py` (which reads `RUN#game1`) print SD and meta-share-weighted figures.
-- `runs/rr18-bo3` finished: 4,590 matches, 11,174 games, 2.3 h, 0 errors. Numbers in
-  `VALIDATION.md`, "Best-of-three with sideboards". In short: **the sideboards change nothing
-  beyond noise.** Game-level SD in the sideboarded games 2/3 is 14.2 against 14.5 in game 1s (gap
-  11.5 vs 12.1); Dwarves, Dragons, Landfall stay where they were; Jund Sacrifice falls. Matches
-  widen the spread as the format must (12 decks: SD 13.3 → 19.0, gap 11.4 → 16.7).
+  `tools/compare_games.py` handles best-of-three ids and takes `--game1`.
+- `runs/rr18-bo3` (with Forge's sideboarding) and `runs/rr18-bo3-nosb` (`--no-sideboard`, same
+  seeds, game 1s shared) both finished, 0 errors. Numbers in `VALIDATION.md`, "Best-of-three with
+  sideboards". **The format accounts for all of the widening (18 decks: SD 14.5 in game 1s, 19.6
+  in matches without sideboards) and the sideboards pull back about half a point (19.1; difference
+  −0.5, interval −1.5 to +0.4; gap −0.8, −1.9 to +0.3).** Per game, sideboarded games 2/3 have SD
+  14.2, unsideboarded 14.6. Dwarves, Dragons and Landfall do not fall; Jund Sacrifice falls.
+- So the leading hypothesis (best-of-one without sideboards favours the creature decks) is not
+  supported, with Forge's `SideboardAdvisor`. Only a much better sideboarder could revive it.
 - Game 1s on the 12 original decks equal `runs/rr-final-12` exactly.
-- `runs/rr18-bo3-nosb` (`--no-sideboard`, same seed) was started after it, with the 4,020 game 1s
-  copied (a filter bug skipped the 570 whose ids contain "|g" for Golgari/Grixis; those replay,
-  which checks determinism). If the container restarted, continue it with
-  `python3 -m mtgsim matrix decks/standard/meta -n 30 --seed 1 --bo3 --no-sideboard --resume runs/rr18-bo3-nosb`.
-  Then compare its later games and matches with `rr18-bo3`'s (`calibration_diff.py runs/rr18-bo3-nosb runs/rr18-bo3`)
-  and fill the PENDING line in `VALIDATION.md`.
-- Unless the no-sideboard arm changes the picture, best-of-three is not the explanation: the leading
-  hypothesis is weakened (with Forge's sideboarding). Step 3 (the field) cannot lower the spread
-  much (`field_bound.py`), so step 4 (the pilot) is where the gap is.
+- **Determinism crack:** 4,588 of 4,590 replayed game 1s identical; both differences are Four-Color
+  Control vs Grixis Reanimator (games 18 and 28), and two fresh replays of game 18 agree with each
+  other but not with either round-robin run. Likely state a Forge worker keeps between games, touched
+  by some card in that pairing. Not traced; worth a look before relying on single-game replays there
+  (play that pairing alone with 1 worker, then after other games, and diff `--save-logs` logs).
+- **Next: step 3 is optional now.** `field_bound.py` says a field lowers the spread a few points at
+  most, and best-of-three did not help, so the gap is the pilot (step 4). Ask the user whether to run
+  step 3 anyway (cheap, about 4.5 h) or go straight to step 4.
 
 ### Next, in order (revised plan; one step per session is fine)
 

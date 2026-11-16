@@ -42,7 +42,9 @@ What you can do with it:
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
 - **Games are best-of-one with no sideboarding unless you pass `--bo3`.** With `--bo3`, games 2
   and 3 are sideboarded by Forge's own advisor, which picks cards by their rules text, not the way
-  a person would. How well best-of-three tracks real results has not been measured yet.
+  a person would. On the 18 meta decks best-of-three did not track real results any better: matches
+  spread win rates further apart than single games, and the sideboards changed that by less than the
+  noise (`VALIDATION.md`).
 - **Sample size matters.** At 100 games a win rate is only known to about ±10 points, at 400
   games about ±5. Every number in the report comes with an interval; a matchup is only
   clearly good or bad when the whole interval is on one side of 50%.

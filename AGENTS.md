@@ -23,9 +23,10 @@ patch with its cause and measurement.
 
 **The goal of the current work is simulations whose win rates look like the real ones.** Judge every
 change by the spread (SD) and the mean gap of the 18 meta decks against their real win rates. The
-plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`; done 16 Nov: checked
-on real games, tested, not yet run at scale); run the 18-deck round robin in best-of-three, whose game 1s are the
-best-of-one baseline; only then add a small field of about 25 "Other" decks. The earlier plan of
+plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`; done 16 Nov);
+run the 18-deck round robin in best-of-three (done 16 Nov: the format widens the spread and Forge's
+sideboards do not pull it back beyond noise, so best-of-one is not the explanation); optionally a
+small field of about 25 "Other" decks; then the pilot. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
 "CHECKPOINT" section at the top of `docs/ai-pilot-status.md`.
@@ -47,8 +48,12 @@ number. In short, as of 15 November 2026:
   Torch the Tower and Seam Rip; how opponents block and aim removal against Boros Dwarves and
   Boros Dragons; those two decks' card scripts.
 - **Not established either way:** whether `--mc fixed` plays better (+6.0 points, interval −2.9
-  to +14.8, one pairing); whether best-of-one without sideboards explains the creature decks'
-  excess (the leading hypothesis, untested).
+  to +14.8, one pairing).
+- **Tested and rejected (16 Nov):** that best-of-one without sideboards explains the creature
+  decks' excess. In the 18-deck best-of-three round robin, Forge-sideboarded games 2 and 3 have
+  the same spread as game 1s (SD 14.2 vs 14.5) and match results with and without sideboards
+  differ by −0.5 points of SD (−1.5 to +0.4). Only a sideboarder much better than Forge's
+  `SideboardAdvisor` could revive it.
 - **Still unverified:** `decks/standard/meta/real-matchups-unverified.json` (mtgdecks.net refuses
   automated requests) and the three melee.gg tournament lists. Real win rates, shares and the
   nine aggregate lists were checked against the Magic.gg article.
@@ -99,8 +104,9 @@ Always pass on the limits with the numbers:
   creature decks (Boros Dwarves, Boros Dragons, Mono-Green Landfall, Orzhov Lifegain) are
   overrated, Jund Sacrifice, Dimir Uldaros, Izzet Spellementals and Four-Color Control underrated.
   Wins against opponents marked `ai_pilot: weak` say little.
-- Games are best-of-one without sideboards. That alone favours creature decks: in the logs their
-  results turn on how much removal the opponent draws, and sideboards are where the rest of it is.
+- Games are best-of-one without sideboards unless `--bo3` is passed. In the logs the creature
+  decks' results turn on how much removal the opponent draws, but best-of-three with Forge's
+  sideboarding did not bring them down (`VALIDATION.md`), and matches spread win rates wider than games.
 - A matchup is only decided when its 95% interval excludes 50%; an A/B difference only when the
   verdict says it is reliable. 100 games pin a win rate to about ±10 points; detecting a 5-point
   A/B gap needs ~1,500 games per version. Never present a 54% from 100 games as an edge.

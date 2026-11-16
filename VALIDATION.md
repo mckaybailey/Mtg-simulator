@@ -25,7 +25,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
 | Profile tuning on the meta (16 candidates, 12,010 games, 2 decks held out) | no profile beats Forge's default beyond noise (training rank correlation +0.18, noise −0.20 to +0.43; held-out gap −0.8 points, noise −5.8 to +4.7); none shipped |
-| Best-of-three with Forge's sideboarding, 18-deck round robin (16 Nov) | spread wider, not narrower: on the original 12 decks SD 19.0 and mean gap 16.7 in matches against 13.3 and 11.4 in their game 1s (real SD 4.0); in the sideboarded games 2 and 3 the game-level SD is 14.2 against 14.5 in game 1s; the creature decks do not fall; game 1s equal the best-of-one run game for game; see below |
+| Best-of-three with Forge's sideboarding, 18-deck round robin (16 Nov) | matches spread wider than games, all from the format: 18 decks SD 19.1 with sideboards, 19.6 without (difference −0.5, −1.5 to +0.4), against 14.5 in game 1s (real 6.0); sideboarded games 2 and 3 have SD 14.2, unsideboarded 14.6; the creature decks do not fall; game 1s replay 4,588 of 4,590 (both differences in Four-Color Control vs Grixis Reanimator); see below |
 
 ## The pipeline behaves correctly
 
@@ -538,11 +538,32 @@ Lifegain 66.3 → 62.9) and of the underrated decks only Four-Color Control rise
 mostly from close matches) and give the previous loser the play, which by itself pulls rates
 towards 50%, so if anything this overstates what the sideboards do.
 
-So with Forge's sideboarding, best-of-three does not bring the simulation closer to the real
-win rates: the per-game spread is unchanged and the match spread is wider. This does not
-rule out sideboards done the way people do them (the advisor's weak spots are in
-`docs/ai-pilot-status.md`). The same run without sideboarding (`--no-sideboard`,
-`runs/rr18-bo3-nosb`, game 1s shared) separates the format from the sideboards: PENDING.
+The same round robin without sideboarding (`--no-sideboard --out runs/rr18-bo3-nosb`, the same
+seeds, game 1s copied from `rr18-bo3`, 1.4 hours for the later games) separates the format from
+the sideboards:
+
+| 18 decks | Spearman | Mean gap | SD | Weighted gap | Weighted SD |
+|---|---|---|---|---|---|
+| matches without sideboards | 0.16 (0.10–0.21) | 16.7 (16.1–17.5) | 19.6 (19.0–20.3) | 17.0 | 19.9 |
+| matches with sideboards | 0.14 (0.04–0.16) | 16.0 (15.4–16.8) | 19.1 (18.5–19.8) | 16.6 | 19.8 |
+| difference (`calibration_diff.py`) | −0.03 (−0.14 to +0.02) | −0.8 (−1.9 to +0.3) | −0.5 (−1.5 to +0.4) | −0.4 (−1.6 to +1.1) | −0.2 (−1.4 to +1.1) |
+
+On the original 12 decks: without sideboards gap 16.5 and SD 18.9, with them 16.7 and 19.0 (gap
+difference +0.2, −1.6 to +1.7). Per game, the unsideboarded games 2 and 3 have SD 14.6 and gap
+12.3, the sideboarded ones 14.2 and 11.5, game 1s 14.5 and 12.1. So the format accounts for all
+of the widening (14.5 → 19.6) and Forge's sideboards pull the decks back by about half a point,
+an amount no interval separates from zero. **Best-of-one without sideboards is not why the
+creature decks are overrated, as far as Forge's sideboarding can show.** It does not rule out
+sideboards built the way people build them; the advisor's weak spots are in
+`docs/ai-pilot-status.md`.
+
+Determinism: of the 4,590 game 1s, 570 were replayed in the second run (a copy filter skipped
+them), and `tools/compare_games.py --game1` finds 4,588 of 4,590 identical. Both differences are
+Four-Color Control vs Grixis Reanimator (games 18 and 28): game 18 ended with seat 0 winning in 35
+turns in one run and 42 in the other, and two fresh replays of that pairing with `--save-logs`
+gave seat 1 in 27 turns, identical to each other. So that pairing's games depend on something
+besides the seed, most likely state a worker keeps from its earlier games; every other pairing
+replayed exactly. Not yet traced.
 
 ## The goldfish model
 
