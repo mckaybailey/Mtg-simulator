@@ -13,6 +13,20 @@ games run on it.
 
 | Patch | Deck | Measured on top of |
 |---|---|---|
-| 0012-no-library-sac-when-dying | Jund Sacrifice (Umbral Collar Zealot) | 0001–0011 |
 | 0013-discard-hand-only-when-small | Izzet Spellementals (Stoke Genius) | 0001–0012 |
 | 0014-land-animate-at-opponents-end-step | Four-Color Control (Great Hall of the Biblioplex) | 0001–0013 |
+
+## Dropped
+
+**0012-no-library-sac-when-dying** (Jund Sacrifice, Umbral Collar Zealot). In the declare
+blockers step, when `ComputerUtilCombat.lifeInSeriousDanger` holds, `ComputerUtil.getCardPreference`
+pays any sacrifice cost with anything; for the Zealot's surveil 1 that sacrificed creatures
+outside combat (33 of 510 games in the log run). The patch let a Scry/Surveil/Mill outlet pay only
+with a creature the combat destroys anyway. Measured (`gauntlet jund-sacrifice --vs <the other 17
+meta decks> -n 100 --seed 1`, on 0001–0011, 16 Nov 2026): 40.5% (38–43) without, 40.0% (38–42)
+with, −0.5 points, paired 95% CI −0.9 to −0.0 (12 wins became losses, 4 losses wins, 1,684 of
+1,700 games unchanged). Most of the lost wins end on the same turn: in this deck a sacrifice is
+not only a surveil, it also triggers Biotech Specialist (2 damage per artifact) and The
+Sackville-Bagginses (1 life per token), so the last-ditch sacrifices sometimes win the race. Not
+shipped. 0013 and 0014 were measured on builds that included it in both arms; it changes 16 of
+1,700 of Jund's games and no other deck casts the Zealot.
