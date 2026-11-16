@@ -7,10 +7,24 @@ what was learned and what to do next.
 
 ## CHECKPOINT 16 Nov 2026: best-of-three with sideboards, in progress
 
-**Read this section first; it is where the last session stopped.** The user asked for a best-of-three
-simulation with sideboards on more decks, to test the leading hypothesis (game one without sideboards
-favours creature decks). The user then asked for **about 100 more decks before running anything**
-(see "Next" below). Nothing below has been run at scale yet.
+**Read this section first; it is where the last session stopped.**
+
+**The goal (stated by the user, 16 Nov 2026): the simulations must give reasonable win rates, ones
+that look like the real ones.** Everything below serves that. Best-of-three with sideboards tests one
+explanation of why they do not (game one without sideboards favours creature decks). The extra decks
+are **not a goal in themselves**: they are there to test a second explanation, that a small closed field
+forces the results into a zero-sum game. In a round robin of 12 or 18 decks the deck averages must
+average 50%, every point one deck gains is taken from the few others, and a deck that beats or loses
+to two or three neighbours swings far. The real decks play a field of 1,810 lists, 18.6% of them
+"Other", so their win rates sit between 44% and 58% (Izzet Prowess's 30.6% is the exception, from
+about 25 players). If the simulator is sound, adding a wide, realistically weighted field should
+pull the simulated win rates of the 18 meta decks towards those values (a smaller spread and a
+smaller mean gap); if they stay as far apart, the problem is the pilot or the format, not the field.
+Judge every run by that: the spread and the gap of the 18 decks with real win rates, not by how
+many decks were added.
+
+The user asked for **about 100 more decks before running anything** (see "Next" below). Nothing
+below has been run at scale yet.
 
 ### Done in this session (committed as work in progress, untested on full runs)
 
@@ -77,21 +91,39 @@ advisor would be a Forge patch, measured like any other.
    an integration test (one bo3 match replays). Update `mtgsim/bridge/AGENTS.md` (protocol),
    `mtgsim/AGENTS.md` (invariants: seats in games 2/3 are not by parity; game 1 = bo1 game), README
    (`--bo3`), `tests/AGENTS.md`.
-2. **About 100 more decks (the user's request).** The Magic.gg table has real win rates for only 18
-   archetypes, and all 18 are now in. For more decks with a real win rate, use individual lists and
-   their own tournament records: the three events' melee.gg standings (tournaments 472270 Arena
-   Championship 13, 440878 Spotlight Hartford, 457663 Spotlight Beijing; links in the Magic.gg
-   article) give each player's decklist and match record. A per-list win rate from one event is very
-   noisy (±12 points from ~15 matches), so pool lists by archetype where possible, keep each deck's
-   `real_win_rate` with its match count, and weight by it in the calibration. Check how the standings
-   page loads (it may be filled by a JSON endpoint; look at the page's scripts), stay polite (one
-   request a second), run `mtgsim check` on every list and resolve unknown card names rather than
-   guessing. Put them in a separate folder (e.g. `decks/standard/fracture-2026/`) with its own
-   `gauntlet.json`, so the 18-deck meta gauntlet stays the default. Mind the cost: a round robin grows
-   with the square of the deck count (118 decks = 6,903 pairings; at 10 bo3 matches each, about
-   17,000 games, roughly 4–5 hours on 4 cores). A gauntlet of each new deck against the 18 meta decks
-   is linear and may be the better design.
-3. **The experiment.** `matrix decks/standard/meta -n 30 --seed 1 --bo3` (18 decks, 153 pairings; about
+2. **About 100 more decks, as a field (the user's request; purpose above).** They are opponents that
+   make the field look like the real one; they do not need real win rates of their own, and the
+   calibration is still measured on the 18 decks that have one. So pick them for coverage and weight
+   them by how often they were played:
+   - Source: the three events' melee.gg standings (tournaments 472270 Arena Championship 13,
+     440878 Spotlight Hartford, 457663 Spotlight Beijing; links in the Magic.gg article), which list
+     every player's decklist. Check how the standings page loads (it may be filled by a JSON
+     endpoint; read the page's scripts), stay polite (one request a second).
+   - Take several lists per big archetype (variation within an archetype matters too) and lists from
+     the "Other" 18.6% (Sultai Reanimator, Izzet Fling, Jeskai Planeswalkers, Jeskai Artifacts, Boros
+     Mobilize, Selesnya Offense, Dimir Control, Mardu Discard, Temur Omniscience, Azorius Prison,
+     Mono-Red Aggro, Dimir Oculus, Jeskai Control and more; the Magic.gg article links one list for
+     each). Give each list a `meta_share` so that the field's archetype shares match the real table.
+   - Keep each list's own match record from the standings as optional metadata (secondary check only:
+     ±12 points from ~15 matches).
+   - Run `mtgsim check` on every list; resolve unknown card names, never guess. Put them in a separate
+     folder (e.g. `decks/standard/fracture-2026-field/`) with its own `gauntlet.json`, so the 18-deck
+     meta gauntlet stays the default.
+   - Design: a gauntlet of each of the 18 meta decks against the whole field (18 x ~118 pairings,
+     linear) rather than a full round robin (6,903 pairings), and report each meta deck's
+     **meta-share-weighted** win rate (`summarize_field` already weights by `meta_share`). At 10 bo3
+     matches per pairing that is about 21,000 matches (~50,000 games, ~10 hours on 4 cores); 10
+     best-of-one games per pairing is ~21,000 games (~4 hours). Start with best-of-one, so the field
+     effect and the format effect can be told apart.
+3. **The experiments, each judged by the spread and the mean gap of the 18 meta decks against their
+   real win rates (and the rank correlation, with its noise range):**
+   (a) the 18-deck best-of-one round robin, the baseline (game 1s of (b));
+   (b) the 18-deck best-of-three round robin with sideboards: does the format move them towards the
+   real values?
+   (c) the 18 meta decks against the ~118-deck weighted field, best-of-one: does a realistic field
+   flatten the win rates (the zero-sum question)?
+   (d) if (b) or (c) helps, the two together.
+   For (b): `matrix decks/standard/meta -n 30 --seed 1 --bo3` (18 decks, 153 pairings; about
    4,600 game 1s, which are the best-of-one round robin, plus about 6,700 later games; roughly 3 hours),
    detached with `setsid nohup`, `--out` set, resumable. Then compare calibration of `matrix_game1`
    (best-of-one) with the match results (`tools/calibration.py` reads `summary["pairings"]`; add a
