@@ -12,7 +12,7 @@ about where to take the AI pilot after `--mc deep` failed (next section). The fa
 in the sections below and in `VALIDATION.md`; this records the conclusions, two corrections and
 the options now on the table. **Ask the user which option to take before doing more work.**
 
-**State of the numbers** (calibration `runs/rr18-cal`, 18 decks, 14 patches, 4,590 games): rank
+**State of the numbers** (the calibration on `main`, commit `6be0cdd`, from `runs/rr18-cal`, 18 decks, 14 patches, 4,590 games): rank
 correlation 0.14 (noise 0.04–0.19), mean gap 11.4 points, SD 14.0 against a real 6.0.
 **Correction:** a pilot that put every deck at exactly 50% would score a mean gap of 4.7 points
 (4.1 share-weighted), better than any simulation. SD and mean gap reward compression toward 50%
@@ -76,9 +76,14 @@ baseline beside the gap. (An earlier remark in the discussion gave 3.5 from the 
 3. **More single-error hunting** (option (c) below): every fix so far moved one deck.
 
 **The Swiss check** (not built; a small stdlib Python tool in `tools/`, an hour or two):
-1. Needs the calibration matchup table. **Correction:** `runs/rr18-cal` is git-ignored and not in a
-   fresh container; replay it first with `matrix decks/standard/meta -n 30 --seed 1 --out
-   $PWD/runs/rr18-cal` (about an hour on 4 cores; detached, see "Long runs" below).
+1. Needs the calibration's per-pairing table (153 pairings). The calibration itself is on `main`
+   (commit `6be0cdd`), but only as per-deck averages (`gauntlet.json`, the meta README table,
+   `VALIDATION.md` "Calibration with fourteen patches"); the pairing results live only in
+   `runs/rr18-cal`, which is git-ignored and absent from a fresh container. Replay it first with
+   `matrix decks/standard/meta -n 30 --seed 1 --out $PWD/runs/rr18-cal` (about an hour on 4
+   cores; detached, see "Long runs" below; same seed, so the same games), and consider committing
+   the exported pairing table (for example `decks/standard/meta/sim-matchups.json`) so later
+   checks need no replay.
 2. Convert each pairing's game win rate to a best-of-three match win rate (the real figures are
    match results; this widens the spread before Swiss narrows it).
 3. Simulate about 1,000 events of the real size (~1,810 players) with decks drawn by real meta
