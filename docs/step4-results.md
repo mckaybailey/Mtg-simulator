@@ -44,6 +44,15 @@ Control better. It gained most against Dimir Midrange (43 → 62), Golgari Midra
 Boros Dwarves (23 → 37) and Rakdos Lizards (37 → 50); nothing against Mono-Green Landfall, Dimir
 Uldaros or Dimir Excruciator. Real win rate 46.6%.
 
-Next, as planned: the same A/B for Jund Sacrifice and Dimir Uldaros, the two decks the
-simulation underrates most; only if they gain too is a round robin with `fixed` for the weak
-decks worth its cost.
+The same A/B for the two decks the simulation underrates most (17 Nov, same setup):
+
+| Deck (real) | Default AI | `--mc fixed` on its seat | Paired difference |
+|---|---|---|---|
+| Azorius Control (46.6%) | 42.1% (39–45%) | 51.1% (48–54%) | +9.0 (+5.7 to +12.4) |
+| Jund Sacrifice (57.6%) | 40.1% (37–43%) | 50.4% (47–53%) | +10.3 (+7.3 to +13.3) |
+| Dimir Uldaros (49.2%) | 30.0% (27–33%) | 43.7% (41–47%) | +13.7 (+10.4 to +17.0) |
+
+All three gain beyond noise and move towards their real win rates. That alone does not show that
+search would narrow the spread: if the overrated creature decks gained as much from it, a field in
+which every deck searches would be as spread out as now. The control is the same A/B for Boros
+Dwarves (real 50.2%, simulated about 69%), running.
