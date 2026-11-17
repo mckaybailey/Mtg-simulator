@@ -26,7 +26,8 @@ change by the spread (SD) and the mean gap of the 18 meta decks against their re
 plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`; done 16 Nov);
 run the 18-deck round robin in best-of-three (done 16 Nov: the format widens the spread and Forge's
 sideboards do not pull it back beyond noise, so best-of-one is not the explanation); a field of
-the 13 "Other" decks (done 16 Nov: SD 14.9 → 14.5, within noise); now the pilot. The earlier plan of
+the 13 "Other" decks (done 16 Nov: SD 14.9 → 14.5, within noise); a random sample of 100 real lists in best-of-three
+(done 17 Nov: match SD 19.8 → 18.6, one point of the thirteen needed); now the pilot. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
 "CHECKPOINT" section at the top of `docs/ai-pilot-status.md`.

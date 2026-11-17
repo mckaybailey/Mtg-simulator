@@ -1,0 +1,11054 @@
+{
+ "description": "Baseline: each meta deck against the 100 sampled lists, best-of-three with Forge's sideboarding, 6 matches per pairing, seed 1 (tools/sample_runs.sh, N=6). pairings: meta deck -> opponent key -> [match wins, losses, draws, decided]. calibration: tools/sample_calibration.py runs/rr18-bo3 runs/sample --reps 1000.",
+ "command": "python3 -m mtgsim gauntlet decks/standard/meta/DECK.txt --vs decks/standard/fracture-2026-sample -n 6 --seed 1 --bo3",
+ "forge_patches": "a2cd2f5b6b3740ef009378dd6a02e90566d9495fcbd8fdebd106b70de0ca9de4",
+ "created": "2026-11-17",
+ "calibration": {
+  "diff_vs_meta": {
+   "sample": {
+    "spearman": [
+     -0.021683017861157616,
+     -0.13835830444738667,
+     0.05094002133233831
+    ],
+    "mae": [
+     3.5317290641293493,
+     2.0504372389396686,
+     4.6406908432569995
+    ],
+    "sd": [
+     3.676255709534191,
+     2.1912329174716696,
+     4.688019073726801
+    ]
+   },
+   "sample_no_mirror": {
+    "spearman": [
+     -0.014455345240771744,
+     -0.13526073046722126,
+     0.07124420154380358
+    ],
+    "mae": [
+     4.039942692207269,
+     2.428583235397568,
+     5.117122359916342
+    ],
+    "sd": [
+     4.1893046124127995,
+     2.8012144910481744,
+     5.201895918000881
+    ]
+   }
+  },
+  "decks": {
+   "Boros Dwarves": {
+    "real": 50.2,
+    "meta": 71.07594936708858,
+    "sample": 82.16666666666667,
+    "sample_no_mirror": 83.15972222222221
+   },
+   "Mono-Black Aggro": {
+    "real": 42.6,
+    "meta": 65.86666666666665,
+    "sample": 73.33333333333333,
+    "sample_no_mirror": 73.33333333333333
+   },
+   "Boros Dragons": {
+    "real": 45.0,
+    "meta": 65.73573573573573,
+    "sample": 72.33333333333334,
+    "sample_no_mirror": 72.56944444444444
+   },
+   "Rakdos Lizards": {
+    "real": 42.9,
+    "meta": 60.838548185231545,
+    "sample": 69.26666666666667,
+    "sample_no_mirror": 69.26666666666667
+   },
+   "Mono-Green Landfall": {
+    "real": 53.4,
+    "meta": 70.39844509232262,
+    "sample": 78.0,
+    "sample_no_mirror": 78.75457875457876
+   },
+   "Orzhov Lifegain": {
+    "real": 53.6,
+    "meta": 65.42562724014338,
+    "sample": 70.33333333333334,
+    "sample_no_mirror": 72.03703703703704
+   },
+   "Golgari Midrange": {
+    "real": 47.5,
+    "meta": 58.39983374896093,
+    "sample": 59.13333333333334,
+    "sample_no_mirror": 58.88888888888889
+   },
+   "Dimir Midrange": {
+    "real": 54.5,
+    "meta": 55.84254143646408,
+    "sample": 60.16666666666667,
+    "sample_no_mirror": 61.111111111111114
+   },
+   "Azorius Momo": {
+    "real": 48.8,
+    "meta": 48.6111111111111,
+    "sample": 54.666666666666664,
+    "sample_no_mirror": 54.63917525773196
+   },
+   "Grixis Reanimator": {
+    "real": 52.7,
+    "meta": 50.80116230801162,
+    "sample": 54.06666666666666,
+    "sample_no_mirror": 54.82993197278911
+   },
+   "Four-Color Control": {
+    "real": 48.8,
+    "meta": 39.452411994784875,
+    "sample": 44.166666666666664,
+    "sample_no_mirror": 44.21768707482993
+   },
+   "Azorius Control": {
+    "real": 46.6,
+    "meta": 43.125552608311224,
+    "sample": 40.33333333333333,
+    "sample_no_mirror": 40.625
+   },
+   "Dimir Excruciator": {
+    "real": 46.0,
+    "meta": 32.74092615769712,
+    "sample": 36.166666666666664,
+    "sample_no_mirror": 36.564625850340136
+   },
+   "Azorius Artifacts": {
+    "real": 54.8,
+    "meta": 47.660668380462724,
+    "sample": 44.06666666666666,
+    "sample_no_mirror": 43.36769759450172
+   },
+   "Izzet Prowess": {
+    "real": 30.6,
+    "meta": 20.475594493116397,
+    "sample": 16.833333333333332,
+    "sample_no_mirror": 16.833333333333332
+   },
+   "Izzet Spellementals": {
+    "real": 44.3,
+    "meta": 32.90876242095753,
+    "sample": 31.5,
+    "sample_no_mirror": 30.175438596491226
+   },
+   "Dimir Uldaros": {
+    "real": 49.2,
+    "meta": 30.7351598173516,
+    "sample": 29.166666666666668,
+    "sample_no_mirror": 28.421052631578945
+   },
+   "Jund Sacrifice": {
+    "real": 57.6,
+    "meta": 36.57645466847091,
+    "sample": 34.166666666666664,
+    "sample_no_mirror": 32.17054263565892
+   }
+  },
+  "real_sd": 6.037866621028766,
+  "metrics": {
+   "meta": {
+    "spearman": 0.1280330578468354,
+    "mae": 12.233085750685468,
+    "sd": 14.904721184374312
+   },
+   "sample": {
+    "spearman": 0.1063500399856778,
+    "mae": 15.764814814814818,
+    "sd": 18.580976893908502
+   },
+   "sample_no_mirror": {
+    "spearman": 0.11357771260606367,
+    "mae": 16.273028442892738,
+    "sd": 19.09402579678711
+   }
+  },
+  "noise": {
+   "meta": {
+    "spearman": [
+     0.07950439882424457,
+     0.22715542521212734
+    ],
+    "mae": [
+     11.362971062885675,
+     13.599843903152546
+    ],
+    "sd": [
+     14.078405555513966,
+     16.177126481256586
+    ]
+   },
+   "sample": {
+    "spearman": [
+     0.05162623300275621,
+     0.16933404424904036
+    ],
+    "mae": [
+     15.005555555555556,
+     16.479629629629628
+    ],
+    "sd": [
+     18.001721073031348,
+     19.282739693015284
+    ]
+   },
+   "sample_no_mirror": {
+    "spearman": [
+     0.061951479603307456,
+     0.18275686482975698
+    ],
+    "mae": [
+     15.591459415634919,
+     17.053462969709184
+    ],
+    "sd": [
+     18.514427669681094,
+     19.818205473781735
+    ]
+   }
+  }
+ },
+ "pairings": {
+  "azorius-artifacts": {
+   "rakdos-discard-001": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-008": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-010": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-020": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    2,
+    3,
+    1,
+    5
+   ],
+   "dimir-midrange-025": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "bant-055": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-079": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "azorius-control": {
+   "rakdos-discard-001": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-020": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "bant-055": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-079": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "azorius-momo": {
+   "rakdos-discard-001": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-010": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-020": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "bant-055": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-079": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    2,
+    4,
+    0,
+    6
+   ]
+  },
+  "boros-dragons": {
+   "rakdos-discard-001": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-008": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-010": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-020": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-079": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    2,
+    4,
+    0,
+    6
+   ]
+  },
+  "boros-dwarves": {
+   "rakdos-discard-001": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-010": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-020": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-079": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    1,
+    5,
+    0,
+    6
+   ]
+  },
+  "dimir-excruciator": {
+   "rakdos-discard-001": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-008": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-020": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "bant-055": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-079": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "dimir-midrange": {
+   "rakdos-discard-001": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-020": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-079": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "dimir-uldaros": {
+   "rakdos-discard-001": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-008": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-020": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "bant-055": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-079": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "four-color-control": {
+   "rakdos-discard-001": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-008": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-010": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-020": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-079": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    2,
+    4,
+    0,
+    6
+   ]
+  },
+  "golgari-midrange": {
+   "rakdos-discard-001": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-010": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-020": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    4,
+    1,
+    1,
+    5
+   ],
+   "dimir-midrange-025": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-079": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    3,
+    3,
+    0,
+    6
+   ]
+  },
+  "grixis-reanimator": {
+   "rakdos-discard-001": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-008": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-020": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    2,
+    3,
+    1,
+    5
+   ],
+   "dimir-midrange-025": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "bant-055": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-079": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    1,
+    5,
+    0,
+    6
+   ]
+  },
+  "izzet-prowess": {
+   "rakdos-discard-001": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-008": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-020": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "bant-055": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-079": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "izzet-spellementals": {
+   "rakdos-discard-001": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-010": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-020": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-079": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    2,
+    4,
+    0,
+    6
+   ]
+  },
+  "jund-sacrifice": {
+   "rakdos-discard-001": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-008": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-010": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-020": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "bant-055": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-079": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    0,
+    6,
+    0,
+    6
+   ]
+  },
+  "mono-black-aggro": {
+   "rakdos-discard-001": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-008": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-010": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-020": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-079": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    1,
+    5,
+    0,
+    6
+   ]
+  },
+  "mono-green-landfall": {
+   "rakdos-discard-001": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-008": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-010": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-020": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-079": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    3,
+    3,
+    0,
+    6
+   ]
+  },
+  "orzhov-lifegain": {
+   "rakdos-discard-001": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-008": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-010": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    0,
+    6,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-020": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-025": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-079": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    2,
+    4,
+    0,
+    6
+   ]
+  },
+  "rakdos-lizards": {
+   "rakdos-discard-001": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-002": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-sacrifice-003": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mardu-midrange-004": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-005": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-control-006": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-007": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "jund-008": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-control-009": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-010": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-spellementals-011": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-012": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-013": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dwarves-014": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-015": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-green-landfall-016": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-spellementals-017": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-018": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-019": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-020": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-aggro-021": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-dwarves-022": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "orzhov-lifegain-023": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "w-u-b-r-control-024": [
+    3,
+    2,
+    1,
+    5
+   ],
+   "dimir-midrange-025": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "izzet-elementals-026": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "boros-dragons-027": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-omniscience-028": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-midrange-029": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-control-030": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-excruciator-031": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-uldaros-032": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-033": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-034": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-combo-035": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-combo-036": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-sacrifice-037": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-038": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-039": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-tempo-040": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-midrange-041": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-042": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-combo-043": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-reanimator-044": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "selesnya-aggro-045": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "orzhov-lifegain-046": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "u-b-r-g-rhythm-047": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-048": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-049": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "sultai-reanimator-050": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-051": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "azorius-artifacts-052": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-053": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-spellementals-054": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "bant-055": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-elementals-056": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "azorius-tempo-057": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "selesnya-offense-058": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-059": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "jund-sacrifice-060": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-061": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "dimir-uldaros-062": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-sacrifice-063": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "dimir-midrange-064": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "w-u-b-r-control-065": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-midrange-066": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-reanimator-067": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "orzhov-lifegain-068": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-lifegain-069": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "golgari-midrange-070": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "boros-artifacts-071": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "mono-green-landfall-072": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "izzet-control-073": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jeskai-planeswalkers-074": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "mono-green-075": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "temur-otters-076": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "dimir-midrange-077": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "jund-sacrifice-078": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-079": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "boros-dwarves-080": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mardu-aggro-081": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "grixis-combo-082": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-deceit-083": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "jund-landfall-084": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "azorius-momo-085": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "dimir-combo-086": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "jund-midrange-087": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "izzet-spellementals-088": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "izzet-lessons-089": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "azorius-momo-090": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "boros-dragons-091": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-092": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "selesnya-offense-093": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "azorius-tempo-094": [
+    4,
+    2,
+    0,
+    6
+   ],
+   "mono-green-landfall-095": [
+    2,
+    4,
+    0,
+    6
+   ],
+   "dimir-midrange-096": [
+    5,
+    1,
+    0,
+    6
+   ],
+   "mono-white-tokens-097": [
+    3,
+    3,
+    0,
+    6
+   ],
+   "orzhov-life-gain-098": [
+    6,
+    0,
+    0,
+    6
+   ],
+   "orzhov-lifegain-099": [
+    1,
+    5,
+    0,
+    6
+   ],
+   "mono-green-aggro-100": [
+    2,
+    4,
+    0,
+    6
+   ]
+  }
+ }
+}

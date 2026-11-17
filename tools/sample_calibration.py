@@ -109,7 +109,15 @@ def main(argv):
         for i, name in enumerate(("Spearman", "mean abs gap", "SD")):
             v, (lo, hi) = m[3 * j + i], noise[3 * j + i]
             print(f"  {name:13s} {v:6.2f}  noise range {lo:.2f}..{hi:.2f}")
-    out = {"decks": {meta[k]["name"]: {"real": r, "meta": a, "sample": b, "sample_no_mirror": c}
+    diffs = {}
+    for j, label in ((1, "sample"), (2, "sample_no_mirror")):
+        print(f"{label} minus meta-only (95% range of the difference over the same resamples):")
+        for i, name in enumerate(("Spearman", "mean abs gap", "SD")):
+            v = m[3 * j + i] - m[i]
+            lo, hi = q([b[3 * j + i] - b[i] for b in boot])
+            diffs.setdefault(label, {})[("spearman", "mae", "sd")[i]] = [v, lo, hi]
+            print(f"  {name:13s} {v:+6.2f}  ({lo:+.2f} to {hi:+.2f})")
+    out = {"diff_vs_meta": diffs, "decks":{meta[k]["name"]: {"real": r, "meta": a, "sample": b, "sample_no_mirror": c}
                      for k, r, a, b, c in rows},
            "real_sd": st.pstdev(real),
            "metrics": {label: dict(zip(("spearman", "mae", "sd"), m[3 * j:3 * j + 3]))
