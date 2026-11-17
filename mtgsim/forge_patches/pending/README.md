@@ -31,3 +31,13 @@ shipped. 0013 and 0014 were measured on builds that included it in both arms; it
 
 0013 was measured and moved up to the shipped series (Izzet Spellementals +3.3 points, paired 95% CI +1.6 to +5.0).
 0014 was measured and moved up as well (Four-Color Control +11.8 points, paired 95% CI +9.6 to +14.1). Nothing is pending now.
+
+**0014, revised** (`0014-land-animate-revised.patch.txt`, named so that nothing applies it): the
+shipped 0014 was measured on Four-Color Control only, but its rule also covers Soulstone Sanctuary
+({4}: a 3/3 vigilance creature for good) in Dimir Midrange, Mono-Black Aggro and 13 lists of the
+100-list sample. Against the other 17 meta decks (100 games each, seed 1, without and with 0014):
+Dimir Midrange 52.2% → 52.5% (+0.2, paired CI −1.3 to +1.8), Mono-Black Aggro 68.5% → 65.7%
+(−2.8, paired −4.0 to −1.5): the aggro deck now attacks with the land a turn later. The revision
+also allows the animate before the AI's own attack when the land is untapped and no instant or
+flash card in hand wants the mana; it is being measured on all three decks and replaces 0014 if
+it keeps Four-Color Control's gain without the loss.
