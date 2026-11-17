@@ -8,8 +8,8 @@ supply with `setup --forge-dir` is never modified.
 ## The shipped series
 
 Patches 0001–0010 each fix a card the AI held but never (or almost never) cast in the meta round
-robin; 0011 fixes an ability it activated at the wrong time, and 0013 a spell it cast with a full
-hand (found with `tools/log_analysis/activations.py`; 0012 was tried and dropped, see `pending/README.md`).
+robin; 0011 fixes an ability it activated at the wrong time, 0013 a spell it cast with a full
+hand and 0014 a land it animated in its own upkeep (found with `tools/log_analysis/activations.py`; 0012 was tried and dropped, see `pending/README.md`).
 Found with `python3 -m mtgsim misplays` and Forge's worker logs; every patch header says which
 code path refused the card and how it was measured. Gauntlet numbers are the deck against the
 other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
@@ -28,6 +28,7 @@ other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
 | 0010 | Chainsaw (Boros Dwarves) | the same, for its "up to one target" 3 damage | card script |
 | 0011 | Ba Sing Se (Mono-Green Landfall) | `EarthbendAi` approved the activation every first main phase, leaving no mana for permanents cast in the second | Java |
 | 0013 | Stoke Genius (Izzet Spellementals) | `DiscardAi` cast "discard your hand, then draw two" with any hand (most often five cards discarded) | Java |
+| 0014 | Great Hall of the Biblioplex (Four-Color Control) | `AnimateAi` let a permanent animate through at any time, so the {5} animate was paid in the AI's own upkeep and left it tapped out for two turns | Java |
 
 0020 is of another kind: it changes no card and no game played without Monte Carlo. It adds
 `AiController.setFlatMonteCarloCountOnly`, which the driver switches on for seats playing
@@ -42,11 +43,12 @@ games replay from the seed (`VALIDATION.md`, "Monte Carlo with a fixed budget").
 | Boros Dragons (0009) | 64.5% (61–67%) | 66.0% (63–69%) | +1.5 (−2.7 to +5.7), not reliable | 53.0% (46–60%) |
 | Boros Dwarves (0010) | 74.5% (72–77%) | 74.4% (72–77%) | −0.1 (−3.9 to +3.7), no effect | 48.0% (41–55%) |
 | Mono-Green Landfall (0011) | 47.4% (44–50%) | 67.7% (65–71%) | +20.3 (+16.0 to +24.5) | 54.8% (48–62%) |
+| Four-Color Control (0014) | 42.1% (40–44%) | 53.9% (52–56%) | +11.8 (+8.5 to +15.1; paired +9.6 to +14.1) | 52.0% (45–59%) |
 | Izzet Spellementals (0013) | 32.9% (31–35%) | 36.2% (34–39%) | +3.3 (+0.1 to +6.5; paired +1.6 to +5.0) | 51.0% (44–58%) |
 
 Patches that share a deck were measured together, except 0001 and 0002 (0001 alone: +17.5,
 CI +13.5 to +21.4). 0009–0011 were each measured on top of the patches before them (0009 and
-0010 on 0001–0008, 0011 on 0001–0010, 0013 on 0001–0011 and against the other 17 meta decks). 0009 and 0010 get their card cast (Nova Hellkite in 660 of
+0010 on 0001–0008, 0011 on 0001–0010, 0013 on 0001–0011 and 0014 on 0001–0013, both against the other 17 meta decks). 0009 and 0010 get their card cast (Nova Hellkite in 660 of
 671 games seen instead of 346, Chainsaw in 408 of 444 instead of 284) without moving the win rate.
 
 ## What `setup --build` does with them

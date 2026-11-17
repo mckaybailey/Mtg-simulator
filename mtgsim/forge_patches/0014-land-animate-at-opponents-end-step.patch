@@ -8,7 +8,13 @@ Why: AnimateAi.checkPhaseRestrictions lets every Duration$ Permanent animate thr
   Control cast 0.32 spells over the two turns after an upkeep animate, against 1.23 on turns
   without one. Now a land's permanent, instant-speed self-animate with a mana cost waits for the
   opponent's end step, when the mana untaps next anyway.
-Measured: PENDING
+Measured: `mtgsim gauntlet decks/standard/meta/four-color-control.txt --vs <the other 17 meta
+  decks> -n 100 --seed 1`, default AI, Forge 7db198d72e, on 16-17 Nov 2026, both arms built on
+  0001-0011 and 0013 plus a candidate 0012 that was later dropped (it touches only Umbral Collar
+  Zealot sacrifices). Without this patch: 42.1% (95% CI 40-44%, 715-985). With it: 53.9%
+  (52-56%, 916-784). Difference +11.8 points, 95% CI +8.5 to +15.1 (paired over the same 1,700
+  seeds: +9.6 to +14.1; 300 losses became wins, 99 wins became losses). Mirror with the patch
+  (`match four-color-control four-color-control -n 200 --seed 1`): 52.0% (45-59%).
 
 diff --git a/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java b/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
 index 11aeccc6..6c38129a 100644
