@@ -55,3 +55,7 @@ back to tapping five lands in its first main phase. Third revision
 must attack this turn (`ComputerUtilCard.doesSpecifiedCreatureAttackAI`, which Forge already
 uses for temporary animates) and the mana left must pay for all instant and flash cards in hand.
 Being measured.
+
+Third revision measured and shipped as 0014 (17 Nov): Four-Color Control +12.1 (paired +9.9 to
++14.4), Mono-Black Aggro −0.8 (paired −1.9 to +0.4), Dimir Midrange +0.6 (paired −1.0 to +2.2),
+mirror 49.5%. The revision files were removed; their text is in the git history of this folder.

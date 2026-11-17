@@ -6,31 +6,60 @@ Why: AnimateAi.checkPhaseRestrictions lets every Duration$ Permanent animate thr
   and in its own first main phase (111), and only 12 times in an end step. Mana spent in its own
   upkeep stays tapped for that turn and the opponent's next: on turns 5 and later Four-Color
   Control cast 0.32 spells over the two turns after an upkeep animate, against 1.23 on turns
-  without one. Now a land's permanent, instant-speed self-animate with a mana cost waits for the
-  opponent's end step, when the mana untaps next anyway.
-Measured: `mtgsim gauntlet decks/standard/meta/four-color-control.txt --vs <the other 17 meta
-  decks> -n 100 --seed 1`, default AI, Forge 7db198d72e, on 16-17 Nov 2026, both arms built on
-  0001-0011 and 0013 plus a candidate 0012 that was later dropped (it touches only Umbral Collar
-  Zealot sacrifices). Without this patch: 42.1% (95% CI 40-44%, 715-985). With it: 53.9%
-  (52-56%, 916-784). Difference +11.8 points, 95% CI +8.5 to +15.1 (paired over the same 1,700
-  seeds: +9.6 to +14.1; 300 losses became wins, 99 wins became losses). Mirror with the patch
-  (`match four-color-control four-color-control -n 200 --seed 1`): 52.0% (45-59%).
+  without one. Now a land's permanent, instant-speed self-animate with a mana cost is done at the
+  opponent's end step, when the mana untaps next anyway, or in the AI's own first main phase or
+  beginning of combat when the animated land would attack (ComputerUtilCard.doesSpecifiedCreatureAttackAI)
+  and the mana left afterwards still pays for every instant and flash card in hand; never in an
+  upkeep or earlier on the opponent's turn. A first
+  version allowed only the opponent's end step and cost Mono-Black Aggro, whose Soulstone
+  Sanctuary ({4}: a 3/3 vigilance creature for good) attacks a turn later that way, 2.8 points
+  (paired 95% CI -4.0 to -1.5).
+Measured: `mtgsim gauntlet decks/standard/meta/DECK.txt --vs <the other 17 meta decks> -n 100
+  --seed 1`, default AI, Forge 7db198d72e, 16-17 Nov 2026, both arms on 0001-0011 and 0013 plus a
+  candidate 0012 that was later dropped (it touches only Umbral Collar Zealot sacrifices).
+  Four-Color Control: 42.1% (95% CI 40-44%) without, 54.2% (52-57%) with, +12.1 points, 95% CI
+  +8.8 to +15.4 (paired over the same 1,700 seeds: +9.9 to +14.4; 307 losses became wins, 101
+  wins became losses). Mono-Black Aggro: 68.5% (66-71%) without, 67.7% (65-70%) with, -0.8
+  (paired -1.9 to +0.4, within noise). Dimir Midrange: 52.2% (50-55%) without, 52.8% (50-55%)
+  with, +0.6 (paired -1.0 to +2.2, within noise). Mirror with the patch (`match
+  four-color-control four-color-control -n 200 --seed 1`): 49.5% (43-56%). Two earlier versions
+  were measured the same way: end step only (Four-Color Control +11.8, Mono-Black Aggro -2.8,
+  paired -4.0 to -1.5) and "precombat if the cheapest instant can still be paid" (Four-Color
+  Control only +4.6).
 
 diff --git a/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java b/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
-index 11aeccc6..6c38129a 100644
+index 11aeccc6..b0264739 100644
 --- a/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
 +++ b/forge-ai/src/main/java/forge/ai/ability/AnimateAi.java
-@@ -111,6 +111,14 @@ public class AnimateAi extends SpellAbilityAi {
+@@ -111,6 +111,32 @@ public class AnimateAi extends SpellAbilityAi {
                  }
              }
          }
-+        // A land that turns itself into a creature for good (Great Hall of the Biblioplex) can wait for the end of
-+        // the opponent's turn, when the mana would go unused anyway; earlier it leaves the AI tapped out for its own
-+        // turn and the opponent's.
++        // A land that turns itself into a creature for good (Great Hall of the Biblioplex, Soulstone Sanctuary):
++        // paid in the AI's upkeep or on the opponent's turn it leaves the AI tapped out for two turns. Do it at the
++        // end of the opponent's turn, when the mana would go unused anyway, or before the AI's own attack when the
++        // land will attack and the AI can still pay for the instant and flash cards in its hand.
 +        if ("Permanent".equals(sa.getParam("Duration")) && "Self".equals(sa.getParamOrDefault("Defined", "Self"))
 +                && source.isLand() && !source.isCreature() && sa.getPayCosts().hasManaCost()
 +                && !isSorcerySpeed(sa, ai) && !sa.hasParam("ActivationPhases")) {
-+            return ph.is(PhaseType.END_OF_TURN) && ph.isPlayerNextTurn(ai);
++            if (ph.is(PhaseType.END_OF_TURN) && ph.isPlayerNextTurn(ai)) {
++                return true;
++            }
++            if (ph.isPlayerTurn(ai) && (ph.is(PhaseType.MAIN1) || ph.is(PhaseType.COMBAT_BEGIN))
++                    && !source.isTapped()) {
++                // it has to attack this turn, and the mana left afterwards still has to pay for every instant and
++                // flash card in hand (a control deck keeps its turn's mana for the opponent's turn)
++                int instants = 0;
++                for (Card c : ai.getCardsIn(ZoneType.Hand)) {
++                    if (!c.isLand() && (c.isInstant() || c.hasKeyword(Keyword.FLASH))) {
++                        instants += c.getCMC();
++                    }
++                }
++                final int left = ComputerUtilMana.getAvailableManaEstimate(ai, false)
++                        - sa.getPayCosts().getTotalMana().getCMC() - (sa.getPayCosts().hasTapCost() ? 1 : 0);
++                return left >= instants && ComputerUtilCard.doesSpecifiedCreatureAttackAI(ai, becomeAnimated(source, sa));
++            }
++            return false;
 +        }
          // Don't use instant speed animate abilities before AI's COMBAT_BEGIN
          if (!ph.is(PhaseType.COMBAT_BEGIN) && ph.isPlayerTurn(ai) && !isSorcerySpeed(sa, ai)

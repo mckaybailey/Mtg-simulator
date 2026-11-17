@@ -28,7 +28,7 @@ other ten meta decks, 100 games each, seed 1 (1,000 games per arm).
 | 0010 | Chainsaw (Boros Dwarves) | the same, for its "up to one target" 3 damage | card script |
 | 0011 | Ba Sing Se (Mono-Green Landfall) | `EarthbendAi` approved the activation every first main phase, leaving no mana for permanents cast in the second | Java |
 | 0013 | Stoke Genius (Izzet Spellementals) | `DiscardAi` cast "discard your hand, then draw two" with any hand (most often five cards discarded) | Java |
-| 0014 | Great Hall of the Biblioplex (Four-Color Control) | `AnimateAi` let a permanent animate through at any time, so the {5} animate was paid in the AI's own upkeep and left it tapped out for two turns | Java |
+| 0014 | Great Hall of the Biblioplex (Four-Color Control); Soulstone Sanctuary (Dimir Midrange, Mono-Black Aggro) | `AnimateAi` let a land's permanent self-animate through at any time, so the {5} animate was paid in the AI's own upkeep and left it tapped out for two turns; now at the opponent's end step, or before the AI's own attack when the land will attack and the instants in hand stay payable | Java |
 
 0020 is of another kind: it changes no card and no game played without Monte Carlo. It adds
 `AiController.setFlatMonteCarloCountOnly`, which the driver switches on for seats playing
@@ -43,7 +43,9 @@ games replay from the seed (`VALIDATION.md`, "Monte Carlo with a fixed budget").
 | Boros Dragons (0009) | 64.5% (61–67%) | 66.0% (63–69%) | +1.5 (−2.7 to +5.7), not reliable | 53.0% (46–60%) |
 | Boros Dwarves (0010) | 74.5% (72–77%) | 74.4% (72–77%) | −0.1 (−3.9 to +3.7), no effect | 48.0% (41–55%) |
 | Mono-Green Landfall (0011) | 47.4% (44–50%) | 67.7% (65–71%) | +20.3 (+16.0 to +24.5) | 54.8% (48–62%) |
-| Four-Color Control (0014) | 42.1% (40–44%) | 53.9% (52–56%) | +11.8 (+8.5 to +15.1; paired +9.6 to +14.1) | 52.0% (45–59%) |
+| Four-Color Control (0014) | 42.1% (40–44%) | 54.2% (52–57%) | +12.1 (+8.8 to +15.4; paired +9.9 to +14.4) | 49.5% (43–56%) |
+| Mono-Black Aggro (0014) | 68.5% (66–71%) | 67.7% (65–70%) | −0.8 (paired −1.9 to +0.4), no effect | |
+| Dimir Midrange (0014) | 52.2% (50–55%) | 52.8% (50–55%) | +0.6 (paired −1.0 to +2.2), no effect | |
 | Izzet Spellementals (0013) | 32.9% (31–35%) | 36.2% (34–39%) | +3.3 (+0.1 to +6.5; paired +1.6 to +5.0) | 51.0% (44–58%) |
 
 Patches that share a deck were measured together, except 0001 and 0002 (0001 alone: +17.5,
