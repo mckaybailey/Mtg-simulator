@@ -41,3 +41,9 @@ Dimir Midrange 52.2% → 52.5% (+0.2, paired CI −1.3 to +1.8), Mono-Black Aggr
 also allows the animate before the AI's own attack when the land is untapped and no instant or
 flash card in hand wants the mana; it is being measured on all three decks and replaces 0014 if
 it keeps Four-Color Control's gain without the loss.
+
+First revision measured (16–17 Nov, against the same without-arms): Four-Color Control +11.8
+(paired −/+: +9.6 to +14.0), Mono-Black Aggro −1.7 (paired −2.9 to −0.5). Mono-Black Aggro
+holds nine instant removal spells, so one in hand stopped the precombat animate even with mana
+to spare. A second revision (`0014-land-animate-revised-mana.patch.txt`) allows it when the mana
+left afterwards still pays for the cheapest instant or flash card in hand; being measured.
