@@ -594,6 +594,38 @@ and Azorius Momo gains 2 points; no deck's verdict changes.
 spread comes from the pilot: Forge's AI plays creature decks far better, relative to people, than
 decks that win through planning.
 
+## A random sample of the real field, best-of-three (17 November 2026)
+
+A stricter version of the field test: instead of one list per small archetype, 100 lists drawn at
+random from the 1,811 decklists of the three events the real win rates come from
+(`decks/standard/fracture-2026-sample/`; draw, sources and the card-overlap archetypes in its README).
+The sample has the field's real composition: 81 of the 100 are meta archetypes (real 81.3%), with
+list-to-list variation inside them. Each meta deck played 6 best-of-three matches against each
+list, Forge's sideboarding, seed 1 (`tools/sample_runs.sh`, `runs/sample/<deck>`, 10,800 matches,
+0 errors; the pairing counts are in `decks/standard/fracture-2026-sample/baseline-bo3-n6-s1.json`).
+Every list counts once. `tools/sample_calibration.py runs/rr18-bo3 runs/sample` compares the decks'
+match win rates against the sample with their share-weighted match win rates against the other
+meta decks (`runs/rr18-bo3`, the same format):
+
+| 18 decks, best-of-three matches | Spearman | Mean gap | SD |
+|---|---|---|---|
+| against the meta decks only, share-weighted | 0.08 (0.04–0.17) | 16.6 (15.9–17.7) | 19.8 (19.0–20.7) |
+| against the 100-list sample | 0.11 (0.05–0.17) | 15.8 (15.1–16.5) | 18.6 (18.0–19.3) |
+| against the sample, mirrors left out | 0.11 (0.06–0.18) | 16.3 (15.6–17.0) | 19.1 (18.5–19.8) |
+| sample minus meta-only | +0.03 (−0.07 to +0.10) | −0.9 (−2.2 to +0.1) | −1.2 (−2.4 to −0.2) |
+| no-mirror sample minus meta-only | +0.04 (−0.07 to +0.11) | −0.3 (−1.8 to +0.6) | −0.7 (−1.9 to +0.3) |
+
+(Real SD 6.0. Matches spread wider than games, as in "Best-of-three with sideboards": the same
+comparison on game 1s of `runs/rr18-bo3` gives SD 14.9.) The realistic field narrows the spread by
+about one point out of the thirteen it would need to lose, and with mirrors left out, as the real
+win rates are, not beyond noise. The ranking does not change: Boros Dwarves 82%, Mono-Black Aggro
+73%, Boros Dragons 72% and Mono-Green Landfall 78% against the sample; Jund Sacrifice 34% (real
+57.6%), Dimir Uldaros 29%, Izzet Spellementals 32%. The largest single moves are Four-Color Control
+(+9.5 points, 34.7 → 44.2), Jund Sacrifice (+9.1), Rakdos Lizards (+6.1) and Azorius Momo (+5.3):
+against variant lists and the small archetypes they do better than against the 18 fixed lists,
+without changing the overall verdict. **A bigger, realistic field does not explain the gap**; this
+confirms `tools/field_bound.py` with real lists.
+
 ## The goldfish model
 
 Unit tests check the opening-hand land counts against the exact hypergeometric distribution

@@ -10,6 +10,10 @@
   the same Magic.gg article links, one melee.gg list each, `meta_share` split evenly, no real win
   rates. Used by `tools/field_calibration.py` to rate the meta decks against the whole field; not a
   default gauntlet.
+- `standard/fracture-2026-sample/`: 100 lists drawn at random from the 1,811 lists of the same three
+  events (melee.gg), `meta_share` 1.0 each, `archetype` from card overlap (81 meta archetypes). Used
+  by `tools/sample_runs.sh` / `tools/sample_calibration.py`; `baseline-bo3-n6-s1.json` holds the
+  meta decks' results against it. Not a default gauntlet.
 - `standard/casual/`: five one-colour decks built from Foundations commons and uncommons, as
   kitchen-table opponents. Written for mtgsim, not tournament lists.
 - `brews/` (create when needed): user decks worth keeping.

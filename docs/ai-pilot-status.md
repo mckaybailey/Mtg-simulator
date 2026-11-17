@@ -167,6 +167,22 @@ advisor would be a Forge patch, measured like any other.
   (real "Other" 45.7%).
 - **With format and field both ruled out, the gap is the pilot: go to step 4.**
 
+### Step 3b done (17 Nov 2026, at the user's request): a 100-list random sample of the field, bo3
+
+- `decks/standard/fracture-2026-sample/`: 100 lists drawn at random (seed 1) from the 1,811 lists
+  of the three source events (melee.gg standings), archetypes assigned by card overlap; 81 are
+  meta archetypes, as in the real field.
+- `tools/sample_runs.sh` (N=6 bo3 matches per pairing, Forge sideboarding, seed 1) into
+  `runs/sample/<deck>`; 10,800 matches. **Baseline for step 4 patches:**
+  `decks/standard/fracture-2026-sample/baseline-bo3-n6-s1.json` (pairing counts and the
+  `tools/sample_calibration.py` output), so a patch replays only the decks it changes.
+- Against `runs/rr18-bo3` matches: SD 19.8 → 18.6 (difference −1.2, −2.4 to −0.2), gap 16.6 → 15.8
+  (within noise), Spearman 0.08 → 0.11 (within noise); mirrors left out, SD −0.7 (−1.9 to +0.3).
+  Real SD 6.0. Numbers in `VALIDATION.md`, "A random sample of the real field".
+- The container sleeps about 10–15 minutes after the session goes idle and kills detached jobs
+  (runs/ survives). A long run advances only while a turn is active: stay in the turn with
+  foreground waits of at most 10 minutes, with a `send_later` fallback check-in.
+
 ### Next, in order (revised plan; one step per session is fine)
 
 1. **(Done, see above.) Check the bo3 mechanics on real games, then add tests and docs.** `runs/chk-bo3` exists from an
