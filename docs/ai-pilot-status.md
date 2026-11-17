@@ -21,6 +21,32 @@ Step 4, in `VALIDATION.md`, "The pilot":
   share-weighted SD 13.8 → 13.2 (−0.6, −2.5 to +1.3), gap 11.5 → 10.6 (−1.0, −2.5 to +1.2),
   Spearman 0.16 → 0.10. Within noise: the one-seat gains vanish when the opponents search too.
 
+**Open task, independent of the decision below: recalibrate and bring the user docs up to date.**
+The Forge patches changed this session (0013 and 0014 added, now 14 shipped), and `AGENTS.md` asks
+for the standard calibration run after every patch change. It has not been done; the 18-deck round
+robins in step 4 used 20 games per pairing and are not the calibration run. Steps:
+
+1. `python3 -m mtgsim doctor` (expect "14 applied, up to date"; if not, `setup --build`).
+2. `matrix decks/standard/meta -n 30 --seed 1 --out $PWD/runs/rr18-cal` (153 pairings, 4,590
+   games, about an hour on 4 cores; detach it from a resuming script and keep the turn open, see
+   "Long runs" below).
+3. `python3 tools/calibration.py runs/rr18-cal --reps 1000` (equal- and share-weighted figures),
+   then `python3 tools/update_calibration.py runs/rr18-cal`: it writes `sim_win_rate` and
+   `ai_pilot` into `decks/standard/meta/gauntlet.json` for all 18 decks (six have none yet) and
+   prints the README table. Edit the `calibration` string in `gauntlet.json` by hand (18 decks,
+   14 patches, the combined hash `doctor` prints, the date).
+4. `decks/standard/meta/README.md`: replace the calibration table and its text (now from the
+   12-deck, eleven-patch run: "rank correlation 0.23, mean gap 11.4").
+5. `README.md`, facts only (the wider rewrite waits for the user's decision (a)): lines ~37–38
+   (twelve decks, 0.23, 11 points → the new 18-deck numbers), line ~149 (`--mc fixed`: "a gain in
+   play strength ... has not been shown yet" → it wins 3–14 points on one seat against the
+   default AI, but on every seat the ranking is no closer to the real one; `VALIDATION.md`, "The
+   pilot"), and the mentions of "twelve" meta decks (~158, ~284; there are 18).
+6. The calibration numbers in `AGENTS.md` ("Always pass on the limits") and in `VALIDATION.md`
+   (add the run to "The pilot" or a short calibration section).
+7. Run the tests, commit, push `claude/ai-decision-engine` (and keep
+   `claude/gifted-mendel-ia018w` at the same commit if that session's branch is still used).
+
 **A decision is pending with the user (17 Nov). Ask which one before doing more work:**
 
 - **(a) Recommended: accept what mtgsim measures well and say so.** No more searching for realistic
