@@ -15,9 +15,19 @@ Measured: Forge 7db198d72e with patches 0001-0008, Azorius Control vs Boros Dwar
   default AI, 200 games, seed 1: 32.0% (26-39) against 26.0% (20-32) with the default pilot,
   +6.0 points (95% interval -2.9 to +14.8): not a reliable gain. 0.08-0.14 s per rollout, 178
   rollouts and 21 s per game for one searching seat (2.3 s without). See VALIDATION.md.
+  Revised 17 Nov 2026: AiController.setFlatMonteCarloCountedDepth and Config.counted(depth) size the
+  counted search by a depth (1 = the search above; mtgsim --mc deep plays depth 8: up to 8 approved
+  and 5 discovered lines, 2 target variants, 32 rounds plus 16, 800 rollouts a turn). Depth 1 is
+  unchanged: Azorius Control vs Boros Dwarves, `-n 12 --seed 7 --mc fixed`, 12 of 12 games
+  identical before and after. Depth 8 replays: `-n 4 --seed 7 --mc deep` with 2 and 4 workers gave
+  identical games and rollout counts. Cost with both seats searching: 6.6 rollouts a decision and
+  54 s a game at depth 1, 14.2 and 105 s at depth 4, 23.6 and 186 s at depth 8 (pruning keeps the
+  real growth below the nominal one). Strength: Dimir Uldaros's seat against the default-piloted
+  meta, 540 games per arm, seed 1: fixed 45.2% (41-49), deep 44.4% (40-49), deep - fixed -0.7
+  (paired -3.6 to +2.1) at 2.9 times the rollouts. No gain; see VALIDATION.md, "The pilot" (iv).
 
 diff --git a/forge-ai/src/main/java/forge/ai/AiController.java b/forge-ai/src/main/java/forge/ai/AiController.java
-index 0fd6cee9..f7dc2a67 100644
+index 0fd6cee9..f7db2d28 100644
 --- a/forge-ai/src/main/java/forge/ai/AiController.java
 +++ b/forge-ai/src/main/java/forge/ai/AiController.java
 @@ -99,6 +99,7 @@ public class AiController {
@@ -28,16 +38,18 @@ index 0fd6cee9..f7dc2a67 100644
      private FlatMonteCarloPicker.Result lastFlatMcResult;
      /** Circuit breaker: Monte Carlo switches itself off for this player after repeated errors or hopeless slowness. */
      private int flatMcErrors;
-@@ -117,6 +118,8 @@ public class AiController {
+@@ -117,6 +118,10 @@ public class AiController {
      /** Per player switch for comparisons and tests: null follows the game-wide setting. */
      private Boolean flatMcOverride;
      private Boolean flatMcMaxOverride;
 +    /** Search by counts, never by the clock (see {@link FlatMonteCarloPicker.Config#counted}); for reproducible games. */
 +    private boolean flatMcCountOnly;
++    /** Size of the counted search, see {@link FlatMonteCarloPicker.Config#counted(int)}; 1 is mtgsim's "--mc fixed". */
++    private int flatMcCountedDepth = 1;
  
      /**
       * Casts and activations that could not be put on the stack this turn (illegal targets), by card and ability, to
-@@ -1546,6 +1549,7 @@ public class AiController {
+@@ -1546,6 +1551,7 @@ public class AiController {
          lastFlatMcResult = result;
          FlatMonteCarloStats.record(result);
          flatMcTurnSpentNanos += result.elapsedNanos;
@@ -45,7 +57,7 @@ index 0fd6cee9..f7dc2a67 100644
          noteFlatMcOutcome(result.reason);
          final boolean changed = result.decidedByRollouts && result.attackers != null && !result.attackers.equals(before);
          FlatMonteCarloStats.noteAttackResult(result, changed);
-@@ -1704,6 +1708,7 @@ public class AiController {
+@@ -1704,6 +1710,7 @@ public class AiController {
              FlatMonteCarloStats.record(result);
              FlatMonteCarloStats.noteLandChoice(result.decidedByRollouts, result.choice != candidates.get(0));
              flatMcTurnSpentNanos += result.elapsedNanos;
@@ -53,7 +65,7 @@ index 0fd6cee9..f7dc2a67 100644
              noteFlatMcOutcome(result.reason);
              if (result.choice != null && result.choice != candidates.get(0)) {
                  final List<SpellAbility> chosen = new ArrayList<>();
-@@ -2334,6 +2339,7 @@ public class AiController {
+@@ -2334,6 +2341,7 @@ public class AiController {
          if (turn != flatMcTurn) {
              flatMcTurn = turn;
              flatMcTurnSpentNanos = 0;
@@ -61,19 +73,20 @@ index 0fd6cee9..f7dc2a67 100644
          }
          final FlatMonteCarloPicker.Config cfg = FlatMonteCarloPicker.Config.fromProfile(this, player);
          if (flatMcMaxOverride != null ? flatMcMaxOverride : game.getAIFlatMonteCarloMax()) {
-@@ -2341,6 +2347,11 @@ public class AiController {
+@@ -2341,6 +2349,12 @@ public class AiController {
          } else if (game.getAIFlatMonteCarloLite()) {
              cfg.mobileLite();
          }
 +        if (flatMcCountOnly) {
 +            // No smaller search after slow decisions: the size of the search is fixed. The turn budget is counted in
 +            // rollouts; like the timed one it is what ends a turn in which the same play is chosen over and over.
-+            return flatMcTurnSpentRollouts >= FlatMonteCarloPicker.COUNTED_TURN_ROLLOUTS ? null : cfg.counted();
++            return flatMcTurnSpentRollouts >= FlatMonteCarloPicker.countedTurnRollouts(flatMcCountedDepth) ? null
++                    : cfg.counted(flatMcCountedDepth);
 +        }
          if (flatMcSlowTrips > 0) {
              // Back after a pause for slowness: a smaller search, and no look at the opponent's turn, which costs most.
              cfg.maxCandidates = Math.max(3, cfg.maxCandidates - 2 * flatMcSlowTrips);
-@@ -2426,6 +2437,7 @@ public class AiController {
+@@ -2426,6 +2440,7 @@ public class AiController {
          lastFlatMcResult = result;
          FlatMonteCarloStats.record(result);
          flatMcTurnSpentNanos += result.elapsedNanos;
@@ -81,7 +94,7 @@ index 0fd6cee9..f7dc2a67 100644
          noteFlatMcOutcome(result.reason);
          if (result.hold) {
              return null; // pass priority with the mana still available
-@@ -2523,6 +2535,19 @@ public class AiController {
+@@ -2523,6 +2538,32 @@ public class AiController {
          return game.getAIFlatMonteCarloLite();
      }
  
@@ -98,10 +111,23 @@ index 0fd6cee9..f7dc2a67 100644
 +        return flatMcCountOnly;
 +    }
 +
++    /**
++     * How large the counted search is (see {@link FlatMonteCarloPicker.Config#counted(int)}): 1, the default, is the
++     * size of mtgsim's "--mc fixed"; larger depths compare more lines with more rollouts each and allow more rollouts
++     * per turn. Only read while {@link #setFlatMonteCarloCountOnly} is on.
++     */
++    public void setFlatMonteCarloCountedDepth(final int depth) {
++        flatMcCountedDepth = Math.max(1, Math.min(FlatMonteCarloPicker.MAX_COUNTED_DEPTH, depth));
++    }
++
++    public int getFlatMonteCarloCountedDepth() {
++        return flatMcCountedDepth;
++    }
++
      /** Forces the attack search on or off for this player; null follows the profile (FLAT_MC_ATTACK). */
      public void setFlatMonteCarloAttackOverride(final Boolean enabled) {
          flatMcAttackOverride = enabled;
-@@ -2534,6 +2559,9 @@ public class AiController {
+@@ -2534,6 +2575,9 @@ public class AiController {
      }
  
      void noteFlatMcOutcome(final String reason) {
@@ -112,10 +138,10 @@ index 0fd6cee9..f7dc2a67 100644
              if (++flatMcErrors >= 3) {
                  flatMcTripped = true;
 diff --git a/forge-ai/src/main/java/forge/ai/simulation/FlatMonteCarloPicker.java b/forge-ai/src/main/java/forge/ai/simulation/FlatMonteCarloPicker.java
-index b568aa40..aaa120d7 100644
+index b568aa40..b86a5d46 100644
 --- a/forge-ai/src/main/java/forge/ai/simulation/FlatMonteCarloPicker.java
 +++ b/forge-ai/src/main/java/forge/ai/simulation/FlatMonteCarloPicker.java
-@@ -89,6 +89,20 @@ public final class FlatMonteCarloPicker {
+@@ -89,6 +89,27 @@ public final class FlatMonteCarloPicker {
      static final int LOOKAHEAD_PERCENT_MOBILE = 35;
      /** On a phone the (expensive) look at the opponent's turn is only done for decisions with at most this many lines. */
      static final int MOBILE_LOOKAHEAD_MAX_CANDIDATES = 3;
@@ -131,12 +157,19 @@ index b568aa40..aaa120d7 100644
 +     * the stack is chosen again and again.
 +     */
 +    public static final int COUNTED_TURN_ROLLOUTS = 100;
++    /** Largest depth of the counted search, see {@link Config#counted(int)}. */
++    public static final int MAX_COUNTED_DEPTH = 8;
++
++    /** The turn budget in rollouts of a counted search of this depth: {@link #COUNTED_TURN_ROLLOUTS} per step of depth. */
++    public static int countedTurnRollouts(final int depth) {
++        return COUNTED_TURN_ROLLOUTS * Math.max(1, Math.min(MAX_COUNTED_DEPTH, depth));
++    }
 +    /** Stands for "no limit" where a time budget is still read; far from overflowing when doubled or added to a clock value. */
 +    static final long NO_TIME_LIMIT_NANOS = Long.MAX_VALUE / 8;
  
      private static final int HOLD_VALUE_PER_CMC = 14;
      private static final int HOLD_COUNTER_VALUE_PER_CMC = 22;
-@@ -200,6 +214,12 @@ public final class FlatMonteCarloPicker {
+@@ -200,6 +221,12 @@ public final class FlatMonteCarloPicker {
           * so a slow device keeps a real, if smaller, comparison instead of one sample per line and no pairs.
           */
          public boolean scaleToDevice = true;
@@ -149,7 +182,7 @@ index b568aa40..aaa120d7 100644
          /** Drop lines that are clearly behind after every round, so the budget goes to the lines still in contention. */
          public boolean pruning = true;
          /** Value held-up cards by what they do (counter, removal, trick, flash creature) instead of mana cost alone. */
-@@ -332,6 +352,29 @@ public final class FlatMonteCarloPicker {
+@@ -332,6 +359,41 @@ public final class FlatMonteCarloPicker {
              return this;
          }
  
@@ -163,13 +196,25 @@ index b568aa40..aaa120d7 100644
 +         * maximum strength features at this size.
 +         */
 +        public Config counted() {
++            return counted(1);
++        }
++
++        /**
++         * The counted search at a given depth (1 to {@link FlatMonteCarloPicker#MAX_COUNTED_DEPTH}; depth 1 is
++         * {@link #counted()}). Each step of depth adds one approved and one discovered play to the comparison (up to
++         * the desktop maximum of {@link #maximized()}), a second target variant from depth 2, and as many rounds
++         * again: depth d plays {@code COUNTED_ROLLOUTS * d} rounds plus {@code COUNTED_EXTRA_ROUNDS * d} for the lines
++         * still in the race. Nothing is timed at any depth, so a game still replays from its seed.
++         */
++        public Config counted(final int depth) {
++            final int d = Math.max(1, Math.min(MAX_COUNTED_DEPTH, depth));
 +            countOnly = true;
 +            scaleToDevice = false;
-+            maxCandidates = COUNTED_CANDIDATES;
-+            targetVariants = COUNTED_TARGET_VARIANTS;
-+            extraCandidates = COUNTED_EXTRA_CANDIDATES;
-+            rolloutsPerCandidate = COUNTED_ROLLOUTS;
-+            extraRounds = COUNTED_EXTRA_ROUNDS;
++            maxCandidates = Math.min(MAX_CANDIDATES_DESKTOP, COUNTED_CANDIDATES + d - 1);
++            targetVariants = Math.min(MAX_TARGET_VARIANTS_DESKTOP, COUNTED_TARGET_VARIANTS + (d > 1 ? 1 : 0));
++            extraCandidates = Math.min(MAX_EXTRA_CANDIDATES_DESKTOP, COUNTED_EXTRA_CANDIDATES + d - 1);
++            rolloutsPerCandidate = COUNTED_ROLLOUTS * d;
++            extraRounds = COUNTED_EXTRA_ROUNDS * d;
 +            pruning = true;
 +            budgetNanos = NO_TIME_LIMIT_NANOS;
 +            turnBudgetNanos = NO_TIME_LIMIT_NANOS;
@@ -179,7 +224,7 @@ index b568aa40..aaa120d7 100644
          private static int intProp(final AiController ai, final AiProps prop, final int min, final int max) {
              int value;
              try {
-@@ -540,17 +583,19 @@ public final class FlatMonteCarloPicker {
+@@ -540,17 +602,19 @@ public final class FlatMonteCarloPicker {
          if (cands.size() < 2) {
              return Result.keepHeuristic(heuristicChoice, "single-candidate");
          }
@@ -202,7 +247,7 @@ index b568aa40..aaa120d7 100644
          final long baseSeed = MyRandom.getRandom().nextLong();
  
          final int playoutPlays = playoutLength(player, cfg);
-@@ -587,7 +632,7 @@ public final class FlatMonteCarloPicker {
+@@ -587,7 +651,7 @@ public final class FlatMonteCarloPicker {
                      break; // nothing left to compare
                  }
                  // Only start another round if all of it fits, so that every candidate gets the same samples.
@@ -211,7 +256,7 @@ index b568aa40..aaa120d7 100644
                      break;
                  }
              }
-@@ -596,7 +641,7 @@ public final class FlatMonteCarloPicker {
+@@ -596,7 +660,7 @@ public final class FlatMonteCarloPicker {
                      continue;
                  }
                  AITimeoutTracker.check();
@@ -220,7 +265,7 @@ index b568aa40..aaa120d7 100644
                      // The second candidate is what makes a comparison possible at all, so it may use the hard limit.
                      final long limit = r == 0 && c == 1 || r == 1 ? hardDeadline : softDeadline;
                      if (System.nanoTime() + maxRolloutNanos > limit) {
-@@ -604,7 +649,7 @@ public final class FlatMonteCarloPicker {
+@@ -604,7 +668,7 @@ public final class FlatMonteCarloPicker {
                          break rounds;
                      }
                  }
@@ -229,7 +274,7 @@ index b568aa40..aaa120d7 100644
                      tooSlow = r == 0 && c < 2;
                      break rounds;
                  }
-@@ -615,7 +660,7 @@ public final class FlatMonteCarloPicker {
+@@ -615,7 +679,7 @@ public final class FlatMonteCarloPicker {
                  final Long value = !aimed ? null : rollout(player, cand, seed, rcfg, playoutPlays, mode);
                  maxRolloutNanos = Math.max(maxRolloutNanos, System.nanoTime() - t0);
                  rollouts++;
@@ -238,7 +283,7 @@ index b568aa40..aaa120d7 100644
                      limitN = Math.min(limitN, affordableLines(softDeadline - System.nanoTime(), maxRolloutNanos,
                              cfg.rolloutsPerCandidate, n));
                  }
-@@ -642,7 +687,7 @@ public final class FlatMonteCarloPicker {
+@@ -642,7 +706,7 @@ public final class FlatMonteCarloPicker {
          }
  
          final long elapsed = System.nanoTime() - start;
@@ -247,7 +292,7 @@ index b568aa40..aaa120d7 100644
              FlatMonteCarloStats.noteSlow(mode + " " + (elapsed / 1_000_000) + "ms: candidates=" + n + " evaluated=" + evaluated
                      + " rollouts=" + rollouts + " build=" + (buildNanos / 1_000_000) + "ms longestRollout="
                      + (maxRolloutNanos / 1_000_000) + "ms budget=" + (budget / 1_000_000) + "ms");
-@@ -1655,7 +1700,9 @@ public final class FlatMonteCarloPicker {
+@@ -1655,7 +1719,9 @@ public final class FlatMonteCarloPicker {
              final GameSimulator sim = GameSimulator.forRollout(player.getGame(), player, mode == Mode.RESPOND || mode == Mode.BLOCKED);
              final Game simGame = sim.getSimulatedGameState();
              final Player simAi = sim.getSimulatedAiPlayer();

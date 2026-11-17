@@ -21,6 +21,20 @@ Step 4, in `VALIDATION.md`, "The pilot":
   share-weighted SD 13.8 → 13.2 (−0.6, −2.5 to +1.3), gap 11.5 → 10.6 (−1.0, −2.5 to +1.2),
   Spearman 0.16 → 0.10. Within noise: the one-seat gains vanish when the opponents search too.
 
+**Update, later on 17 Nov: option (b) was tried and fails at the gate.** The user chose (b), a much
+larger search budget. `--mc deep` (patch 0020 revised: the counted search at depth 8, still
+replayable) uses 2.9 times the rollouts of `fixed` on one seat and wins no more: Dimir Uldaros
+against the default meta, 540 games per arm, `fixed` 45.2%, `deep` 44.4%, −0.7 (paired −3.6 to
++2.1); `fixed` − default +13.1, replicating step 4 (ii). 478 of 540 games end the same way. The
+search is saturated at `fixed`'s size: the rollouts' heuristic playouts and the evaluation limit
+it, not the sample count. The all-seat round robin (~19 h) was therefore not run.
+`VALIDATION.md`, "The pilot" (iv). What remains of the options below: (a), (c), or a different
+kind of pilot change (better rollout policy or evaluation, which is real Forge AI work).
+Decision with the user (17 Nov): the result is kept, not deleted, so the experiment is not
+repeated. `--mc deep` stays as an experiment setting (it gives no better results than `fixed`;
+`fixed` games are unchanged by it) and the branch `claude/intelligent-bohr-0rx7cq` goes to `main`
+by pull request. Dropping the code later is safe: the experiment rebuilds from commit `8aa373d`.
+
 **Done 17 Nov (later session): recalibration and user-doc facts.** `matrix decks/standard/meta
 -n 30 --seed 1` (`runs/rr18-cal`, 4,590 games, 14 patches, no time-outs or errors): Spearman
 0.14 (0.04–0.19), mean gap 11.4, SD 14.0 against a real 6.0, equal- and share-weighted alike.

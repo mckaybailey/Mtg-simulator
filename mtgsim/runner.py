@@ -24,8 +24,10 @@ STARTUP_TIMEOUT = 300  # seconds to wait for a JVM to load the card database
 RESULT_GRACE = 60  # seconds beyond the in-game timeout before a silent worker is declared hung
 
 # Monte Carlo settings of a game or a seat. "fixed" is the search with a budget counted in rollouts
-# instead of milliseconds (Forge patch 0020): the only one whose games replay from the seed.
-MONTE_CARLO_MODES = ("off", "on", "max", "fixed")
+# instead of milliseconds (Forge patch 0020); "deep" is the same counted search with a larger budget
+# (depth 8: more lines and rounds, about 3.6 times the rollouts). Those two are the only ones whose games replay from the seed.
+MONTE_CARLO_MODES = ("off", "on", "max", "fixed", "deep")
+COUNTED_MODES = ("fixed", "deep")
 DEFAULT_TIMEOUT = 180  # seconds per game
 # A "fixed" search is never cut short by the clock, so its games take as long as they take
 # (VALIDATION.md, "Monte Carlo with a fixed budget"); a game stopped at the time limit is not a replay.
@@ -54,9 +56,10 @@ class Job:
     meta: dict = field(default_factory=dict)
 
     def uses_fixed_search(self) -> bool:
-        """Whether any seat plays Monte Carlo "fixed" (a per-seat setting overrides the game's)."""
+        """Whether any seat plays a counted Monte Carlo search, "fixed" or "deep" (a per-seat setting overrides the
+        game's)."""
         seats = self.seat_monte_carlo or [""] * len(self.decks)
-        return any((mode or self.monte_carlo) == "fixed" for mode in seats)
+        return any((mode or self.monte_carlo) in COUNTED_MODES for mode in seats)
 
     def line(self) -> str:
         for mode in [self.monte_carlo] + [m for m in self.seat_monte_carlo if m]:

@@ -26,7 +26,7 @@ from typing import Callable, Dict, Iterable, List, Optional, Tuple
 from . import ai_profiles
 from .decks import Deck
 from .forge import ForgeInstall, patches_for_run
-from .runner import DEFAULT_TIMEOUT, FIXED_TIMEOUT, Job, run_jobs
+from .runner import COUNTED_MODES, DEFAULT_TIMEOUT, FIXED_TIMEOUT, Job, run_jobs
 
 
 class RunError(RuntimeError):
@@ -44,7 +44,7 @@ class Entrant:
     category: str = ""
     pilot: str = ""  # how well the AI plays this deck compared with people: "weak", "fair", "strong" or unknown
     ai_profile: str = ""  # Forge AI profile for this deck's seat ("" = the run's default)
-    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max", "fixed" ("" = the run's default)
+    ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max", "fixed", "deep" ("" = the run's default)
     dck_path: str = ""
 
     def describe(self) -> dict:
@@ -93,7 +93,7 @@ class RunOptions:
         if self.match_format != "bo1":  # best-of-one runs keep the description they always had
             info.update({"match_format": self.match_format, "sideboard": self.sideboard,
                          "matches_per_pairing": self.games})
-        if self.monte_carlo == "fixed":  # execute() also adds it when only a deck's ai_mc asks for "fixed"
+        if self.monte_carlo in COUNTED_MODES:  # execute() also adds it when only a deck's ai_mc asks for one
             info["timeout_fixed"] = self.fixed_timeout
         return info
 
