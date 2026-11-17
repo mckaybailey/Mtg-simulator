@@ -182,7 +182,7 @@ def _mc_setting(value, deck_name: str) -> str:
     if value in (None, ""):
         return ""
     if value not in MONTE_CARLO_MODES:
-        raise UserError(f"ai_mc for {deck_name} must be off, on, max or fixed, not {value!r}")
+        raise UserError(f"ai_mc for {deck_name} must be off, on, max, fixed or deep, not {value!r}")
     return str(value)
 
 
@@ -808,12 +808,12 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
     p.add_argument("--strict", action="store_true", help="refuse to simulate decks that break format rules")
     p.add_argument("--timeout", type=int, default=None,
                    help=f"seconds before a game is stopped and counted as unfinished (default {DEFAULT_TIMEOUT}; "
-                        f"{FIXED_TIMEOUT} for games with Monte Carlo \"fixed\")")
+                        f"{FIXED_TIMEOUT} for games with Monte Carlo \"fixed\" or \"deep\")")
     p.add_argument("--ai-profile", help="Forge AI profile for both players (Default, Reckless, Cautious, ...)")
     p.add_argument("--mc", choices=MONTE_CARLO_MODES, default=None,
                    help="Forge's Monte Carlo AI look-ahead for every player: slower. on and max think against the "
                         "clock, so their games do not replay from the seed; fixed searches a counted number of "
-                        "rollouts and does")
+                        "rollouts and does; deep is fixed with a larger budget (several times slower again)")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")
 
@@ -921,10 +921,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--strict", action="store_true", help="refuse decks that break format rules")
     p.add_argument("--timeout", type=int, default=None,
                    help=f"seconds before a game is stopped and counted as unfinished (default {DEFAULT_TIMEOUT}; "
-                        f"{FIXED_TIMEOUT} with --mc fixed)")
+                        f"{FIXED_TIMEOUT} with --mc fixed or deep)")
     p.add_argument("--mc", choices=MONTE_CARLO_MODES, default=None,
                    help="Monte Carlo search for every seat (default off; on and max make the cache inexact, "
-                        "fixed replays from the seed but is many times slower)")
+                        "fixed and deep replay from the seed but are many times slower)")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.set_defaults(func=cmd_tune)
 

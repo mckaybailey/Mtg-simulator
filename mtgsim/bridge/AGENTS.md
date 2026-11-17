@@ -14,7 +14,7 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
   `FModel.initialize`, replacing Forge's `res/ai` set, and the ready line adds `aiProfileDir` and
   `aiProfiles` (count). A profile setting this Forge does not know is a fatal startup error.
 - stdin: one job per line, tab-separated `key=value`: `id`, `seed`, `timeout`, `format`,
-  `mc` (`off|on|max|fixed`, whole game), `log` (path or empty), repeated `deck=` (seat order),
+  `mc` (`off|on|max|fixed|deep`, whole game), `log` (path or empty), repeated `deck=` (seat order),
   repeated `profile=`, repeated `seatmc=` (per seat; empty follows `mc`). `quit` ends the process.
   Any other Monte Carlo value makes the game an `error`. Three optional fields serve games 2 and 3
   of a best-of-three match (`experiment.plan_match_game`); without them the job is what it always
@@ -83,6 +83,13 @@ the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay
   `timeout` (a game stopped by it is a `timeout`, not a replay; the runner gives fixed games
   1,800 s), and Forge's `StormSolver` (only for decks whose plan Forge classifies as a tutor-storm combo, a 4 s budget; not exercised by the
   measurements in `VALIDATION.md`).
+- **Monte Carlo `deep` is `fixed` at a larger budget.** The driver also calls
+  `AiController.setFlatMonteCarloCountedDepth(DEEP_DEPTH)` (8; `Config.counted(depth)` in patch
+  0020): at most 8 approved + 2 other targets + 5 discovered plays + holding, 32 rounds and 16 more,
+  800 rollouts a turn. Pruning keeps the real growth smaller: 23.6 rollouts a decision against 6.6
+  for `fixed`, about 3.5 times its engine time; it plays no better than `fixed` (`VALIDATION.md`, "The pilot" (iv)). Everything said above about `fixed` (no clock,
+  replays from the seed, heap, timeout) holds for `deep`. `fixed` never calls the depth setter,
+  so its games are the same on builds with and without it.
 - After every game with Monte Carlo the driver prints `FlatMonteCarloStats.summary()` to stderr
   (the worker log) under a `[mtgsim] Monte Carlo in game <id>` line; the counters are reset at
   the start of each such game (one game at a time per JVM). `tools/mc_cost.py` adds them up.

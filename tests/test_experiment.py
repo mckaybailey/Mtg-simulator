@@ -128,9 +128,20 @@ class SeedAndPlanTest(unittest.TestCase):
         self.assertIn("seatmc=\tseatmc=fixed", Job(id="a|b|0", seed=1, decks=["a", "b"],
                                                    seat_monte_carlo=["", "fixed"]).line())
 
+    def test_deep_monte_carlo_is_a_counted_search_with_the_long_time_limit(self):
+        a, b = _entrants()
+        a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
+        a.ai_mc = "deep"
+        jobs = experiment.plan_pairing(a, b, RunOptions(games=2, fixed_timeout=700), Path("/tmp/run"))
+        self.assertEqual([["deep", ""], ["", "deep"]], [j.seat_monte_carlo for j in jobs])
+        self.assertTrue(all(j.uses_fixed_search() for j in jobs))
+        self.assertEqual([700, 700], [j.timeout for j in jobs])
+        self.assertIn("seatmc=deep\tseatmc=", jobs[0].line())
+
     def test_options_record_the_fixed_time_limit_only_for_fixed_runs(self):
         self.assertNotIn("timeout_fixed", RunOptions().describe())
         self.assertEqual(FIXED_TIMEOUT, RunOptions(monte_carlo="fixed").describe()["timeout_fixed"])
+        self.assertEqual(FIXED_TIMEOUT, RunOptions(monte_carlo="deep").describe()["timeout_fixed"])
 
     def test_unique_keys(self):
         self.assertEqual(["mono-red", "mono-red-2", "deck", "a-b-s-c"],

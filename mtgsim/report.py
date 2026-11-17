@@ -677,7 +677,7 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
            + ("both decks sideboarding before games 2 and 3 with Forge's SideboardAdvisor; " if opts.get("sideboard", True)
               else "no sideboarding; "))
         + f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game"
-        + (f" ({int(opts['timeout_fixed'])}s for games with Monte Carlo fixed). " if isinstance(opts.get("timeout_fixed"), int) else ". ")
+        + (f" ({int(opts['timeout_fixed'])}s for games with a counted Monte Carlo search, fixed or deep). " if isinstance(opts.get("timeout_fixed"), int) else ". ")
         +
         f"{problems.get('timeouts', 0)} games hit the time limit and {problems.get('errors', 0)} failed in the engine; "
         "both are excluded from win rates."

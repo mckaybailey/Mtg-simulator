@@ -32,8 +32,9 @@ three measured AI fixes and `--mc fixed` for every seat leave the 18-deck SD at 
 6.0, see `VALIDATION.md`, "The pilot"). None of the levers in the plan closes the gap. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
-"CHECKPOINT" section at the top of `docs/ai-pilot-status.md`: a decision about what to do next is
-pending with the user (options there).
+"CHECKPOINT" section at the top of `docs/ai-pilot-status.md`. Option (b) there, a larger search
+budget, was tried on 17 Nov (`--mc deep`) and plays no better than `--mc fixed`; options (a) and (c)
+remain with the user.
 
 ## The AI pilot: what is settled, so it is not repeated
 
@@ -55,6 +56,9 @@ number. In short, as of 17 November 2026:
   Control +9.0, Jund Sacrifice +10.3, Dimir Uldaros +13.7, Boros Dwarves +2.9 points), but a round
   robin with it on every seat does not narrow the spread (SD 13.8 → 13.2, −0.6, −2.5 to +1.3; gap
   11.5 → 10.6, within noise).
+- **Settled (17 Nov): a larger search budget is not the lever.** `--mc deep` (the counted search
+  at depth 8, 2.9 times `fixed`'s rollouts) on Dimir Uldaros's seat: −0.7 points against `fixed`
+  (paired −3.6 to +2.1, 540 games per arm); the search is saturated at `fixed`'s size.
 - **Patches 0013 (Stoke Genius) and 0014 (Great Hall of the Biblioplex) (17 Nov):** found with
   `tools/log_analysis/activations.py`; Izzet Spellementals +3.3, Four-Color Control +12.1 points.
   0012 (Umbral Collar Zealot) was measured and dropped. The two Dimir decks showed no mana-sink error.
