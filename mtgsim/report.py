@@ -87,6 +87,8 @@ th,td{padding:6px 10px;text-align:right;white-space:nowrap;border-bottom:1px sol
 th{color:var(--ink2);font-weight:600;font-size:12.5px}
 th:first-child,td:first-child{text-align:left}
 td.name{white-space:normal;min-width:150px}
+td.why{white-space:normal;min-width:380px;text-align:left;color:var(--ink2);font-size:12.5px}
+.mv{display:inline-block;min-width:2em;text-align:right}
 td.n,th.n{font-variant-numeric:tabular-nums}
 tr.low td{color:var(--muted)}
 tbody tr:hover td{background:var(--wash)}
@@ -503,6 +505,107 @@ def _section_cards(summary: dict, names: Dict[str, str]) -> str:
     return "".join(out)
 
 
+MISPLAY_ROWS = 15
+
+
+def _misplay_meter(score: Optional[float]) -> str:
+    """Games hit per 100 as a bar on a fixed 0-100 scale, then the number (fixed width, so bars line up)."""
+    width = 0.0 if score is None else max(0.0, min(100.0, score))
+    return f'<span class="meter"><i style="width:{width:.1f}%"></i></span><span class="mv">{num(score, 0)}</span>'
+
+
+def _whole_pts(value: float) -> str:
+    rounded = round(value * 100)
+    return "0" if rounded == 0 else f"{rounded:+d}"
+
+
+def _misplay_compare(c: dict) -> str:
+    """Win-rate difference (flagged minus other games) in points, bold when its interval excludes zero."""
+    if c.get("diff") is None:
+        return '<td class="n">–</td><td class="n">–</td>'
+    lo, hi = c["ci"]
+    bold = c.get("significant")
+    return (f'<td class="n">{"<b>" if bold else ""}{pts(c["diff"])}{"</b>" if bold else ""} '
+            f'<span class="note">({c["games"]} vs {c["other_games"]})</span></td>'
+            f'<td class="n">{_whole_pts(lo)} to {_whole_pts(hi)}</td>')
+
+
+def _misplay_table(deck: dict) -> str:
+    from . import misplay
+
+    rows = misplay.top_cards(deck, MISPLAY_ROWS)
+    if not rows:
+        return '<p class="note">No card was flagged in these games.</p>'
+    body = []
+    if deck.get("basis") == "flagged":
+        head = ("<tr><th>Card</th><th>Games hit per 100</th><th>Seen</th><th>Cast when seen</th>"
+                "<th>Idle turns per game</th><th>Castable, never cast</th><th>Left in hand</th><th>Poor targets</th>"
+                "<th>Counter windows passed</th><th>Win rate hit − not (pts)</th><th>95% interval</th>"
+                "<th>Why it was flagged</th></tr>")
+        for r in rows:
+            idle, stranded = r["idle"], r["stranded"]
+            removal, counter = r.get("removal"), r.get("counter")
+            poor = (f'{removal["poor"]} of {removal["casts"]}' if removal and removal["casts"] else "–")
+            passed = (f'{counter["passed"]} ({counter["big_passed_games"]} big)' if counter else "–")
+            never = (f'{pct(idle["never_cast_share"], 0)} <span class="note">of {idle["castable_games"]}</span>'
+                     if idle["castable_games"] else "–")
+            body.append(
+                f'<tr><td class="name">{r["copies"]} {esc(r["card"])}</td>'
+                f'<td class="n">{_misplay_meter(r["score"])}</td>'
+                f'<td class="n">{r["seen"]}</td><td class="n">{pct(r["cast_rate"], 0)}</td>'
+                f'<td class="n">{num(idle["per_game"])}</td><td class="n">{never}</td>'
+                f'<td class="n">{pct(stranded["rate"], 0)}</td><td class="n">{poor}</td><td class="n">{passed}</td>'
+                + _misplay_compare(r["compare"])
+                + f'<td class="why">{esc("; ".join(r["reasons"]))}</td></tr>')
+    else:
+        head = ("<tr><th>Card</th><th>Never cast, per 100 games</th><th>Seen</th><th>Cast when seen</th>"
+                "<th>Win rate never cast − cast (pts)</th><th>95% interval</th></tr>")
+        for r in rows:
+            body.append(
+                f'<tr><td class="name">{r["copies"]} {esc(r["card"])}</td>'
+                f'<td class="n">{_misplay_meter(r["score"])}</td>'
+                f'<td class="n">{r["seen"]}</td><td class="n">{pct(r["cast_rate"], 0)}</td>'
+                + _misplay_compare(r["compare"]) + "</tr>")
+    return f'<div class="scroll"><table><thead>{head}</thead><tbody>{"".join(body)}</tbody></table></div>'
+
+
+def _section_misplays(summary: dict, names: Dict[str, str]) -> str:
+    data = summary.get("misplays") or {}
+    decks = data.get("decks") or {}
+    if not decks:
+        return ""
+    entrants = summary.get("entrants", {})
+    order = sorted(decks, key=lambda k: (entrants.get(k, {}).get("role") not in ("hero", "variant"),
+                                         names.get(k, k).lower()))
+    poor = data.get("poor_target") or 2 / 3
+    out = [
+        '<section class="card"><h2>Likely AI misplays</h2>',
+        '<p class="note">Cards the Forge AI may be mishandling, ranked by how many games of 100 a problem touched. '
+        "A game is flagged for a card when the card could have been cast in a free window and never was (the "
+        "owner's cleanup step for sorcery-speed cards, an opponent's for instants and flash), when it was left in "
+        "hand at the end after being castable, when removal hit a target worth less than "
+        f"{poor * 100:.0f}% of the best legal opposing target it could have killed (or its caster's own permanent), "
+        f"or when a counterspell let a spell of mana value {esc(data.get('big_spell', 3))} or more resolve while it "
+        "could have countered it. “Win rate hit − not” compares flagged games with the other games the card was seen "
+        "in; only bold differences have an interval clear of zero. "
+        + esc(data.get("caveat", "")) + "</p>",
+    ]
+    if not data.get("signals"):
+        out.append('<p class="note">These games were recorded before mtgsim tracked misplay signals, so only '
+                   "“seen but never cast” is available. Re-run the command with this version for the full analysis.</p>")
+    for key in order:
+        deck = decks[key]
+        flagged = len([r for r in deck.get("cards", []) if (r.get("score") or 0) > 0])
+        lands = deck.get("lands_left_in_hand")
+        sub = (f"{deck['games']} decided games, {flagged} card{'s' if flagged != 1 else ''} with a score above zero"
+               + (f"; {lands:.1f} lands left in hand at the end on average" if lands is not None else ""))
+        is_hero = entrants.get(key, {}).get("role") in ("hero", "variant")
+        out.append(f'<details{" open" if is_hero or len(decks) <= 2 else ""}><summary>{esc(names.get(key, key))} — '
+                   f'{esc(sub)}</summary>{_misplay_table(deck)}</details>')
+    out.append("</section>")
+    return "".join(out)
+
+
 def _section_clock(summary: dict, names: Dict[str, str]) -> str:
     clock = summary["clock"]
     games = clock["games"] or 1
@@ -538,6 +641,10 @@ def _section_clock(summary: dict, names: Dict[str, str]) -> str:
 
 def _section_decks(summary: dict, names: Dict[str, str]) -> str:
     out = ['<section class="card"><h2>Decks and run details</h2>']
+    run_opts = summary.get("options", {})
+    side_note = ("(not used in these best-of-one games)" if run_opts.get("match_format", "bo1") == "bo1"
+                 else "(sideboarded before games 2 and 3)" if run_opts.get("sideboard", True)
+                 else "(not used: best-of-three without sideboarding)")
     notes = summary.get("deck_notes") or {}
     if notes:
         out.append("<h3>Deck check notes</h3>")
@@ -554,7 +661,7 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
         out.append(f'<details{" open" if info.get("role") in ("hero", "variant") else ""}>'
                    f'<summary>{esc(info["name"])} — {esc(role)}, {info["main_count"]} cards</summary>'
                    f'<div class="decklist">{main}</div>'
-                   + (f'<p class="note">Sideboard (not used in these best-of-one games)</p><div class="decklist">{side}</div>' if side else "")
+                   + (f'<p class="note">Sideboard {side_note}</p><div class="decklist">{side}</div>' if side else "")
                    + "</details>")
     opts, forge = summary.get("options", {}), summary.get("forge", {})
     problems = summary.get("problems", {})
@@ -563,8 +670,15 @@ def _section_decks(summary: dict, names: Dict[str, str]) -> str:
         "<h3>How this was run</h3><p class=\"note\">"
         f"Forge {esc(forge.get('forgeVersion') or forge.get('version') or '?')}, AI profile {esc(opts.get('ai_profile', 'Default'))}"
         f"{'' if opts.get('monte_carlo', 'off') == 'off' else ', Monte Carlo ' + esc(opts.get('monte_carlo'))}; "
-        f"{opts.get('games_per_pairing', '?')} games per pairing, best-of-one, no sideboarding; "
-        f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game. "
+        + (f"{opts.get('games_per_pairing', '?')} games per pairing, best-of-one, no sideboarding; "
+           if opts.get("match_format", "bo1") == "bo1" else
+           f"{opts.get('games_per_pairing', '?')} best-of-three matches per pairing (win rates count matches; "
+           "play/draw, turns and mulligans count games; card statistics and misplays are from the first games), "
+           + ("both decks sideboarding before games 2 and 3 with Forge's SideboardAdvisor; " if opts.get("sideboard", True)
+              else "no sideboarding; "))
+        + f"base seed {opts.get('seed', '?')}; time limit {opts.get('timeout', '?')}s per game"
+        + (f" ({int(opts['timeout_fixed'])}s for games with Monte Carlo fixed). " if isinstance(opts.get("timeout_fixed"), int) else ". ")
+        +
         f"{problems.get('timeouts', 0)} games hit the time limit and {problems.get('errors', 0)} failed in the engine; "
         "both are excluded from win rates."
         + (f" Total run time {elapsed / 60:.0f} min." if elapsed else "")
@@ -592,10 +706,13 @@ def render(summary: dict) -> str:
     body = sections[kind](summary, names) if kind in sections else ""
     if kind != "clock":
         body += _section_cards(summary, names)
+    body += _section_misplays(summary, names)
     body += _section_goldfish(summary, names)
     body += _section_decks(summary, names)
     opts = summary.get("options", {})
-    sub = (f"{esc(summary.get('format', ''))} · {opts.get('games_per_pairing', '?')} games per pairing · "
+    per = ("games per pairing" if opts.get("match_format", "bo1") == "bo1"
+           else "best-of-three matches per pairing" + (", sideboarding" if opts.get("sideboard", True) else ""))
+    sub = (f"{esc(summary.get('format', ''))} · {opts.get('games_per_pairing', '?')} {per} · "
            f"Forge AI on both sides · {esc(summary.get('created', ''))}")
     return (
         "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"

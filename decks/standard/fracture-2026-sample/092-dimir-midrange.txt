@@ -1,0 +1,36 @@
+Deck
+2 Bitter Triumph
+4 Dream Beavers
+4 Enduring Curiosity
+4 Floodpits Drowner
+4 Gloomlake Verge
+4 Watery Grave
+2 Tishana's Tidebinder
+3 Swamp
+3 Requiting Hex
+1 Spell Snare
+2 Shipwreck Marsh
+2 Shoot the Sheriff
+2 Soulstone Sanctuary
+2 Restless Reef
+3 Spyglass Siren
+1 Strategic Betrayal
+4 Kaito, Bane of Nightmares
+2 The Wondrous Wasp
+4 Island
+1 Wan Shi Tong, Librarian
+2 Hidden Lair
+3 We Say Thee Nay!
+1 Yuriko, Hope from the Shadows
+
+Sideboard
+2 Day of Black Sun
+1 Tishana's Tidebinder
+1 Negate
+2 Flashfreeze
+2 Strategic Betrayal
+3 Duress
+1 Ghost Vacuum
+1 Vren, the Relentless
+1 Wan Shi Tong, Librarian
+1 Requiting Hex

@@ -1,0 +1,33 @@
+Deck
+3 Opt
+4 Callous Sell-Sword
+4 Elusive Otter
+4 Starting Town
+1 Balmor, Battlemage Captain
+1 Magic Damper
+2 Turn Inside Out
+2 Secret Identity
+1 Mountain
+4 Wild Ride
+4 Pompous Battlemage
+3 Multiversal Passage
+4 Ancestral Anger
+2 Drake Hatcher
+3 Riverpyre Verge
+4 Steam Vents
+4 Spirebluff Canal
+4 Sleight of Hand
+4 Slickshot Show-Off
+2 Full Bore
+
+Sideboard
+2 Dreadmaw's Ire
+1 Magic Damper
+1 Secret Identity
+1 Into the Flood Maw
+2 Shore Up
+4 Spell Pierce
+1 Poison Dart Frog
+1 Soul-Guide Lantern
+1 Full Bore
+1 Octopus Form

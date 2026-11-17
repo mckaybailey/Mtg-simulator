@@ -1,0 +1,31 @@
+Deck
+1 Cori Mountain Monastery
+2 Stock Up
+3 Island
+3 Mountain
+4 Riverpyre Verge
+4 Spirebluff Canal
+4 Steam Vents
+4 Stormcarved Coast
+2 Spell Snare
+4 Firebending Lesson
+4 Accumulate Wisdom
+4 Geist of Saint Thalia
+4 It'll Quench Ya!
+4 Combustion Technique
+4 Abandon Attachments
+1 Petrified Hamlet
+2 Ajani Unrelenting
+3 The Theorist, Jace Beleren
+2 Emeritus of Ideation
+1 Three Steps Ahead
+
+Sideboard
+1 Torpor Orb
+2 Negate
+3 Price of Freedom
+3 Tishana's Tidebinder
+1 Avengers Disassembled
+2 Flashfreeze
+2 Ghost Vacuum
+1 Fire Magic

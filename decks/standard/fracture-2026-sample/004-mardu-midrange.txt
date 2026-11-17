@@ -1,0 +1,45 @@
+Deck
+3 Ajani Unrelenting
+2 Blazemire Verge
+1 Bleachbone Verge
+1 Blood Crypt
+4 Break Under Pressure
+1 Cavern of Souls
+1 Cloak and Dagger, Entwined
+1 Dark Fortress
+4 Dark Matter Manipulator
+1 Elspeth, Storm Slayer
+4 Erode
+2 Fabled Passage
+1 Fountainport
+2 Get Lost
+2 Gideon's Memorial
+2 Godless Shrine
+2 Haunted Ridge
+1 Hidden Grotto
+1 Lorehold Charm
+1 Mjölnir, Hammer of Thor
+1 Mountain
+4 Overlord of the Balemurk
+2 Plains
+1 Realm of Koh
+4 Rewrite Regrets
+1 Sacred Foundry
+1 Shattered Sanctum
+1 Stingcaster Mage
+2 Sundown Pass
+3 Swamp
+1 The End
+2 Trumpeting Carnosaur
+1 Valgavoth's Faithful
+
+Sideboard
+1 Ancient Vendetta
+1 Black Cat, Cunning Thief
+1 Bloodghast
+2 Cruelclaw's Heist
+3 Duress
+1 Garruk, Veiled Butcher
+1 Ghost Vacuum
+3 Karn, Argent Defender
+2 Voice of Victory

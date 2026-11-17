@@ -1,0 +1,30 @@
+Deck
+3 Sunderflock
+8 Island
+4 Eddymurk Crab
+4 Opt
+2 Burst Lightning
+4 Traumatic Critique
+1 Get Out
+4 Flow State
+2 Spell Snare
+3 Impractical Joke
+1 Spell Pierce
+4 Hearth Elemental
+4 Riverpyre Verge
+4 Prismari Charm
+4 Steam Vents
+4 Spirebluff Canal
+4 Sleight of Hand
+
+Sideboard
+2 Disdainful Stroke
+1 Essence Scatter
+1 Flashfreeze
+2 Abrade
+2 Colorstorm Stallion
+2 The Theorist, Jace Beleren
+2 Ghost Vacuum
+1 Spell Snare
+1 Broadside Barrage
+1 Sunderflock

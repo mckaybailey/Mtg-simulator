@@ -1,0 +1,28 @@
+Deck
+4 Llanowar Elves
+4 Sazh's Chocobo
+2 Esper Origins
+2 Tifa Lockhart
+2 Bristly Bill, Spine Sower
+2 Lumbering Worldwagon
+4 Earthbender Ascension
+4 Mossborn Hydra
+4 Icetill Explorer
+4 Mightform Harmonizer
+1 Planar Engineering
+2 Sapling Nursery
+13 Forest
+2 Elven Passage
+4 Fabled Passage
+2 Demolition Field
+2 Ba Sing Se
+2 Escape Tunnel
+
+Sideboard
+2 Snakeskin Veil
+2 Soul-Guide Lantern
+2 Meltstrider's Resolve
+2 Origin of Metalbending
+2 Karn, Argent Defender
+2 Keen-Eyed Curator
+3 Surrak, Elusive Hunter

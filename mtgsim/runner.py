@@ -22,6 +22,14 @@ from .forge import ForgeError, ForgeInstall
 
 STARTUP_TIMEOUT = 300  # seconds to wait for a JVM to load the card database
 RESULT_GRACE = 60  # seconds beyond the in-game timeout before a silent worker is declared hung
+
+# Monte Carlo settings of a game or a seat. "fixed" is the search with a budget counted in rollouts
+# instead of milliseconds (Forge patch 0020): the only one whose games replay from the seed.
+MONTE_CARLO_MODES = ("off", "on", "max", "fixed")
+DEFAULT_TIMEOUT = 180  # seconds per game
+# A "fixed" search is never cut short by the clock, so its games take as long as they take
+# (VALIDATION.md, "Monte Carlo with a fixed budget"); a game stopped at the time limit is not a replay.
+FIXED_TIMEOUT = 1800
 MAX_START_FAILURES = 3
 
 
@@ -32,15 +40,28 @@ class Job:
     id: str
     seed: int
     decks: List[str]  # .dck paths in seat order
-    timeout: int = 180
+    timeout: int = DEFAULT_TIMEOUT
     game_format: str = "Constructed"
-    monte_carlo: str = "off"
+    monte_carlo: str = "off"  # one of MONTE_CARLO_MODES, for every seat
     log_path: str = ""
     profiles: List[str] = field(default_factory=list)
     seat_monte_carlo: List[str] = field(default_factory=list)  # per seat; "" follows ``monte_carlo``
+    # Games after the first of a best-of-three match (experiment.plan_match_game): seat 0 starts, and both seats
+    # sideboard against the other's main deck. Left at their defaults, the job line is what it always was.
+    first_seat: int = -1  # -1: the engine's coin flip; 0: seat 0 starts
+    sideboard: bool = False
+    plan_only: bool = False  # with ``sideboard``: only report the swaps, play nothing (status "plan")
     meta: dict = field(default_factory=dict)
 
+    def uses_fixed_search(self) -> bool:
+        """Whether any seat plays Monte Carlo "fixed" (a per-seat setting overrides the game's)."""
+        seats = self.seat_monte_carlo or [""] * len(self.decks)
+        return any((mode or self.monte_carlo) == "fixed" for mode in seats)
+
     def line(self) -> str:
+        for mode in [self.monte_carlo] + [m for m in self.seat_monte_carlo if m]:
+            if mode not in MONTE_CARLO_MODES:
+                raise ValueError(f"unknown Monte Carlo setting {mode!r}")
         parts = [
             f"id={self.id}", f"seed={self.seed}", f"timeout={self.timeout}",
             f"format={self.game_format}", f"mc={self.monte_carlo}", f"log={self.log_path}",
@@ -49,6 +70,16 @@ class Job:
         parts += [f"profile={p}" for p in self.profiles]
         if any(self.seat_monte_carlo):
             parts += [f"seatmc={m}" for m in self.seat_monte_carlo]
+        if self.first_seat not in (-1, 0):
+            raise ValueError(f"first_seat must be -1 or 0, not {self.first_seat!r}")
+        if self.first_seat == 0:
+            parts.append("first=0")
+        if self.sideboard:
+            parts.append("sideboard=1")
+        if self.plan_only:
+            if not self.sideboard:
+                raise ValueError("plan_only needs sideboard")
+            parts.append("planonly=1")
         for part in parts:
             if "\t" in part or "\n" in part:
                 raise ValueError(f"job field may not contain tabs or newlines: {part!r}")
@@ -60,8 +91,9 @@ class _Worker:
 
     _EOF = object()
 
-    def __init__(self, cmd: List[str], cwd: Path, env: dict, stderr_path: Path):
+    def __init__(self, cmd: List[str], cwd: Path, env: dict, stderr_path: Path, expect_profiles: bool = False):
         self._cmd, self._cwd, self._env, self._stderr_path = cmd, cwd, env, stderr_path
+        self._expect_profiles = expect_profiles
         self.proc: Optional[subprocess.Popen] = None
         self.info: dict = {}
         self._messages: "queue.Queue" = queue.Queue()
@@ -84,6 +116,11 @@ class _Worker:
                 "A Forge worker failed to start" + (f": {detail.strip()[:600]}" if detail else "")
                 + f" (see {self._stderr_path})."
             )
+        if self._expect_profiles and not message.get("aiProfileDir"):
+            # An old driver would ignore the folder and play every seat with Forge's own profiles.
+            self.stop()
+            raise ForgeError("The Forge driver did not load the run's AI profile folder; "
+                             "delete ~/.mtgsim/bridge so it is recompiled.")
         self.info = message
 
     @classmethod
@@ -171,15 +208,18 @@ def run_jobs(
     workers: Optional[int] = None,
     heap: str = "2g",
     log_dir: Optional[Path] = None,
+    profile_dir: Optional[Path] = None,
 ) -> dict:
     """Play every job, calling ``on_result(job, result)`` (serialised) as each game finishes.
 
-    Returns information about the engine that played them (Forge and Java versions).
+    ``profile_dir`` is the AI profile folder the JVMs load instead of Forge's own (every profile a
+    job names must be in it). Returns information about the engine that played them (Forge and
+    Java versions).
     """
     if not jobs:
         return {}
     classes = forge_mod.ensure_bridge(install)
-    cmd = forge_mod.java_command(install, classes, heap=heap)
+    cmd = forge_mod.java_command(install, classes, heap=heap, profile_dir=profile_dir)
     env = forge_mod.java_env()
     log_dir = Path(log_dir) if log_dir else forge_mod.home_dir() / "logs"
     count = max(1, min(workers or default_workers(), len(jobs)))
@@ -204,7 +244,8 @@ def run_jobs(
                 except queue.Empty:
                     return
                 while worker is None and not stop.is_set():
-                    candidate = _Worker(cmd, install.workdir, env, log_dir / f"worker-{index}.log")
+                    candidate = _Worker(cmd, install.workdir, env, log_dir / f"worker-{index}.log",
+                                        expect_profiles=profile_dir is not None)
                     try:
                         candidate.start()
                     except ForgeError:

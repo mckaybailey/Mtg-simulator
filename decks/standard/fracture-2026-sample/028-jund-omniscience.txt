@@ -1,0 +1,39 @@
+Deck
+1 Swamp
+1 Mutagen Man, Living Ooze
+2 Magda, the Hoardmaster
+4 Greedy Freebooter
+3 Umbral Collar Zealot
+1 Forest
+4 Obsessive Pursuit
+4 Lively Dirge
+4 Starting Town
+2 Torch the Tower
+4 Stomping Ground
+2 Overgrown Tomb
+4 Gene Pollinator
+1 Mountain
+1 Smaug the Magnificent
+4 Biotech Specialist
+4 Blooming Marsh
+1 Multiversal Passage
+1 The Misty Mountains Cold
+1 Bitter Triumph
+1 Wolverine, Fierce Fighter
+1 Requiting Hex
+4 The Sackville-Bagginses
+2 Blazemire Verge
+1 The Ooze
+2 Blood Crypt
+
+Sideboard
+1 Giant Cindermaw
+3 Strategic Betrayal
+1 Guerrilla Gorilla
+1 Leatherhead, Swamp Stalker
+3 Duress
+1 Professor Dellian Fel
+1 Vicious Rivalry
+1 Shoot the Sheriff
+1 Glorious Decay
+2 Fire Magic

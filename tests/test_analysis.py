@@ -1,7 +1,7 @@
 import unittest
 
 from mtgsim import analysis
-from tests.helpers import game
+from tests.helpers import game, later_game
 
 
 def _records():
@@ -166,6 +166,51 @@ class MatrixCardsClockTest(unittest.TestCase):
         by_turn = {t["turn"]: t["by_turn"] for t in clock["turns"]}
         self.assertAlmostEqual(3 / 9, by_turn[4])
         self.assertAlmostEqual(8 / 9, by_turn[6])
+
+
+def _matches():
+    """Five best-of-three matches of hero vs foe (game 1 seats alternate by index as in best-of-one):
+    0: hero 2-0; 1: foe 2-1; 2: hero 2-1; 3: 1-1 and a timed-out game 3 (a draw); 4: game 1 only (unfinished)."""
+    h, f = "hero", "foe"
+    return [
+        game(h, f, 0, winner="a", first="a"), later_game(h, f, 0, 2, "b", winner="a"),
+        game(h, f, 1, winner="a", first="b"), later_game(h, f, 1, 2, "b", winner="b"),
+        later_game(h, f, 1, 3, "a", winner="b"),
+        game(h, f, 2, winner="b", first="a"), later_game(h, f, 2, 2, "a", winner="a"),
+        later_game(h, f, 2, 3, "b", winner="a"),
+        game(h, f, 3, winner="a", first="b"), later_game(h, f, 3, 2, "b", winner="b"),
+        later_game(h, f, 3, 3, "a", status="timeout"),
+        game(h, f, 4, winner="b", first="a"),
+        game("hero", "other", 0, winner="a", first="a"),
+    ]
+
+
+class MatchTest(unittest.TestCase):
+    def test_matches_are_won_with_two_game_wins(self):
+        s = analysis.summarize_matches(_matches(), "hero", "foe")
+        self.assertEqual(("bo3", 5, 2, 1, 1, 1, 3), (s["match_format"], s["games"], s["wins"], s["losses"],
+                                                     s["draws"], s["unfinished"], s["decided"]))
+        self.assertAlmostEqual(2 / 3, s["win_rate"])
+        self.assertEqual({"2": 1, "3": 2}, s["match_lengths"])
+        self.assertEqual((6, 5), (s["game_wins"], s["game_losses"]))
+        self.assertAlmostEqual(6 / 11, s["game_win_rate"])
+        self.assertEqual((12, 1), (s["game_totals"]["games"], s["game_totals"]["timeouts"]))
+
+    def test_game_ones_and_later_games_are_reported_apart(self):
+        s = analysis.summarize_matches(_matches(), "hero", "foe")
+        self.assertEqual((3, 2), (s["game1"]["wins"], s["game1"]["losses"]))
+        self.assertEqual((3, 3), (s["later_games"]["wins"], s["later_games"]["losses"]))
+
+    def test_later_games_take_the_seat_from_the_record_not_the_index(self):
+        g = later_game("hero", "foe", 0, 2, "b", winner="a")  # match 0 (even index), but hero is in seat 1
+        self.assertEqual(1, analysis.seat_of_a(g))
+        self.assertEqual(g["seats"][analysis.seat_of_a(g)], "hero")
+        self.assertEqual(1, g["winner_seat"])
+
+    def test_first_games_drops_games_two_and_three(self):
+        firsts = analysis.first_games(_matches())
+        self.assertEqual(6, len(firsts))
+        self.assertTrue(all("match_game" not in r for r in firsts))
 
 
 if __name__ == "__main__":

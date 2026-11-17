@@ -1,0 +1,137 @@
+{
+ "format": "standard",
+ "snapshot": "2026-11-05",
+ "description": "The 'Other' archetypes (each below 1% of the field, 18.6% together, 45.7% match win rate) of the Magic.gg Metagame Mentor table of 2026-11-05: one melee.gg list for each 'Other' archetype the article links. meta_share splits the 18.6% evenly. No real win rates. See README.md.",
+ "decks": [
+  {
+   "file": "sultai-reanimator.txt",
+   "name": "Sultai Reanimator",
+   "category": "combo",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "NAKASHIMA, SHUNICHI, Magic Spotlight: Fracture (Beijing) (melee.gg label: U-B-R-G Combo)",
+   "source_url": "https://melee.gg/Decklist/View/8add6413-003b-4e99-9308-b4f300a0ae83",
+   "source_date": "2026-10-31"
+  },
+  {
+   "file": "izzet-fling.txt",
+   "name": "Izzet Fling",
+   "category": "combo",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "AlexMacIsaac, Magic Spotlight: Fracture (Beijing) (melee.gg label: U-B-R-G Fling)",
+   "source_url": "https://melee.gg/Decklist/View/344a38b8-ab61-49e3-85a2-b4f1003c2a85",
+   "source_date": "2026-10-31"
+  },
+  {
+   "file": "jeskai-planeswalkers.txt",
+   "name": "Jeskai Planeswalkers",
+   "category": "control",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "Andrade, Nick, Magic Spotlight: Fracture (Hartford) (melee.gg label: Jeskai Control)",
+   "source_url": "https://melee.gg/Decklist/View/2bb15f4e-0eed-4eb5-9b3a-b4ed001478af",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "jeskai-artifacts.txt",
+   "name": "Jeskai Artifacts",
+   "category": "control",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "Talonflame23185, Magic Spotlight: Fracture (Hartford) (melee.gg label: Jeskai Artifacts)",
+   "source_url": "https://melee.gg/Decklist/View/1588162b-0206-42a0-9db0-b4ec006c7163",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "boros-mobilize.txt",
+   "name": "Boros Mobilize",
+   "category": "aggro",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "liguanglei, Magic Spotlight: Fracture (Beijing) (melee.gg label: Boros Aggro)",
+   "source_url": "https://melee.gg/Decklist/View/78c57899-b247-4547-af7b-b4f201086891",
+   "source_date": "2026-10-31"
+  },
+  {
+   "file": "selesnya-offense.txt",
+   "name": "Selesnya Offense",
+   "category": "aggro",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "White, Sam, Magic Spotlight: Fracture (Hartford) (melee.gg label: Selesnya Offense)",
+   "source_url": "https://melee.gg/Decklist/View/740ae06e-398c-49e5-99ab-b4ec00609a25",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "dimir-control.txt",
+   "name": "Dimir Control",
+   "category": "control",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "iwi, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Control)",
+   "source_url": "https://melee.gg/Decklist/View/fde0ee0d-2771-4257-a4b8-b4f30095bb44",
+   "source_date": "2026-10-31"
+  },
+  {
+   "file": "mardu-discard.txt",
+   "name": "Mardu Discard",
+   "category": "midrange",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "Kuznetsov, Iaroslav, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mardu Discard)",
+   "source_url": "https://melee.gg/Decklist/View/e69e2256-74e7-4993-b2da-b4ce00608f13",
+   "source_date": "2026-10-31"
+  },
+  {
+   "file": "temur-omniscience.txt",
+   "name": "Temur Omniscience",
+   "category": "combo",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "Davis, Aylin, Magic Spotlight: Fracture (Hartford) (melee.gg label: Four-Color Omniscience)",
+   "source_url": "https://melee.gg/Decklist/View/3cfd62b3-abd9-4a77-a74e-b4ec017667ea",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "azorius-prison.txt",
+   "name": "Azorius Prison",
+   "category": "aggro",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "boring_syndrome, Magic Spotlight: Fracture (Beijing) (melee.gg label: Azorius Aggro)",
+   "source_url": "https://melee.gg/Decklist/View/8d52c2bc-e738-4e98-b34e-b4f100f6c77f",
+   "source_date": "2026-10-31"
+  },
+  {
+   "file": "mono-red-aggro.txt",
+   "name": "Mono-Red Aggro",
+   "category": "aggro",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "Sutter, Noah, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-Red Aggro)",
+   "source_url": "https://melee.gg/Decklist/View/7351b7e6-fc7a-4a97-b770-b4ed001b4116",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "dimir-oculus.txt",
+   "name": "Dimir Oculus",
+   "category": "midrange",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "O'Donnell, Devon, Magic Spotlight: Fracture (Hartford) (melee.gg label: Dimir Oculus)",
+   "source_url": "https://melee.gg/Decklist/View/fdeddc13-d714-4655-bf90-b4ec0014b60d",
+   "source_date": "2026-10-24"
+  },
+  {
+   "file": "jeskai-control.txt",
+   "name": "Jeskai Control",
+   "category": "control",
+   "meta_share": 1.43,
+   "list_type": "tournament list",
+   "pilot": "Deng, Dezhong, Magic Spotlight: Fracture (Hartford) (melee.gg label: Jeskai Control)",
+   "source_url": "https://melee.gg/Decklist/View/fd011c1d-c179-464e-b9cb-b4ed001b4b13",
+   "source_date": "2026-10-24"
+  }
+ ]
+}

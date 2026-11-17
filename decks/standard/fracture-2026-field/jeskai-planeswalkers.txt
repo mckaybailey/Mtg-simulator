@@ -1,0 +1,42 @@
+Deck
+1 Thundering Falls
+1 Cori Mountain Monastery
+1 Deserted Beach
+1 Erode
+2 Three Steps Ahead
+3 Starting Town
+2 Seam Rip
+3 Floodfarm Verge
+3 Hallowed Fountain
+4 Get Lost
+1 Sundown Pass
+2 Consult the Star Charts
+1 Island
+2 No More Lies
+1 Spell Snare
+3 Ajani Unrelenting
+2 Day of Judgment
+3 Lightning Helix
+3 Sacred Foundry
+3 The Theorist, Jace Beleren
+2 Solitary Cell
+4 Chandra, Chill of Compliance
+1 Meticulous Archive
+2 Stock Up
+2 Elspeth, Storm Slayer
+1 Plains
+3 Riverpyre Verge
+3 Steam Vents
+
+Sideboard
+1 Disdainful Stroke
+1 Flashfreeze
+1 Wan Shi Tong, Librarian
+1 Refute Destiny
+2 Annul
+2 Rest in Peace
+1 Captain Marvel, Earth's Protector
+2 Doorkeeper Thrull
+1 Negate
+1 Pinnacle Starcage
+2 Voice of Victory

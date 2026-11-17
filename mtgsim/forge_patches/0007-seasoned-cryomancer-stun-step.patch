@@ -1,0 +1,28 @@
+Subject: Seasoned Cryomancer: do not refuse it over the stun step's unknown target count
+Why: Before casting it the AI checks the whole ETB chain (draw two, discard two, then an
+  immediate trigger that taps and stuns up to X creatures, X = nonland cards discarded). At that
+  point X is 0, so TapAiBase.tapPrefTargeting finds no target, ImmediateTriggerAi.chkDrawback
+  says no and the creature is refused (Dimir Uldaros, baseline: seen in 209 games, cast in 7).
+  AILogic$ Always is the hint ImmediateTriggerAi already checks for; the stun targets are still
+  chosen when the immediate trigger resolves, where the AI must pick them.
+Measured: `mtgsim gauntlet decks/standard/meta/dimir-uldaros.txt --vs <the other ten meta decks> -n 100
+  --seed 1`, default AI, Forge 7db198d72e, on 13 Nov 2026. Arm without patches: 30.1% (95% CI
+  27-33%, 301-699). Arm with 0006 and 0007 together (separate shares not measured): 33.9%
+  (31-37%, 339-661). Difference +3.8 points, 95% CI -0.3 to +7.9, p = 0.07: not a reliable
+  change on 1,000 games each. Mirror on the patched engine (`match dimir-uldaros dimir-uldaros
+  -n 200 --seed 1`): 51.0% (44-58%).
+  Seasoned Cryomancer cast in 478 of 679 games where it was seen (13 of 695 without).
+
+diff --git a/forge-gui/res/cardsfolder/s/seasoned_cryomancer.txt b/forge-gui/res/cardsfolder/s/seasoned_cryomancer.txt
+index fa09355..82ad755 100644
+--- a/forge-gui/res/cardsfolder/s/seasoned_cryomancer.txt
++++ b/forge-gui/res/cardsfolder/s/seasoned_cryomancer.txt
+@@ -5,7 +5,7 @@ PT:2/2
+ T:Mode$ ChangesZone | Origin$ Any | Destination$ Battlefield | ValidCard$ Card.Self | Execute$ TrigDraw | TriggerDescription$ When this creature enters, draw two cards, then discard two cards. When you discard one or more nonland cards this way, tap up to that many target creatures and put a stun counter on each of them.
+ SVar:TrigDraw:DB$ Draw | NumCards$ 2 | SubAbility$ DBDiscard
+ SVar:DBDiscard:DB$ Discard | NumCards$ 2 | Mode$ TgtChoose | RememberDiscarded$ True | SubAbility$ DBImmediateTrig
+-SVar:DBImmediateTrig:DB$ ImmediateTrigger | ConditionDefined$ Remembered | RememberObjects$ RememberedCard | ConditionPresent$ Card.nonLand | Execute$ TrigTap | SubAbility$ DBCleanup| TriggerDescription$ When you discard one or more nonland cards this way, tap up to that many target creatures and put a stun counter on each of them.
++SVar:DBImmediateTrig:DB$ ImmediateTrigger | AILogic$ Always | ConditionDefined$ Remembered | RememberObjects$ RememberedCard | ConditionPresent$ Card.nonLand | Execute$ TrigTap | SubAbility$ DBCleanup| TriggerDescription$ When you discard one or more nonland cards this way, tap up to that many target creatures and put a stun counter on each of them.
+ SVar:TrigTap:DB$ Tap | ValidTgts$ Creature | TargetMin$ 0 | TargetMax$ X | SubAbility$ DBPutCounter
+ SVar:DBPutCounter:DB$ PutCounter | Defined$ Targeted | CounterType$ STUN | CounterNum$ 1
+ SVar:DBCleanup:DB$ Cleanup | ClearRemembered$ True

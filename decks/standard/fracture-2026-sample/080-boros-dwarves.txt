@@ -1,0 +1,29 @@
+Deck
+3 Cavern of Souls
+3 Chainsaw
+2 Skateboard
+4 Dragonfire Blade
+2 Dwalin, Weaponmaster
+4 Dwarven Mauler
+4 Dáin's Company
+2 Giott, King of the Dwarves
+4 Inspiring Vantage
+4 Kíli the Resourceful
+4 Lavaspur Boots
+4 Leyline Axe
+1 Multiversal Passage
+3 Plains
+4 Sacred Foundry
+4 Sunbillow Verge
+4 The Lonely Mountain
+4 Thorin, Mountain-king
+
+Sideboard
+2 Abrade
+2 Bofur, Reliable Guardian
+1 Get Lost
+3 Rest in Peace
+2 Shattered Acolyte
+2 The Queen of Dale
+1 Torch the Tower
+2 Voice of Victory

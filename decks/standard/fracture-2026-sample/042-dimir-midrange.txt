@@ -1,0 +1,34 @@
+Deck
+4 Floodpits Drowner
+4 Swamp
+4 Dream Beavers
+4 Kaito, Bane of Nightmares
+1 Cecil, Dark Knight
+2 Restless Reef
+1 Realm of Koh
+2 We Say Thee Nay!
+4 Island
+1 Yuriko, Hope from the Shadows
+2 Spell Snare
+2 The Wondrous Wasp
+2 Bitter Triumph
+4 Enduring Curiosity
+1 The Theorist, Jace Beleren
+2 Shoot the Sheriff
+3 Requiting Hex
+2 Spyglass Siren
+2 Tishana's Tidebinder
+4 Watery Grave
+2 Soulstone Sanctuary
+1 Strategic Betrayal
+4 Gloomlake Verge
+2 Hidden Lair
+
+Sideboard
+2 Strategic Betrayal
+2 Wan Shi Tong, Librarian
+2 Torpor Orb
+3 Duress
+2 Annul
+2 Day of Black Sun
+2 Karn, Argent Defender

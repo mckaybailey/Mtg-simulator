@@ -1,0 +1,31 @@
+Deck
+1 Guiding Hydra
+4 Momo, Friendly Flier
+2 Erode
+1 Mockingbird
+2 Get Lost
+4 Floodfarm Verge
+4 Hallowed Fountain
+2 Seam Rip
+4 Springleaf Drum
+3 Practiced Offense
+1 Island
+4 Daydream
+3 Gleaming Bastion
+7 Plains
+2 Abandoned Air Temple
+4 Sage of the Skies
+4 Starfield Shepherd
+1 Nurturing Pixie
+4 Quantum Riddler
+3 Steamcore Scholar
+
+Sideboard
+2 Disdainful Stroke
+2 Negate
+2 Seam Rip
+2 Day of Judgment
+2 Spider-Sense
+1 Curious Farm Animals
+1 Flitterwing Nuisance
+3 Rest in Peace

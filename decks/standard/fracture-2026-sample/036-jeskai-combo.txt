@@ -1,0 +1,33 @@
+Deck
+2 Braided Net
+2 Candy Trail
+4 Castle Doom
+2 Clay-Fired Bricks
+4 Cryogen Relic
+4 Floodfarm Verge
+4 Hallowed Fountain
+3 Meticulous Archive
+4 Perilous Snare
+3 Petrified Hamlet
+3 Pinnacle Starcage
+4 Plains
+4 Repurposing Bay
+4 Simulacrum Synthesizer
+1 Steam Vents
+1 Sunbillow Verge
+1 The Fire Crystal
+1 The Irencrag
+3 The Mind Stone
+1 Torpor Orb
+4 United Battlefront
+1 White Auracite
+
+Sideboard
+1 Authority of the Consuls
+2 Day of Judgment
+2 Erode
+3 Negate
+1 Rest in Peace
+2 Seam Rip
+1 Torpor Orb
+3 Voice of Victory

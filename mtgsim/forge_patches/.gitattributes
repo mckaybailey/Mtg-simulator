@@ -1,0 +1,2 @@
+# Patches are applied byte for byte and identified by their sha256: never convert line endings.
+*.patch -text

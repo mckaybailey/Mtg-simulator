@@ -1,0 +1,40 @@
+Deck
+1 Deserted Beach
+2 Candy Trail
+1 Braided Net
+1 Thousand Moons Smithy
+1 Erode
+4 Simulacrum Synthesizer
+4 Perilous Snare
+1 Torpor Orb
+1 Fomori Vault
+4 Floodfarm Verge
+4 Hallowed Fountain
+1 Seam Rip
+3 Repurposing Bay
+4 Cryogen Relic
+2 Island
+1 Clay-Fired Bricks
+1 No More Lies
+1 The Fire Crystal
+1 Day of Judgment
+2 The Mind Stone
+1 Meticulous Archive
+5 Plains
+1 White Auracite
+1 Spring-Loaded Sawblades
+4 United Battlefront
+4 Castle Doom
+1 Soul-Guide Lantern
+3 Pinnacle Starcage
+
+Sideboard
+2 Disdainful Stroke
+1 Torpor Orb
+2 Restoration Magic
+3 Authority of the Consuls
+2 Rest in Peace
+1 Day of Judgment
+1 Erode
+1 Pinnacle Starcage
+2 Voice of Victory

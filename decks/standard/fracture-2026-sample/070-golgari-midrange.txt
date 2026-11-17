@@ -1,0 +1,33 @@
+Deck
+4 Swamp
+3 Forest
+3 Restless Cottage
+2 Ral Zarek, Guest Lecturer
+1 Keen-Eyed Curator
+4 Duress
+2 Emeritus of Abundance
+4 Mosswood Dreadknight
+4 Blooming Marsh
+4 Wastewood Verge
+2 Vicious Rivalry
+1 Maelstrom Pulse
+2 Bitter Triumph
+3 Professor Dellian Fel
+4 Overgrown Tomb
+2 Ba Sing Se
+3 Requiting Hex
+3 Vraska, the Cutting Glare
+1 Garruk, Veiled Butcher
+4 Simulacrum Shaper
+2 Witherbloom Charm
+2 Strategic Betrayal
+
+Sideboard
+2 Surrak, Elusive Hunter
+1 Strategic Betrayal
+3 Qarsi Revenant
+1 Keen-Eyed Curator
+3 Cruelclaw's Heist
+2 Terminal Criticism
+2 Day of Black Sun
+1 Outrageous Robbery

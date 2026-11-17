@@ -15,6 +15,7 @@ from .carddb import CardDatabase, load_database
 from .decks import Deck, DeckIssue, find_deck_files, load_deck
 from .experiment import Entrant, RunError, RunOptions
 from .forge import ForgeError
+from .runner import DEFAULT_TIMEOUT, FIXED_TIMEOUT, MONTE_CARLO_MODES
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_GAUNTLET = REPO_ROOT / "decks" / "standard" / "meta"
@@ -180,19 +181,40 @@ def _entrants(ctx: Context, groups: Sequence[Tuple[Sequence[str], str]]) -> Tupl
 def _mc_setting(value, deck_name: str) -> str:
     if value in (None, ""):
         return ""
-    if value not in ("off", "on", "max"):
-        raise UserError(f"ai_mc for {deck_name} must be off, on or max, not {value!r}")
+    if value not in MONTE_CARLO_MODES:
+        raise UserError(f"ai_mc for {deck_name} must be off, on, max or fixed, not {value!r}")
     return str(value)
 
 
 def _options(args: argparse.Namespace) -> RunOptions:
     if args.games < 1:
         raise UserError("--games must be at least 1")
+    if args.timeout is not None and args.timeout < 1:
+        raise UserError("--timeout must be at least 1 second")
+    bo3 = bool(getattr(args, "bo3", False))
+    if getattr(args, "no_sideboard", False) and not bo3:
+        raise UserError("--no-sideboard only applies to --bo3 (best-of-one games never sideboard)")
     return RunOptions(
-        games=args.games, seed=args.seed, timeout=args.timeout, workers=args.workers,
+        match_format="bo3" if bo3 else "bo1", sideboard=not getattr(args, "no_sideboard", False),
+        games=args.games, seed=args.seed,
+        # without --timeout, games with a "fixed" Monte Carlo seat get the longer limit (see runner.FIXED_TIMEOUT)
+        timeout=args.timeout or DEFAULT_TIMEOUT, fixed_timeout=args.timeout or FIXED_TIMEOUT, workers=args.workers,
         heap=args.heap, monte_carlo=args.mc or "off", ai_profile=args.ai_profile or "", save_logs=args.save_logs,
         force_profile=bool(args.ai_profile), force_monte_carlo=args.mc is not None,
     )
+
+
+def _pairing(records: List[dict], a_key: str, b_key: str, options: RunOptions) -> dict:
+    """Results of one pairing: games for best-of-one, matches for best-of-three (analysis.summarize_matches)."""
+    if options.match_format == "bo3":
+        return analysis.summarize_matches(records, a_key, b_key)
+    return analysis.summarize_pairing(records, a_key, b_key)
+
+
+def _units(options: RunOptions) -> str:
+    if options.match_format == "bo1":
+        return "games"
+    return "best-of-three matches" + (" (sideboarding before games 2 and 3)" if options.sideboard else " (no sideboarding)")
 
 
 def _run_dir(args: argparse.Namespace, kind: str, label: str) -> Path:
@@ -214,7 +236,9 @@ def _check_ai_profile(ctx: Context) -> None:
 def _check_profile_name(ctx: Context, profile: Optional[str], where: str = "") -> None:
     if not profile:
         return
-    available = sorted(p.stem for p in (ctx.install.res / "ai").glob("*.ai"))
+    from . import ai_profiles
+
+    available = ai_profiles.available(ctx.install)  # Forge's, mtgsim's and the user's (MTGSIM_HOME/profiles)
     if profile not in available:
         raise UserError(f"unknown AI profile \"{profile}\"{where}. Available: {', '.join(available)}")
 
@@ -261,6 +285,18 @@ def _card_tables(entrants: List[Entrant], records: List[dict], roles: Sequence[s
         e.key: analysis.card_stats(records, e.key, dict(e.deck.main))
         for e in entrants if e.role in roles
     }
+
+
+def _add_misplays(summary: dict, ctx: Context, entrants: List[Entrant], records: List[dict], run_dir: Path) -> None:
+    """Put every deck's misplay table into the summary and point at the command that prints it."""
+    from . import misplay
+
+    lands = {name for e in entrants for name in e.deck.main
+             if ctx.db.get(name) is not None and ctx.db.get(name).is_land}
+    # later games of a best-of-three match are played with sideboarded decks; misplays are read from first games
+    summary["misplays"] = misplay.analyze(analysis.first_games(records), {e.key: e.describe() for e in entrants},
+                                          lands=lands)
+    print(f"\nLikely AI misplays, card by card:  python -m mtgsim misplays {run_dir}")
 
 
 def _goldfish_for(ctx: Context, entrants: List[Entrant], roles: Sequence[str]) -> dict:
@@ -341,8 +377,11 @@ def cmd_setup(args: argparse.Namespace) -> int:
     major = forge.check_java()
     print(f"Java {major} found.")
     if args.build:
-        install = forge.build_from_source(Path(args.dest) if args.dest else None, ref=args.ref)
+        install = forge.build_from_source(Path(args.dest) if args.dest else None, ref=args.ref,
+                                          apply_patches=not args.no_patches)
     elif args.forge_dir:
+        if args.no_patches:
+            raise UserError("--no-patches only applies to --build; mtgsim never patches a Forge you supply")
         install = forge.detect_install(Path(args.forge_dir))
     else:
         raise UserError("choose --build (fetch and build Forge) or --forge-dir PATH (use an existing Forge)")
@@ -350,6 +389,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
     config["forge_dir"] = str(install.root)
     forge.save_config(config)
     print(f"Forge {install.version} at {install.root}")
+    print(forge.patch_status(install, verify=args.build).summary())
     print("Compiling the game driver...")
     forge.ensure_bridge(install, force=True)
     print("Reading the card database...")
@@ -366,6 +406,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"Java {forge.check_java()}")
     install = ctx.install
     print(f"Forge {install.version} at {install.root}")
+    patches = forge.patch_status(install, verify=True)
+    print(patches.summary())
     print(f"Card database: {len(ctx.db)} cards")
     formats = legality.load_formats(install.res)
     if "standard" in formats:
@@ -382,7 +424,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     ok = [r for r in records if r["status"] == "ok"]
     if len(ok) != 2:
         raise UserError("the test games did not complete: " + "; ".join(r.get("error", r["status"]) for r in records))
-    print(f"Played 2 test games in {sum(r['ms'] for r in ok) / 1000:.1f}s of engine time. Everything works.")
+    played = f"Played 2 test games in {sum(r['ms'] for r in ok) / 1000:.1f}s of engine time."
+    if patches.state == "out-of-date":
+        raise UserError(f"{played} The engine works, but its Forge patches are out of date; "
+                        "run `python -m mtgsim setup --build` to update them.")
+    print(f"{played} Everything works.")
     return 0
 
 
@@ -417,9 +463,9 @@ def cmd_match(args: argparse.Namespace) -> int:
     a, b = entrants
     options = _options(args)
     run_dir = _run_dir(args, "match", f"{a.deck.name}-vs-{b.deck.name}")
-    print(f"{a.deck.name} vs {b.deck.name}: {options.games} games (Forge {ctx.install.version})")
+    print(f"{a.deck.name} vs {b.deck.name}: {options.games} {_units(options)} (Forge {ctx.install.version})")
     records = experiment.execute(ctx.install, run_dir, entrants, [(a, b)], options, meta={"kind": "match"})
-    pairing = analysis.summarize_pairing(records, a.key, b.key)
+    pairing = _pairing(records, a.key, b.key, options)
     names = {e.key: e.deck.name for e in entrants}
     print()
     _print_pairing_rows([pairing], names, label=f"{a.deck.name} vs")
@@ -428,12 +474,13 @@ def cmd_match(args: argparse.Namespace) -> int:
         ahead = a.deck.name if (pairing["win_rate"] or 0) > 0.5 else b.deck.name
         print("\n" + (f"A real edge for {ahead}: an even matchup would rarely produce this result "
                       if even < 0.05 else "This is consistent with an even matchup ") + f"(p = {even:.3f}).")
-    cards = _card_tables(entrants, records, ("hero",))
+    cards = _card_tables(entrants, analysis.first_games(records), ("hero",))
     if a.key != b.key:
         for e in entrants:
             _print_cards(cards[e.key], e.deck.name)
     summary = _base_summary("match", f"{a.deck.name} vs {b.deck.name}", ctx, run_dir, entrants, records, notes)
     summary.update({"pairings": [pairing], "cards": cards, "goldfish": _goldfish_for(ctx, entrants, ("hero",))})
+    _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
 
@@ -453,11 +500,11 @@ def cmd_gauntlet(args: argparse.Namespace) -> int:
     hero, opponents = entrants[0], entrants[1:]
     options = _options(args)
     run_dir = _run_dir(args, "gauntlet", hero.deck.name)
-    print(f"{hero.deck.name} vs {len(opponents)} opponents: {options.games} games each, "
+    print(f"{hero.deck.name} vs {len(opponents)} opponents: {options.games} {_units(options)} each, "
           f"{options.games * len(opponents)} in total (Forge {ctx.install.version})")
     pairs = [(hero, o) for o in opponents]
     records = experiment.execute(ctx.install, run_dir, entrants, pairs, options, meta={"kind": "gauntlet"})
-    pairings = [analysis.summarize_pairing(records, hero.key, o.key) for o in opponents]
+    pairings = [_pairing(records, hero.key, o.key, options) for o in opponents]
     weights = {o.key: o.weight for o in opponents}
     field = analysis.summarize_field(hero.key, pairings, weights)
     names = {e.key: e.deck.name for e in entrants}
@@ -465,11 +512,12 @@ def cmd_gauntlet(args: argparse.Namespace) -> int:
     _print_pairing_rows(sorted(pairings, key=lambda p: -(p["win_rate"] or 0)), names)
     _print_pilot_note(opponents)
     _print_field(field)
-    cards = _card_tables(entrants, records, ("hero",))
+    cards = _card_tables(entrants, analysis.first_games(records), ("hero",))
     _print_cards(cards[hero.key], hero.deck.name)
     summary = _base_summary("gauntlet", f"{hero.deck.name} vs the field", ctx, run_dir, entrants, records, notes)
     summary.update({"hero": hero.key, "pairings": pairings, "field": {hero.key: field}, "cards": cards,
                     "goldfish": _goldfish_for(ctx, entrants, ("hero",))})
+    _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
 
@@ -552,10 +600,10 @@ def cmd_matrix(args: argparse.Namespace) -> int:
     options = _options(args)
     pairs = [(entrants[i], entrants[j]) for i in range(len(entrants)) for j in range(i + 1, len(entrants))]
     run_dir = _run_dir(args, "matrix", f"{len(entrants)}-decks")
-    print(f"Round robin: {len(entrants)} decks, {len(pairs)} pairings, {options.games} games each, "
+    print(f"Round robin: {len(entrants)} decks, {len(pairs)} pairings, {options.games} {_units(options)} each, "
           f"{options.games * len(pairs)} in total (Forge {ctx.install.version})")
     records = experiment.execute(ctx.install, run_dir, entrants, pairs, options, meta={"kind": "matrix"})
-    pairings = [analysis.summarize_pairing(records, a.key, b.key) for a, b in pairs]
+    pairings = [_pairing(records, a.key, b.key, options) for a, b in pairs]
     matrix = analysis.summarize_matrix([e.key for e in entrants], pairings)
     names = {e.key: e.deck.name for e in entrants}
     rows = [[str(i + 1), names[r["key"]], _pct(r["mean_win_rate"]), _ci(r["ci"]), f"{r['wins']}-{r['decided'] - r['wins']}"]
@@ -563,7 +611,14 @@ def cmd_matrix(args: argparse.Namespace) -> int:
     print()
     print(_table(["#", "Deck", "Avg win rate", "95% CI", "W-L"], rows, right=(0, 2, 3, 4)))
     summary = _base_summary("matrix", f"Round robin of {len(entrants)} decks", ctx, run_dir, entrants, records, notes)
-    summary.update({"pairings": pairings, "matrix": matrix, "cards": _card_tables(entrants, records, ("hero",))})
+    summary.update({"pairings": pairings, "matrix": matrix,
+                    "cards": _card_tables(entrants, analysis.first_games(records), ("hero",))})
+    if options.match_format == "bo3":
+        # the same run's first games are the best-of-one round robin with the same seeds
+        game1 = [analysis.summarize_pairing(analysis.first_games(records), a.key, b.key) for a, b in pairs]
+        summary["matrix_game1"] = analysis.summarize_matrix([e.key for e in entrants], game1)
+        summary["pairings_game1"] = game1
+    _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
 
@@ -607,6 +662,123 @@ def cmd_goldfish(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_tune(args: argparse.Namespace) -> int:
+    """Search AI profile settings that make simulated win rates track real ones (see tune.py)."""
+    from . import tune
+
+    ctx = Context(args)
+    stored = tune.stored_run(args.resume) if args.resume else None
+    paths = [d["file"] for d in stored["decks"]] if stored else (args.decks or [str(DEFAULT_GAUNTLET)])
+    entrants, _notes = _entrants(ctx, [(paths, "hero")])
+    real = {}
+    for e in entrants:
+        info = _read_manifest(e.deck.path.parent).get(e.deck.path.name, {}) if e.deck.path else {}
+        real[e.key] = info.get("real_win_rate")
+    if args.resume:
+        run_dir = Path(args.resume).expanduser()
+    else:
+        run_dir = Path(args.out).expanduser() if args.out else \
+            Path("runs") / f"{time.strftime('%Y%m%d-%H%M%S')}-tune-{len(entrants)}-decks"
+    return tune.command(ctx.install, run_dir, entrants, real, args, stored)
+
+
+def _misplay_lands(args: argparse.Namespace, entrants: Dict[str, dict]) -> Optional[set]:
+    """Land names from the card database, when Forge is set up; None otherwise (basics are still known)."""
+    try:
+        db = Context(args).db
+    except (ForgeError, UserError, OSError, ValueError):
+        return None
+    return {name for info in entrants.values() for name in (info.get("main") or {})
+            if db.get(name) is not None and db.get(name).is_land}
+
+
+def _print_misplays(deck: dict, name: str, top: int) -> None:
+    from . import misplay
+
+    rows = misplay.top_cards(deck, top)
+    lands = deck.get("lands_left_in_hand")
+    print(f"\n{name}: {deck['games']} decided games"
+          + (f", {lands:.1f} lands left in hand at the end on average" if lands is not None else ""))
+    if not rows:
+        print("  No card was flagged.")
+        return
+
+    def compare(c: dict) -> str:
+        if c.get("diff") is None:
+            return "-"
+        return f"{c['diff'] * 100:+.1f}{'*' if c.get('significant') else ' '}"
+
+    table = []
+    if deck.get("basis") == "flagged":
+        for r in rows:
+            idle, stranded, removal, counter = r["idle"], r["stranded"], r.get("removal"), r.get("counter")
+            table.append([
+                f"{r['copies']} {r['card']}", f"{r['score']:.0f}", str(r["seen"]), _pct(r["cast_rate"], 0),
+                _num(idle["per_game"]),
+                f"{_pct(idle['never_cast_share'], 0)} of {idle['castable_games']}" if idle["castable_games"] else "-",
+                _pct(stranded["rate"], 0),
+                f"{removal['poor']} of {removal['casts']}" if removal and removal["casts"] else "-",
+                f"{counter['passed']} ({counter['big_passed_games']} big)" if counter else "-",
+                compare(r["compare"]),
+            ])
+        print(_table(["Card", "Hit/100", "Seen", "Cast", "Idle/game", "Castable, never cast", "In hand at end",
+                      "Poor targets", "Counter passed", "Hit-not pts"], table, right=range(1, 10)))
+        for r in rows:
+            if r["reasons"]:
+                print(f"  {r['card']}: " + "; ".join(r["reasons"]))
+    else:
+        for r in rows:
+            table.append([f"{r['copies']} {r['card']}", f"{r['score']:.0f}", str(r["seen"]),
+                          _pct(r["cast_rate"], 0), compare(r["compare"])])
+        print(_table(["Card", "Never cast/100", "Seen", "Cast when seen", "Never-cast minus cast pts"],
+                     table, right=range(1, 5)))
+
+
+def cmd_misplays(args: argparse.Namespace) -> int:
+    """Rank each deck's cards by how many games a likely AI misplay touched (see misplay.py)."""
+    from . import misplay
+
+    run_dir = Path(args.run_dir).expanduser()
+    info_path = run_dir / "run.json"
+    if not info_path.is_file():
+        raise UserError(f"{run_dir} is not a run directory (no run.json)")
+    info = json.loads(info_path.read_text(encoding="utf-8"))
+    entrants = {e["key"]: e for e in info.get("entrants", []) if isinstance(e, dict) and "key" in e}
+    records = analysis.first_games(experiment.read_games(run_dir))  # later games of a match are sideboarded
+    if not records:
+        raise UserError(f"{run_dir} has no recorded games")
+    keys = list(entrants)
+    if args.deck:
+        wanted = args.deck.casefold()
+        keys = [k for k in entrants if wanted in (k.casefold(), str(entrants[k].get("name", "")).casefold())]
+        keys = keys or [k for k in entrants if wanted in str(entrants[k].get("name", "")).casefold()]
+        if not keys:
+            raise UserError(f"no deck called \"{args.deck}\" in this run. Decks: "
+                            + ", ".join(str(e.get("name", k)) for k, e in entrants.items()))
+    signals = misplay.has_signals(records)
+    result = misplay.analyze(records, entrants, keys, lands=None if signals else _misplay_lands(args, entrants))
+    if args.top < 1:
+        raise UserError("--top must be at least 1")
+    if not signals:
+        print("These games were recorded before mtgsim tracked misplay signals: only cards seen but never cast "
+              "can be ranked. Re-run the command with this version for the full analysis.")
+    for key in keys:
+        if key in result["decks"]:
+            _print_misplays(result["decks"][key], str(entrants[key].get("name", key)), args.top)
+    if signals:
+        print("\nHit/100 = games (per 100 of the deck) in which the card was castable in a free window and never "
+              "cast, left in hand after being castable, aimed at a poor target, or let a big spell resolve; "
+              "Hit-not = win rate in those games minus the other games it was seen in (* = interval clear of zero).")
+    else:
+        print("\nNever cast/100 = games (per 100 of the deck) in which the card was seen but never cast; the last "
+              "column is the win rate in those games minus the games it was cast (* = interval clear of zero).")
+    print(misplay.CAVEAT)
+    if args.json:
+        Path(args.json).write_text(json.dumps(result, indent=1), encoding="utf-8")
+        print(f"\nSaved to {args.json}")
+    return 0
+
+
 def cmd_report(args: argparse.Namespace) -> int:
     from . import report
 
@@ -634,12 +806,23 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
     p.add_argument("--out", help="directory for results (default: runs/<timestamp>-...)")
     p.add_argument("--resume", metavar="RUN_DIR", help="continue an interrupted run in this directory")
     p.add_argument("--strict", action="store_true", help="refuse to simulate decks that break format rules")
-    p.add_argument("--timeout", type=int, default=180, help="seconds before a game is stopped and counted as unfinished")
+    p.add_argument("--timeout", type=int, default=None,
+                   help=f"seconds before a game is stopped and counted as unfinished (default {DEFAULT_TIMEOUT}; "
+                        f"{FIXED_TIMEOUT} for games with Monte Carlo \"fixed\")")
     p.add_argument("--ai-profile", help="Forge AI profile for both players (Default, Reckless, Cautious, ...)")
-    p.add_argument("--mc", choices=("off", "on", "max"), default=None,
-                   help="Forge's Monte Carlo AI look-ahead: slower, and results are no longer exactly reproducible")
+    p.add_argument("--mc", choices=MONTE_CARLO_MODES, default=None,
+                   help="Forge's Monte Carlo AI look-ahead for every player: slower. on and max think against the "
+                        "clock, so their games do not replay from the seed; fixed searches a counted number of "
+                        "rollouts and does")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")
+
+
+def _add_match_format(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--bo3", action="store_true",
+                   help="play best-of-three matches (-n counts matches): the loser of a game starts the next, and "
+                        "both decks sideboard before games 2 and 3 with Forge's SideboardAdvisor")
+    p.add_argument("--no-sideboard", action="store_true", help="with --bo3: keep the main decks for every game")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -655,6 +838,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--forge-dir", help="use an existing Forge installation or built source checkout")
     p.add_argument("--dest", help="where --build puts Forge (default: ~/.mtgsim/forge)")
     p.add_argument("--ref", default=forge.FORGE_PINNED_REF, help="Forge commit to build (default: the validated one)")
+    p.add_argument("--no-patches", action="store_true",
+                   help="build Forge without mtgsim's Forge patches (mtgsim/forge_patches), e.g. to measure what they change")
     p.set_defaults(func=cmd_setup)
 
     p = sub.add_parser("doctor", help="verify the installation by playing two test games")
@@ -670,12 +855,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("deck_a")
     p.add_argument("deck_b")
     _add_common(p)
+    _add_match_format(p)
     p.set_defaults(func=cmd_match)
 
     p = sub.add_parser("gauntlet", help="play one deck against a field of opponents")
     p.add_argument("deck")
     p.add_argument("--vs", nargs="+", metavar="PATH", help="opponent decklists or folders (default: decks/standard/meta)")
     _add_common(p)
+    _add_match_format(p)
     p.set_defaults(func=cmd_gauntlet)
 
     p = sub.add_parser("ab", help="compare two versions of a deck against the same field")
@@ -689,6 +876,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("matrix", help="round robin: every deck against every other deck")
     p.add_argument("decks", nargs="+", help="decklist files or folders")
     _add_common(p)
+    _add_match_format(p)
     p.set_defaults(func=cmd_matrix)
 
     p = sub.add_parser("goldfish", help="solo consistency analysis (mana, curve, colours) without the engine")
@@ -701,9 +889,56 @@ def build_parser() -> argparse.ArgumentParser:
     _add_common(p)
     p.set_defaults(func=cmd_goldfish)
 
+    p = sub.add_parser("tune", help="search AI profile settings that make simulated win rates track real ones")
+    p.add_argument("decks", nargs="*", help="decklists or folders whose gauntlet.json has real_win_rate "
+                   "(default: decks/standard/meta)")
+    _add_common(p, sim=False)
+    p.add_argument("--space", help="parameter space JSON (default: mtgsim/profiles/spaces/default.json)")
+    p.add_argument("--group", action="append", metavar="NAME=CAT,CAT",
+                   help="decks sharing a profile, by category (default: reactive=control,midrange,tempo "
+                        "and proactive=aggro,ramp,combo); repeat for each group")
+    p.add_argument("--tune", nargs="+", metavar="GROUP", help="groups that get candidate profiles (default: all)")
+    p.add_argument("--profiles", type=int, default=3, metavar="K",
+                   help="random profiles per tuned group; candidates are every combination (default 3)")
+    p.add_argument("--rounds", default="10,30", metavar="N,N",
+                   help="games per pairing in each round of successive halving (default 10,30)")
+    p.add_argument("--eta", type=int, default=3, help="keep the best 1/ETA candidates after each round (default 3)")
+    p.add_argument("--confirm", type=int, default=30, metavar="GAMES",
+                   help="fresh games per pairing to re-measure the winner and the baseline (default 30; 0 skips)")
+    p.add_argument("--holdout", nargs="+", metavar="DECK", help="decks whose real win rates are never used for selection")
+    p.add_argument("--cv", default="loo", help="cross-validate the selection over training decks: loo, K folds, or off")
+    p.add_argument("--matchups", metavar="FILE", help="real deck-vs-deck win rates (see README)")
+    p.add_argument("--objective", choices=("deck", "matchup", "both"), default="deck",
+                   help="rank correlation over deck win rates, matchup win rates, or their mean (default deck)")
+    p.add_argument("--bootstrap", type=int, default=1000, help="resamples for the game-noise ranges (default 1000)")
+    p.add_argument("--search-seed", type=int, default=None, help="seed for drawing profiles (default: --seed)")
+    p.add_argument("--import", dest="import_runs", nargs="+", metavar="RUN_DIR",
+                   help="reuse games of earlier runs (e.g. a matrix with the same seed) where they are identical")
+    p.add_argument("--dry-run", action="store_true", help="print the candidates and the games needed, play nothing")
+    p.add_argument("-j", "--workers", type=int, default=None, help="parallel Forge processes (default: CPU count, max 8)")
+    p.add_argument("--out", help="directory for results (default: runs/<timestamp>-tune-...)")
+    p.add_argument("--resume", metavar="RUN_DIR", help="continue a tuning run (its settings are read from tune.json)")
+    p.add_argument("--strict", action="store_true", help="refuse decks that break format rules")
+    p.add_argument("--timeout", type=int, default=None,
+                   help=f"seconds before a game is stopped and counted as unfinished (default {DEFAULT_TIMEOUT}; "
+                        f"{FIXED_TIMEOUT} with --mc fixed)")
+    p.add_argument("--mc", choices=MONTE_CARLO_MODES, default=None,
+                   help="Monte Carlo search for every seat (default off; on and max make the cache inexact, "
+                        "fixed replays from the seed but is many times slower)")
+    p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
+    p.set_defaults(func=cmd_tune)
+
     p = sub.add_parser("report", help="rebuild report.html for an existing run directory")
     p.add_argument("run_dir")
     p.set_defaults(func=cmd_report)
+
+    p = sub.add_parser("misplays", help="rank each deck's cards by likely AI misplays in an existing run")
+    p.add_argument("run_dir")
+    p.add_argument("--deck", help="only this deck (its name or key)")
+    p.add_argument("--top", type=int, default=10, help="cards to list per deck (default 10)")
+    p.add_argument("--json", metavar="FILE", help="also save the full tables as JSON")
+    p.add_argument("--forge-dir", help="Forge installation, used to tell lands apart in runs from older versions")
+    p.set_defaults(func=cmd_misplays)
     return parser
 
 

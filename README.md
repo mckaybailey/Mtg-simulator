@@ -22,6 +22,9 @@ What you can do with it:
 - **`check`** – validate a list: card names, deck size, copy limits, format legality.
 - **Card-level stats** in every report: how the deck does when each card is seen, in the
   opening hand, and how often it actually gets played.
+- **`misplays`** – which cards Forge's AI seems to mishandle: cards it could have cast but kept
+  in hand, counterspells it never used, removal aimed at the wrong target. Also a section of
+  every `match`, `gauntlet` and `matrix` report.
 
 ## Read this before trusting a number
 
@@ -30,14 +33,18 @@ What you can do with it:
   that need careful sequencing are understated, on both sides of the table. Use the results
   to compare similar decks and to spot weak cards and bad mana, not to predict tournament
   win rates.
-- **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,650-game
-  round robin of the eleven included meta decks, simulated win rates barely tracked the
-  decks' real tournament win rates (rank correlation about 0.24): creature decks came out
-  on top and the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
+- **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,980-game
+  round robin of the twelve included meta decks, simulated win rates barely tracked the
+  decks' real tournament win rates (rank correlation 0.23, average gap 11 points, even after
+  mtgsim's Forge patches for cards the AI could not cast or misused): creature decks came out on top and
+  the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
   therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
-- **Games are best-of-one with no sideboarding.** Sideboards are read and checked but never
-  played.
+- **Games are best-of-one with no sideboarding unless you pass `--bo3`.** With `--bo3`, games 2
+  and 3 are sideboarded by Forge's own advisor, which picks cards by their rules text, not the way
+  a person would. On the 18 meta decks best-of-three did not track real results any better: matches
+  spread win rates further apart than single games, and the sideboards changed that by less than the
+  noise (`VALIDATION.md`).
 - **Sample size matters.** At 100 games a win rate is only known to about ±10 points, at 400
   games about ±5. Every number in the report comes with an interval; a matchup is only
   clearly good or bad when the whole interval is on one side of 50%.
@@ -66,6 +73,15 @@ mtgsim compiles a small Java driver against whichever Forge it is given. It is d
 tested against one specific Forge commit (the one `--build` fetches); other versions work
 as long as the driver still compiles against them, and `setup` tells you if it does not.
 
+`--build` also applies mtgsim's own fixes to Forge (`mtgsim/forge_patches/`, for example AI
+hints in card scripts) on top of that commit, and records them in `mtgsim-patches.json` in the
+checkout. A Forge you point to with `--forge-dir` is never modified, so it plays without them.
+`doctor` shows which patches are applied; after updating mtgsim, run `setup --build` again when
+it says they are out of date. That re-applies the patches in seconds and rebuilds Forge only
+when a patch changes its Java code. `setup --build --no-patches` builds the plain Forge commit,
+for comparing results with and without the patches. Every run's `run.json` records the patch
+set it was played with.
+
 Everything mtgsim stores lives in `~/.mtgsim` (override with `MTGSIM_HOME`), including a
 private profile directory for Forge, so simulations never read or change the settings of a
 Forge you use for playing.
@@ -90,6 +106,9 @@ python -m mtgsim ab mydeck.txt mydeck-v2.txt -n 200
 
 # One matchup in depth
 python -m mtgsim match mydeck.txt decks/standard/meta/dimir-midrange.txt -n 300
+
+# Which cards did the AI mishandle in that run?
+python -m mtgsim misplays runs/<the run folder>
 ```
 
 Each run prints a summary and writes a folder under `runs/` containing `report.html` (open
@@ -124,22 +143,26 @@ are warnings unless you pass `--strict`.
 | `-j 4` | parallel Forge processes (default: one per CPU core, up to 8; each uses about 1 GB of memory) |
 | `--vs PATH...` | opponent decklists or folders (default `decks/standard/meta`) |
 | `--seed 7` | base random seed; the same seed and decks replay exactly the same games |
-| `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished |
-| `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`); overrides per-deck settings |
+| `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished (default 180; 1800 for games with `--mc fixed`) |
+| `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`, or one of yours from `~/.mtgsim/profiles`); overrides per-deck settings |
 | `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting) for every player: slower, and because it thinks against a clock the same seed no longer replays the same game; overrides per-deck settings |
+| `--mc fixed` | the same look-ahead with a budget counted in playouts instead of milliseconds, so the same seed replays the same games on any machine and with any `-j`. About 9 times the engine time for each searching player (some 20 s a game with one, 45 s with both); a gain in play strength over the default AI has not been shown yet (`VALIDATION.md`). Needs the Forge build made by `setup --build` (patch 0020) |
+| `--bo3` | best-of-three matches (`match`, `gauntlet`, `matrix`): `-n` counts matches. Game 1 of each match is exactly the best-of-one game with the same seed; in games 2 and 3 the previous game's loser goes first and both decks sideboard against each other's main deck (Forge's `SideboardAdvisor`: at most 7 swaps, chosen from the cards' text). Win rates count matches (two game wins; three games without one is a draw); the report also shows game-1 and later-game results. About 2.5 games per match |
+| `--no-sideboard` | with `--bo3`: play games 2 and 3 with the main decks |
 | `--save-logs` | keep Forge's full play-by-play log of every game |
 
 ### How long it takes
 
 Most games take 2–4 seconds of engine time; slow control and artifact decks take longer.
 On a 4-core machine the meta decks ran at about 85 games per minute, so 100 games against
-each of the eleven meta decks takes roughly a quarter of an hour.
+each of the twelve meta decks takes roughly a quarter of an hour.
 
 ## How results are produced
 
-- Every game is its own fresh match with its own seed and its own coin flip for who goes
-  first. (Forge's built-in simulator lets the previous loser go first, which drags measured
-  win rates towards 50%.)
+- In best-of-one every game is its own fresh match with its own seed and its own coin flip for
+  who goes first. (Forge's built-in simulator lets the previous loser go first, which drags
+  measured win rates towards 50%.) With `--bo3` that rule applies to game 1 only; the loser of
+  game 1 (and of game 2) goes first in the next game, as in real matches.
 - Seeds depend on the decks' contents, not their file names, so re-running a matchup
   replays the same games and editing a deck gives it new ones.
 - Win rates use decided games only; draws, timeouts and engine failures are counted and
@@ -153,10 +176,113 @@ each of the eleven meta decks takes roughly a quarter of an hour.
   400-game test of two identical decks, the same card came out 20 points apart. Reports
   mark the differences whose 95% interval excludes zero; ignore the rest.
 
+## Finding AI misplays
+
+Forge's AI loses games a person would not, and some cards suffer more than others. The
+engine driver watches every game for signs of that, without changing how it is played, and
+`misplays` ranks each deck's cards by how many games they touched:
+
+```
+python -m mtgsim misplays RUN_DIR                    # every deck in the run
+python -m mtgsim misplays RUN_DIR --deck "Azorius Control" --top 15 --json misplays.json
+```
+
+The same tables are in the report of every `match`, `gauntlet` and `matrix` run, under
+"Likely AI misplays". Per card, over decided games:
+
+| Column | Meaning |
+|---|---|
+| Hit/100 | games, per 100 games of the deck, in which at least one of the problems below happened with this card; the ranking |
+| Seen, Cast | games the card was in the opening hand or drawn; share of those in which it was cast |
+| Idle/game | turns per game seen on which the card sat in hand while the untapped lands could pay for it and it had a legal target. Sorcery-speed cards are checked at the end of their owner's turns, instants and flash cards at the end of the opponent's turns (holding an instant through your own turn is normal) |
+| Castable, never cast | of the games with at least one such turn, the share in which the card was never cast |
+| In hand at end | share of games the card was still in hand when the game ended |
+| Poor targets | removal casts that hit the caster's own permanent, or whose target was worth less than two thirds of the best opposing target the spell could have killed (by Forge's own creature evaluation) |
+| Counter passed | opponents' spells a counterspell in hand could have countered but that resolved; "big" counts the games where one cost 3 or more |
+| Hit-not pts | win rate in the flagged games minus the other games the card was seen in, with a `*` (bold in reports) when its 95% interval excludes zero |
+
+How to read it:
+
+- **These are pointers, not verdicts.** A card high on the list is one whose Forge AI logic is
+  worth reading; whether holding it was wrong depends on the game. "Hit-not" is a correlation
+  that moves for reasons unrelated to the card: losing games end with more cards in hand,
+  long games give a card more turns to be flagged, and mana-flooded or screwed games look like
+  holding cards.
+- The mana check is deliberately simple: lands and other free mana sources that are untapped,
+  printed costs (cost reductions are ignored, so a cheaper-than-printed spell may be missed),
+  X = 1. Two copies of a legendary card are not counted as castable while one is in play.
+- Removal is rarely flagged for poor targets, because Forge chooses targets with the same
+  evaluation the check uses; the column is there to catch cards whose own AI logic aims
+  elsewhere.
+- Runs made before this version have no signals; `misplays` then ranks cards by games in which
+  they were seen but never cast, and says so.
+
+## Tuning the AI pilot (`tune`)
+
+`tune` is a research tool: it searches Forge's AI profile settings (the `AiProps` keys in
+Forge's `res/ai/*.ai` files) for values under which simulated win rates track real tournament
+win rates better, and tells you how far that can be trusted.
+
+```
+# What would it play, and how long would it take? (plays nothing)
+python -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --dry-run
+
+# The search, reusing the games of an earlier seed-1 round robin of the same decks
+python -m mtgsim tune --holdout "Dimir Uldaros" "Boros Dragons" --import runs/<matrix-run>
+```
+
+- **Groups, not decks, get profiles.** Decks are grouped by `category` in `gauntlet.json`
+  (default `reactive` = control, midrange, tempo; `proactive` = aggro, ramp, combo; change with
+  `--group NAME=CAT,CAT`). Each tuned group (`--tune`, default all) gets `--profiles K` random
+  profiles drawn from a parameter space (`--space`, default `mtgsim/profiles/spaces/default.json`,
+  which explains each setting it includes), and the candidates are every combination of them,
+  the untouched Default profile included as the baseline.
+- **Objective:** the rank (Spearman) correlation between each deck's simulated win rate (its
+  average over the round robin) and its `real_win_rate`, over the training decks. Pearson and the
+  mean absolute gap are reported too. `--matchups FILE` adds real deck-vs-deck win rates
+  (`[{"a", "b", "real_win_rate", "games", "source"}]`, percent from `a`'s side) and
+  `--objective matchup|both` uses them.
+- **Successive halving:** every candidate plays `--rounds` first number of games per pairing
+  (default 10), the best third (`--eta 3`) plus the baseline go on to the next number (30), and
+  the winner and the baseline are finally re-played on `--confirm 30` fresh games per pairing that
+  played no part in choosing the winner.
+- **Overfitting guards:** `--holdout` decks play but their real win rates are never used for any
+  choice; `--cv loo` (default) re-does the choice once per training deck without that deck and
+  reports the out-of-fold correlation. Every number has a game-noise range from resampling the
+  pairing results, and an improvement is only called real when its range clears zero.
+- **Compute:** game seeds depend only on the decks, the seed and the game index, so a game is
+  fully determined by the two decks, the two profiles' settings, seed, game index, time limit and
+  Monte Carlo setting. Results are cached under exactly that key in `RUN_DIR/cache.jsonl`, so a
+  pairing whose profiles did not change is never replayed, later rounds only play the extra
+  games, `--import RUN_DIR` reuses an earlier run's identical games (a `matrix` with the same
+  seed covers the baseline) and `--resume RUN_DIR` continues where a run stopped. The engine in
+  that key includes the applied Forge patch set, so after `setup --build` applies new patches
+  nothing played before counts, and `--import` refuses runs played on a different patch set.
+- **Output:** a terminal summary, `RUN_DIR/tune.json` (every candidate's settings and metrics in
+  every round, the confirmation, the cross-validation and a statement of how much real data the
+  result would need) and `RUN_DIR/best/tuned-<group>.json`.
+
+What it can and cannot tell you: with a dozen decks, a rank correlation has a 95% interval of
+roughly ±0.4 to ±0.6 from the choice of decks alone (0.24 means anything from −0.44 to 0.74), so
+no tuning can be validated against real data to better than that; `tune` prints how many decks or matchups would narrow it. A profile that wins
+here makes the simulator's *ranking* of these decks more like the real one; it does not make the
+AI play like a person, and it may simply handicap the decks the AI plays too well. Use it to
+find out which settings matter, then check them on other decks.
+
+The one full search on the meta decks so far (16 candidates, about 12,000 games) found no profile
+that beats Forge's default settings beyond game noise; `VALIDATION.md` has the numbers.
+
+To use a tuned profile, copy `best/tuned-reactive.json` into `~/.mtgsim/profiles/` (any name;
+the file name is the profile name) and set `ai_profile` in `gauntlet.json` or pass
+`--ai-profile`. Profiles there may be complete Forge `.ai` files or JSON
+`{"base": "Default", "overrides": {"KEY": value}}`. They are copied into each run's own profile
+folder; mtgsim never changes Forge's.
+
 ## Included decks
 
-- `decks/standard/meta/` – eleven of the most-played Standard archetypes as of early
-  November 2026, with metagame shares. See the README in that folder for sources and limits.
+- `decks/standard/meta/` – eighteen of the most-played Standard archetypes as of early
+  November 2026 (81% of the field), with metagame shares and real win rates; twelve of them
+  have been calibrated against those win rates so far. See the README in that folder for sources and limits.
 - `decks/standard/casual/` – five simple one-colour decks built from Foundations commons and
   uncommons, as kitchen-table opponents.
 

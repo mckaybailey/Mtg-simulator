@@ -1,0 +1,28 @@
+Deck
+4 Earthbender Ascension
+4 Sazh's Chocobo
+4 Llanowar Elves
+4 Icetill Explorer
+4 Fabled Passage
+1 Elven Passage
+13 Forest
+1 Cavern of Souls
+3 Great Divide Guide
+3 Mightform Harmonizer
+4 Esper Origins
+3 Meltstrider's Resolve
+3 Escape Tunnel
+2 Royal Treatment
+4 Ba Sing Se
+3 Mossborn Hydra
+
+Sideboard
+2 Surrak, Elusive Hunter
+2 Torpor Orb
+1 Demolition Field
+3 Sapling Nursery
+1 Meltstrider's Resolve
+2 Carnivorous Cultivator
+1 Cavern of Souls
+1 Mossborn Hydra
+2 Soul-Guide Lantern

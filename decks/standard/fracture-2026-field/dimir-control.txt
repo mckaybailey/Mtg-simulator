@@ -1,0 +1,35 @@
+Deck
+3 Swamp
+3 Theorix Charm
+2 Three Steps Ahead
+1 Wan Shi Tong, Librarian
+4 Intimidation Tactics
+4 Restless Reef
+3 Consult the Star Charts
+2 Demolition Field
+2 Deadly Cover-Up
+2 Liliana, Dreadhorde General
+2 Island
+1 Reenact the Crime
+4 Shipwreck Marsh
+2 Undercity Sewers
+2 The Theorist, Jace Beleren
+3 Requiting Hex
+1 Day of Black Sun
+1 Sphinx of False Conclusions
+2 Stock Up
+4 Watery Grave
+1 Outrageous Robbery
+2 The End
+4 Strategic Betrayal
+4 Gloomlake Verge
+1 Petrified Hamlet
+
+Sideboard
+1 Three Steps Ahead
+2 Malcolm, Alluring Scoundrel
+2 Duress
+3 Terminal Criticism
+1 Bitter Triumph
+2 Flashfreeze
+4 Leyline of the Void

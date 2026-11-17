@@ -1,0 +1,54 @@
+Subject: Earthbend abilities: cast the permanents in hand before sinking mana into Ba Sing Se
+Why: EarthbendAi.canPlay said yes whenever the AI controlled a land, so Ba Sing Se's
+  {2}{G},{T}: Earthbend 2 was activated in the first main phase of every turn. Permanent spells
+  wait for the second main phase (ComputerUtil.castPermanentInMain1), and by then the mana was
+  gone: in the patched round robin Mono-Green Landfall activated it 4.35 times a game when it
+  had Ba Sing Se, cast Mossborn Hydra in 31% of those games against 76% without the land, and
+  won 44.2% against 58.2%. Now an activated earthbend with a mana cost is put off while a
+  permanent card in hand could be paid for with the same mana.
+Measured: `mtgsim gauntlet decks/standard/meta/mono-green-landfall.txt --vs <the other ten meta decks>
+  -n 100 --seed 1`, default AI, Forge 7db198d72e, on 14 Nov 2026. With patches 0001-0010:
+  47.4% (95% CI 44-50%, 474-526). With this patch added: 67.7% (65-71%, 677-323). Difference
+  +20.3 points, 95% CI +16.0 to +24.5 (paired over the same 1,000 seeds: +17.7 to +22.9;
+  209 losses became wins, 6 wins became losses). Games in which a card was cast, of 1,000:
+  Mossborn Hydra 340 to 502, Icetill Explorer 295 to 534, Earthbender Ascension 298 to 451.
+  Mirror with the patch (`match mono-green-landfall mono-green-landfall -n 200 --seed 1`):
+  54.8% (48-62%).
+
+diff --git a/forge-ai/src/main/java/forge/ai/ability/EarthbendAi.java b/forge-ai/src/main/java/forge/ai/ability/EarthbendAi.java
+index 073b942d..34229e01 100644
+--- a/forge-ai/src/main/java/forge/ai/ability/EarthbendAi.java
++++ b/forge-ai/src/main/java/forge/ai/ability/EarthbendAi.java
+@@ -8,6 +8,7 @@ import forge.game.cost.Cost;
+ import forge.game.cost.CostPart;
+ import forge.game.cost.CostSacrifice;
+ import forge.game.player.Player;
++import forge.game.zone.ZoneType;
+ import forge.game.spellability.SpellAbility;
+ 
+ public class EarthbendAi extends SpellAbilityAi {
+@@ -17,6 +18,24 @@ public class EarthbendAi extends SpellAbilityAi {
+         if (lands.isEmpty()) {
+             return new AiAbilityDecision(0, AiPlayDecision.AnotherTime);
+         }
++        // An activated earthbend (Ba Sing Se) is a mana sink. Permanent spells wait for the second main phase
++        // (ComputerUtil.castPermanentInMain1), so activating it first would spend the mana they need.
++        if (sa.isActivatedAbility() && sa.getPayCosts() != null && sa.getPayCosts().hasManaCost()) {
++            for (final Card c : aiPlayer.getCardsIn(ZoneType.Hand)) {
++                if (c.isLand() || !c.isPermanent()) {
++                    continue;
++                }
++                final SpellAbility spell = c.getFirstSpellAbility();
++                if (spell == null) {
++                    continue;
++                }
++                spell.setActivatingPlayer(aiPlayer);
++                if (ComputerUtilCost.canPayCost(spell, aiPlayer, false)) {
++                    return new AiAbilityDecision(0, AiPlayDecision.AnotherTime);
++                }
++            }
++        }
++
+         CardCollection fetchLands = CardLists.filter(lands, c -> {
+                     for (final SpellAbility ability : c.getAllSpellAbilities()) {
+                         if (ability.isActivatedAbility()) {

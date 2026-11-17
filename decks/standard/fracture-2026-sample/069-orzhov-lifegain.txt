@@ -1,0 +1,35 @@
+Deck
+4 Enlightened Confidant
+3 Erode
+1 Swamp
+4 Concealed Courtyard
+1 Dalkovan Encampment
+1 Shattered Sanctum
+1 Emptiness
+4 Starting Town
+4 Amalia Benavides Aguirre
+4 Haliya, Guided by Light
+4 Case of the Uneaten Feast
+2 Multiversal Passage
+3 Moseo, Vein's New Dean
+1 Bitter Triumph
+3 Lunar Convocation
+2 Bleachbone Verge
+4 Hinterland Sanctifier
+3 Plains
+2 Starscape Cleric
+3 Liliana the Faultless
+2 Deep-Cavern Bat
+4 Godless Shrine
+
+Sideboard
+1 Requisition Raid
+3 Strategic Betrayal
+1 Decorum Dissertation
+1 Seam Rip
+3 Duress
+1 Lunar Convocation
+1 Bloodthirsty Conqueror
+1 M.O.D.O.K.
+2 Curious Farm Animals
+1 Starscape Cleric

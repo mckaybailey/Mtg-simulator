@@ -1,0 +1,40 @@
+Deck
+1 Swamp
+2 Seasoned Cryomancer
+1 Uldaros Theorix
+2 Willowrush Verge
+1 Theorix Charm
+3 Starting Town
+1 Wistfulness
+3 Town Greeter
+3 Deceit
+4 Bringer of the Last Gift
+1 Breeding Pool
+1 Awaken the Honored Dead
+2 Ardyn, the Usurper
+4 Superior Spider-Man
+2 Cavern of Souls
+1 Undercity Sewers
+1 Blooming Marsh
+2 Wastewood Verge
+2 Bitter Triumph
+3 Overgrown Tomb
+3 Oblivious Bookworm
+2 Requiting Hex
+4 Watery Grave
+1 Terror of the Peaks
+4 Gloomlake Verge
+4 Formidable Speaker
+2 Overlord of the Balemurk
+
+Sideboard
+1 Giant Cindermaw
+2 Strategic Betrayal
+1 Awaken the Honored Dead
+2 Duress
+1 Wistfulness
+1 Professor Dellian Fel
+2 Vicious Rivalry
+2 Witherbloom Charm
+2 Flashfreeze
+1 Negate

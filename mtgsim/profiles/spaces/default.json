@@ -1,0 +1,128 @@
+{
+ "description": "Default search space for `mtgsim tune`: settings of Forge's heuristic AI (Monte Carlo off) that plausibly decide how control and value decks fare against creature decks. Each parameter lists alternative values to Default.ai's; a parameter with several keys changes them together. FLAT_MC_* settings that only act while Monte Carlo search is on are left out (Monte Carlo is a separate study), except the mulligan ones, which act in every game. Chosen after reading forge-ai's AiProps.java, the code that reads each key, and the built-in profiles (Cautious, Reckless and Experimental differ from Default mainly in these). Note that with Monte Carlo off no profile key makes the AI hold up mana for counterspells; that is FLAT_MC_CONSIDER_HOLDING / FLAT_MC_HOLD_MANA_WEIGHT.",
+ "base": "Default",
+ "change_probability": 0.2,
+ "params": [
+  {
+   "name": "counter-chances",
+   "keys": ["CHANCE_TO_COUNTER_CMC_1", "CHANCE_TO_COUNTER_CMC_2", "CHANCE_TO_COUNTER_CMC_3"],
+   "values": [[0, 50, 100], [60, 90, 100], [100, 100, 100]],
+   "groups": ["reactive"],
+   "why": "Default counters a 1-drop 30% and a 2-drop 75% of the time (CounterAi). Saving counters for bigger threats (Cautious: 0/50/100) or countering everything changes how long a counterspell deck survives a curve of cheap creatures."
+  },
+  {
+   "key": "MIN_SPELL_CMC_TO_COUNTER",
+   "values": [1, 2, 3],
+   "groups": ["reactive"],
+   "why": "Below this mana value the AI only counters removal, burn, pump, auras and other counterspells (Cautious and Reckless use 2)."
+  },
+  {
+   "name": "counter-tricks",
+   "keys": ["ALWAYS_COUNTER_PUMP_SPELLS", "ALWAYS_COUNTER_AURAS", "ALWAYS_COUNTER_DAMAGE_SPELLS"],
+   "values": [[false, false, true], [false, false, false]],
+   "groups": ["reactive"],
+   "why": "Default spends counters on any pump spell, aura or burn spell regardless of the thresholds above; keeping them for threats is what human control players do."
+  },
+  {
+   "name": "danger-threshold",
+   "keys": ["AI_IN_DANGER_THRESHOLD", "AI_IN_DANGER_MAX_THRESHOLD"],
+   "values": [[6, 6], [8, 8], [5, 9]],
+   "why": "Life total below which the AI blocks and removes attackers to stay alive (ComputerUtilCombat.lifeInDanger, also read by several card AIs). Default 4 lets aggro decks race a control deck down to almost nothing; Hardest uses 6."
+  },
+  {
+   "name": "block-trades",
+   "keys": ["MIN_CHANCE_TO_RANDOMLY_TRADE_ON_BLOCK", "MAX_CHANCE_TO_RANDOMLY_TRADE_ON_BLOCK"],
+   "values": [[10, 40], [50, 90], [80, 100]],
+   "why": "Chance to block for an even trade (AiBlockController.wouldLikeToRandomlyTrade), rising as life falls. Control decks want to trade early; creature decks want to keep attackers."
+  },
+  {
+   "key": "RANDOMLY_TRADE_EVEN_WHEN_HAVE_LESS_CREATS",
+   "values": [true],
+   "why": "Default only trades on blocks when it has at least as many creatures; a deck with few creatures (control) then never trades."
+  },
+  {
+   "key": "PLAY_AGGRO",
+   "values": [true],
+   "why": "All-out attacking (AiAttackController). Default is off; it also changes how a deck Forge thinks is non-aggro (name contains Control, or average mana value above 3) holds back blockers."
+  },
+  {
+   "key": "CHANCE_TO_ATTACK_INTO_TRADE",
+   "values": [30, 60, 100],
+   "why": "Default 0 (the AiProps default is 40, Reckless 100): how often the AI attacks into a block that trades creatures. Aggro decks overperform in the simulator, so this works in both directions."
+  },
+  {
+   "key": "CHANCE_TO_ATKTRADE_WHEN_OPP_HAS_MANA",
+   "values": [0, 70, 100],
+   "why": "Whether attacks into trades are made into open mana (combat tricks, flash blockers, instant removal). Default 30, Cautious 0."
+  },
+  {
+   "key": "ATTACK_INTO_TRADE_WHEN_TAPPED_OUT",
+   "values": [true],
+   "why": "Default only attacks into trades while holding mana for a trick; Reckless also does when tapped out."
+  },
+  {
+   "key": "TRY_TO_AVOID_ATTACKING_INTO_CERTAIN_BLOCK",
+   "values": [false],
+   "why": "Extra checks that stop attacks which cannot deal damage (Cautious and Reckless turn them off)."
+  },
+  {
+   "name": "hold-tricks",
+   "keys": ["TRY_TO_HOLD_COMBAT_TRICKS_UNTIL_BLOCK", "CHANCE_TO_HOLD_COMBAT_TRICKS_UNTIL_BLOCK"],
+   "values": [[false, 65], [true, 100]],
+   "why": "Casting pump spells after blocks rather than before; mostly affects creature decks."
+  },
+  {
+   "key": "RESERVE_MANA_FOR_MAIN2_CHANCE",
+   "values": [0, 50],
+   "why": "Chance to keep mana sources for a spell predicted for the second main phase (ComputerUtilMana). The closest heuristic-AI knob to not tapping out early."
+  },
+  {
+   "key": "FLASH_CHANCE_TO_RESPOND_TO_STACK_WITH_ETB",
+   "values": [30, 60],
+   "groups": ["reactive"],
+   "why": "Default never casts a flash creature in response to a spell; the Azorius and Dimir lists play flash threats."
+  },
+  {
+   "name": "kill-evasive",
+   "keys": ["ACTIVELY_DESTROY_IMMEDIATELY_UNBLOCKABLE", "DESTROY_IMMEDIATELY_UNBLOCKABLE_ONLY_IN_DNGR"],
+   "values": [[true, false], [false, true]],
+   "groups": ["reactive"],
+   "why": "Whether removal goes first to creatures that cannot be blocked (flyers), always or only when life is in danger, instead of the biggest threat."
+  },
+  {
+   "name": "protect-planeswalkers",
+   "keys": ["CHANCE_TO_TRADE_TO_SAVE_PLANESWALKER", "CHUMP_TO_SAVE_PLANESWALKER_ONLY_ON_LETHAL"],
+   "values": [[100, false]],
+   "groups": ["reactive"],
+   "why": "Several reactive lists win with planeswalkers; Default only chump-blocks for one when the attack would kill it."
+  },
+  {
+   "key": "SACRIFICE_DEFAULT_PREF_ENABLE",
+   "values": [true],
+   "groups": ["reactive"],
+   "why": "Lets the AI pay sacrifice costs with cheap creatures and tokens when a card has no sacrifice preference of its own (Jund Sacrifice; Reckless enables it)."
+  },
+  {
+   "key": "MULLIGAN_THRESHOLD",
+   "values": [5, 6],
+   "why": "Hand size below which the AI stops mulliganing (Default 4). Slow decks suffer more from going to four or five."
+  },
+  {
+   "key": "FLAT_MC_MULLIGAN",
+   "values": [false],
+   "why": "Despite the name this acts with Monte Carlo off: the deck-plan mulligan (simulation.OpeningHand) instead of the old land-count rule. On by default (the AiProps default; Default.ai does not set it)."
+  },
+  {
+   "key": "FLAT_MC_DECK_PLAN",
+   "values": ["control", "midrange"],
+   "groups": ["reactive"],
+   "why": "The archetype the deck-plan mulligan judges hands by; 'auto' (default) reads it from the list and may call a value deck aggro."
+  },
+  {
+   "key": "FLAT_MC_DECK_PLAN",
+   "values": ["aggro"],
+   "groups": ["proactive"],
+   "why": "As above, for the creature decks."
+  }
+ ]
+}

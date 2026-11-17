@@ -1,0 +1,36 @@
+Deck
+2 Magda, the Hoardmaster
+4 Blooming Marsh
+1 Swamp
+4 Gene Pollinator
+4 Greedy Freebooter
+4 Lively Dirge
+1 Mountain
+3 Umbral Collar Zealot
+2 Blazemire Verge
+2 Requiting Hex
+1 Smaug the Magnificent
+4 Starting Town
+4 Biotech Specialist
+1 Forest
+2 The Misty Mountains Cold
+4 The Sackville-Bagginses
+3 Overgrown Tomb
+4 Obsessive Pursuit
+3 Stomping Ground
+1 Wolverine, Fierce Fighter
+3 Blood Crypt
+2 Torch the Tower
+1 Charming Scoundrel
+
+Sideboard
+3 Strategic Betrayal
+4 Duress
+1 Requiting Hex
+1 Fire Magic
+1 Giant Cindermaw
+1 Guerrilla Gorilla
+1 Leatherhead, Swamp Stalker
+1 Seedship Impact
+1 Heritage Reclamation
+1 Chandra, Spark Hunter

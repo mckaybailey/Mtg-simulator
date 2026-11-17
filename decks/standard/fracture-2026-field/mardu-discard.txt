@@ -1,0 +1,31 @@
+Deck
+1 Inti, Seneschal of the Sun
+1 Swamp
+3 Concealed Courtyard
+2 Erode
+2 Inspiring Vantage
+4 Iron-Shield Elf
+3 Starting Town
+4 Practiced Offense
+1 Mountain
+4 Dark Matter Manipulator
+1 Multiversal Passage
+4 Moonshadow
+4 Hardened Academic
+4 Marauding Mako
+4 Sacred Foundry
+4 Cool but Rude
+2 Requiting Hex
+4 Bloodghast
+1 Carnage, Crimson Chaos
+4 Blood Crypt
+3 Godless Shrine
+
+Sideboard
+2 Strategic Betrayal
+2 Sheltered by Ghosts
+2 Ghost Vacuum
+3 Monument to Endurance
+2 Duress
+2 Shoot the Sheriff
+2 Doorkeeper Thrull

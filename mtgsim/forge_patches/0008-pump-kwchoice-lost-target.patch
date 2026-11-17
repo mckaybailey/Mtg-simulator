@@ -1,0 +1,27 @@
+Subject: PumpEffect: do not crash when a "your choice of keyword" pump has lost its target
+Why: With 0004 the AI casts Practiced Offense, and 5 of the 1,000 patched Azorius Momo gauntlet
+  games ended in an engine error: when the creature target is removed in response, the spell
+  still resolves (its player target is legal), and PumpEffect.resolve asks for the keyword
+  choice with tgtCards.get(0) on an empty list (IndexOutOfBoundsException). Any KWChoice pump
+  whose target is gone hits it; it only showed up now because the AI never cast the card
+  before. The guard matches the `!tgtCards.isEmpty()` check a few lines further down: with no
+  target left, nothing is pumped, as the rules say. Java code: needs a Maven rebuild.
+Measured: the 5 Azorius Momo gauntlet games that crashed with 0003-0007 (same command as in
+  0003, seed 1; two against Azorius Control, three against Izzet Spellementals) were replayed
+  with 0008 added by resuming a copy of that run: all 5 now finish (2 won, 3 lost), and the arm
+  comes to 542-458 over all 1,000 games, 54.2% (95% CI 51-57%), with no engine errors. The other
+  995 games cannot be affected: the changed branch always crashed before. Built with Maven in 49 s.
+
+diff --git a/forge-game/src/main/java/forge/game/ability/effects/PumpEffect.java b/forge-game/src/main/java/forge/game/ability/effects/PumpEffect.java
+index e20d73b..f259ad8 100644
+--- a/forge-game/src/main/java/forge/game/ability/effects/PumpEffect.java
++++ b/forge-game/src/main/java/forge/game/ability/effects/PumpEffect.java
+@@ -294,7 +294,7 @@ public class PumpEffect extends SpellAbilityEffect {
+         List<String> keywords = Lists.newArrayList();
+         if (sa.hasParam("KW")) {
+             keywords.addAll(Arrays.asList(sa.getParam("KW").split(" & ")));
+-        } else if (sa.hasParam("KWChoice")) {
++        } else if (sa.hasParam("KWChoice") && !tgtCards.isEmpty()) {
+             List<String> options = Arrays.asList(sa.getParam("KWChoice").split(","));
+             String chosen = activator.getController().chooseKeywordForPump(options, sa,
+                     Localizer.getInstance().getMessage("lblChooseKeyword"), tgtCards.get(0));

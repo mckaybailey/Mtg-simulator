@@ -1,0 +1,42 @@
+Deck
+3 Uldaros Theorix
+3 Seasoned Cryomancer
+4 Swamp
+2 Theorix Charm
+1 Vraska's Final Mercy
+1 Intimidation Tactics
+3 Restless Reef
+2 Deadly Cover-Up
+4 Deceit
+2 Winternight Stories
+1 Duress
+1 Island
+4 Superior Spider-Man
+2 Cavern of Souls
+1 Multiversal Passage
+1 Spell Snare
+4 Shipwreck Marsh
+2 Undercity Sewers
+2 Bitter Triumph
+3 Requiting Hex
+3 The Theorist, Jace Beleren
+4 Watery Grave
+1 Strategic Betrayal
+4 Gloomlake Verge
+2 Overlord of the Balemurk
+
+Sideboard
+1 Disdainful Stroke
+1 Strategic Betrayal
+1 Flashfreeze
+1 Annul
+1 Qarsi Revenant
+1 Requiting Hex
+1 Ghost Vacuum
+2 Duress
+1 Null Summoner
+1 Day of Black Sun
+1 Terminal Criticism
+1 M.O.D.O.K.
+1 Emeritus of Ideation
+1 Spell Snare

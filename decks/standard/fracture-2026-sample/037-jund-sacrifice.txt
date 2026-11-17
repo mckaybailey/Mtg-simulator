@@ -1,0 +1,39 @@
+Deck
+1 Swamp
+1 Mutagen Man, Living Ooze
+4 Greedy Freebooter
+1 Sentinel of the Nameless City
+1 Umbral Collar Zealot
+1 Forest
+4 Obsessive Pursuit
+3 Lively Dirge
+4 Starting Town
+2 Stir Up Trouble
+2 Stomping Ground
+1 Molten Collapse
+4 Gene Pollinator
+1 Mountain
+4 Biotech Specialist
+4 Blooming Marsh
+3 Callous Inspector
+1 Wastewood Verge
+1 Wolverine, Fierce Fighter
+4 Overgrown Tomb
+1 Clockwork Percussionist
+1 Requiting Hex
+4 The Sackville-Bagginses
+3 Blazemire Verge
+1 Blood Crypt
+3 Rottenmouth Viper
+
+Sideboard
+2 Strategic Betrayal
+1 Guerrilla Gorilla
+1 Leatherhead, Swamp Stalker
+3 Duress
+1 Maelstrom Pulse
+1 Professor Dellian Fel
+1 The Ooze
+2 Vicious Rivalry
+2 Shoot the Sheriff
+1 Fire Magic

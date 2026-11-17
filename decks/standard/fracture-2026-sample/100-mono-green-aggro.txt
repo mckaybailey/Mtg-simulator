@@ -1,0 +1,25 @@
+Deck
+4 Llanowar Elves
+3 Sazh's Chocobo
+3 Ambitious Augmenter
+3 Pawpatch Recruit
+4 Innkeeper's Talent
+2 Mikey & Leo, Chaos & Order
+2 Michelangelo, Weirdness to 11
+2 Scavenging Ooze
+4 Predator Ooze
+4 Wildgrowth Archaic
+4 Ouroboroid
+3 Leatherhead, Swamp Stalker
+3 Hushwood Verge
+2 Wastewood Verge
+17 Forest
+
+Sideboard
+3 Sapling Nursery
+3 Fecund Greenshell
+2 Scavenging Ooze
+3 Compel Brutality
+2 Pawpatch Formation
+1 Pick Your Poison
+1 Strength of Will

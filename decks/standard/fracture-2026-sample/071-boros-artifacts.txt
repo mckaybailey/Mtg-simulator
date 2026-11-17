@@ -1,0 +1,32 @@
+Deck
+4 Aang's Iceberg
+1 Candy Trail
+4 Carrot Cake
+4 Castle Doom
+4 Dusk Rose Reliquary
+1 Fountainport
+4 Inspiring Vantage
+4 Legion Extruder
+2 Mountain
+2 Petrified Hamlet
+3 Pinnacle Starcage
+3 Plains
+4 Sacred Foundry
+4 Spring-Loaded Sawblades
+4 Sundown Pass
+1 Soul-Guide Lantern
+2 Tezzeret, Cruel Captain
+1 Thrór's Map
+4 United Battlefront
+4 Weapons Manufacturing
+
+Sideboard
+1 Chandra, Torch of Defiance
+2 Day of Judgment
+2 Draconic Visitor
+2 Rest in Peace
+1 Return the Favor
+2 Seam Rip
+1 Soul-Guide Lantern
+2 Tezzeret, Cruel Captain
+2 Torpor Orb

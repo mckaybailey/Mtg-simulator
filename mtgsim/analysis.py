@@ -19,8 +19,98 @@ from . import stats
 
 
 def seat_of_a(record: dict) -> int:
-    """Which seat the pairing's first deck had (seats alternate by game; see experiment.plan_pairing)."""
+    """Which seat the pairing's first deck had.
+
+    Stored records name their seats; in best-of-one games they alternate by game index
+    (experiment.plan_pairing), which is what a record without seats falls back to. Games 2 and 3 of a
+    best-of-three match seat the previous game's loser first, so only their seats tell.
+    """
+    seats = record.get("seats")
+    if seats and len(seats) == 2 and seats[0] != seats[1] and record.get("a") in seats:
+        return seats.index(record["a"])
     return 0 if record["game"] % 2 == 0 else 1
+
+
+def match_game(record: dict) -> int:
+    """1 for a best-of-one game or the first game of a match, else 2 or 3."""
+    return int(record.get("match_game") or 1)
+
+
+def first_games(records: Iterable[dict]) -> List[dict]:
+    """The best-of-one games, or the first game of every match: what card and misplay statistics are read from,
+    since later games of a match are played with sideboarded decks."""
+    return [r for r in records if match_game(r) == 1]
+
+
+def summarize_matches(records: Iterable[dict], a_key: str, b_key: str) -> dict:
+    """Best-of-three results of one pairing, from the first deck's point of view.
+
+    The win-rate fields (``games``, ``decided``, ``wins``, ``losses``, ``draws``, ``win_rate``, ``ci``,
+    ``p_even``) count matches: a match is won with two game wins, and one that ends after three games without
+    two wins for either deck (games without a winner) is a draw, left out of the win rate as drawn games are.
+    The other fields are summarize_pairing's over every game of the matches (games on the play, turns,
+    mulligans). ``game1`` is the first games alone, which are the best-of-one games with the same seeds;
+    ``later_games`` are games 2 and 3 (with sideboards, if the run used them).
+    """
+    mine = [r for r in records if r.get("a") == a_key and r.get("b") == b_key]
+    by_match: Dict[int, Dict[int, dict]] = {}
+    for r in mine:
+        by_match.setdefault(int(r["game"]), {})[match_game(r)] = r
+    wins = losses = draws = unfinished = 0
+    game_wins = game_losses = 0
+    lengths: Counter = Counter()
+    for i in sorted(by_match):
+        games = by_match[i]
+        won = {a_key: 0, b_key: 0}
+        played = 0
+        for n in (1, 2, 3):
+            g = games.get(n)
+            if g is None:
+                break
+            played += 1
+            w = g.get("winner_seat", -1)
+            if g.get("status") == "ok" and w in (0, 1):
+                seat_a = seat_of_a(g)
+                if w == seat_a:
+                    won[a_key] += 1
+                    game_wins += 1
+                else:
+                    won[b_key] += 1
+                    game_losses += 1
+            if max(won.values()) >= 2:
+                break
+        if won[a_key] >= 2:
+            wins += 1
+            lengths[played] += 1
+        elif won[b_key] >= 2:
+            losses += 1
+            lengths[played] += 1
+        elif played == 3:
+            draws += 1
+        else:
+            unfinished += 1
+    decided = wins + losses
+    block = _rate_block(wins, decided)
+    summary = summarize_pairing(mine, a_key, b_key)
+    game_counts = {k: summary[k] for k in ("games", "decided", "wins", "losses", "draws", "timeouts", "errors")}
+    summary.update({
+        "match_format": "bo3",
+        "games": len(by_match), "decided": decided, "wins": wins, "losses": losses, "draws": draws,
+        "unfinished": unfinished, "win_rate": block["win_rate"], "ci": block["ci"],
+        "p_even": stats.binomial_p_even(wins, decided),
+        "game_totals": game_counts,
+        "game_wins": game_wins, "game_losses": game_losses,
+        "game_win_rate": stats.rate(game_wins, game_wins + game_losses),
+        "match_lengths": {str(k): lengths[k] for k in sorted(lengths)},
+        "game1": _brief(summarize_pairing([r for r in mine if match_game(r) == 1], a_key, b_key)),
+        "later_games": _brief(summarize_pairing([r for r in mine if match_game(r) > 1], a_key, b_key)),
+    })
+    return summary
+
+
+def _brief(p: dict) -> dict:
+    return {k: p[k] for k in ("games", "decided", "wins", "losses", "draws", "timeouts", "errors", "win_rate", "ci",
+                              "on_play", "on_draw")}
 
 
 def _rate_block(wins: int, games: int) -> dict:

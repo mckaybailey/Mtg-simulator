@@ -1,0 +1,1007 @@
+{
+  "format": "standard",
+  "snapshot": "2026-11-05",
+  "description": "A random sample (Python random.seed(1), random.sample) of 100 of the 1,811 Standard decklists of Arena Championship 13 and the two Magic Spotlight: Fracture events (Beijing, Hartford), the events behind the Magic.gg Metagame Mentor table of 2026-11-05, excluding the lists already in ../meta and ../fracture-2026-field. Every list counts once (meta_share 1.0), so the sample stands for the field by its real composition. See README.md.",
+  "decks": [
+    {
+      "file": "001-rakdos-discard.txt",
+      "name": "Rakdos Discard #001",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "moses2000, Magic Spotlight: Fracture (Beijing) (melee.gg label: Rakdos Discard; real record 3-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/2893ec9a-1019-40f0-9ee7-b4ee00e61f9c",
+      "archetype": "other",
+      "archetype_similarity": 0.21
+    },
+    {
+      "file": "002-orzhov-lifegain.txt",
+      "name": "Orzhov Lifegain #002",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "NickPackard, Magic Spotlight: Fracture (Hartford) (melee.gg label: Orzhov Lifegain; real record 4-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/a55df076-712e-4d1c-adc4-b4ed003319ef",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.93
+    },
+    {
+      "file": "003-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #003",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "WillRoser, Magic Spotlight: Fracture (Hartford) (melee.gg label: Jund Sacrifice; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/f8aa501d-3c66-46e4-bdc4-b4ea011656f4",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.79
+    },
+    {
+      "file": "004-mardu-midrange.txt",
+      "name": "Mardu Midrange #004",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Sprout, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mardu Midrange; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/eb0f6218-8029-4aea-b4dd-b4f3005ff504",
+      "archetype": "other",
+      "archetype_similarity": 0.22
+    },
+    {
+      "file": "005-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #005",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Lorenzo Iuculano, Magic Spotlight: Fracture (Hartford) (melee.gg label: Jund Sacrifice; real record 2-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/e1a3bdf6-3d87-46f4-ac69-b4ec002bc307",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.88
+    },
+    {
+      "file": "006-azorius-control.txt",
+      "name": "Azorius Control #006",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "oatyt, Magic Spotlight: Fracture (Beijing) (melee.gg label: Azorius Control; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/125d52ac-d1f8-4fbd-b742-b4f000ea8390",
+      "archetype": "Azorius Control",
+      "archetype_similarity": 0.89
+    },
+    {
+      "file": "007-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #007",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Richie Abbott, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-Green Landfall; real record 4-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/48e5a9bc-cb31-46aa-b37d-b4eb00236418",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.74
+    },
+    {
+      "file": "008-jund.txt",
+      "name": "Jund #008",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "czzchen, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund; real record 2-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/21e8898e-217a-48d0-a4bb-b4f30037735d",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.89
+    },
+    {
+      "file": "009-azorius-control.txt",
+      "name": "Azorius Control #009",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Deverex, Magic Spotlight: Fracture (Hartford) (melee.gg label: Azorius Control; real record 4-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/8fb03924-585b-44cf-ac49-b4ed0012aac5",
+      "archetype": "Azorius Control",
+      "archetype_similarity": 0.7
+    },
+    {
+      "file": "010-boros.txt",
+      "name": "Boros #010",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "dadi, Magic Spotlight: Fracture (Beijing) (melee.gg label: Boros; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/e0f562b5-0e10-4c23-981e-b4f20048a0a4",
+      "archetype": "Boros Dragons",
+      "archetype_similarity": 0.98
+    },
+    {
+      "file": "011-orzhov-spellementals.txt",
+      "name": "Orzhov Spellementals #011",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "chuan sun, Magic Spotlight: Fracture (Beijing) (melee.gg label: Orzhov Spellementals; real record 4-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/81ef2bb8-a0e8-4ad5-818d-b4f200ee153c",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.95
+    },
+    {
+      "file": "012-dimir-midrange.txt",
+      "name": "Dimir Midrange #012",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "ydddd123, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/8840925e-8b35-402e-956c-b4de006ab659",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "013-dimir-midrange.txt",
+      "name": "Dimir Midrange #013",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Huangwei, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/bdeb02a0-3de2-4f43-b4f7-b4f30083660d",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "014-boros-dwarves.txt",
+      "name": "Boros Dwarves #014",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "brobot5000, Magic Spotlight: Fracture (Hartford) (melee.gg label: Boros Dwarves; real record 2-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/6bf1b8e2-91ad-4cd7-a3e1-b4ec00e5da67",
+      "archetype": "Boros Dwarves",
+      "archetype_similarity": 0.93
+    },
+    {
+      "file": "015-dimir-midrange.txt",
+      "name": "Dimir Midrange #015",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "lianganguo, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/e82b766c-3386-42f6-b9d4-b4f3008c02a1",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "016-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #016",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Zach White, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-Green Landfall; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/3d762921-bf5f-4725-b233-b4ed00cb4afb",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.78
+    },
+    {
+      "file": "017-izzet-spellementals.txt",
+      "name": "Izzet Spellementals #017",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Fabrini92, Magic Spotlight: Fracture (Hartford) (melee.gg label: Izzet Spellementals; real record 2-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/1b29422c-d40d-4221-9f4e-b4ed00c2f045",
+      "archetype": "Izzet Spellementals",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "018-dimir-midrange.txt",
+      "name": "Dimir Midrange #018",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Xin Yu, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/8d1829a2-9a0b-4af9-beca-b4f3009f2e6d",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.92
+    },
+    {
+      "file": "019-azorius-control.txt",
+      "name": "Azorius Control #019",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Devon Swindells, Magic Spotlight: Fracture (Hartford) (melee.gg label: Azorius Control; real record 5-3-1)",
+      "source_url": "https://melee.gg/Decklist/View/07e10f62-0dff-4b6b-b259-b4e900d57a75",
+      "archetype": "Azorius Control",
+      "archetype_similarity": 0.67
+    },
+    {
+      "file": "020-azorius.txt",
+      "name": "Azorius #020",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "SongZhuohang, Magic Spotlight: Fracture (Beijing) (melee.gg label: Azorius; real record 0-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/f59f90b0-8bb1-474a-9c27-b4f30086194f",
+      "archetype": "Azorius Control",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "021-orzhov-aggro.txt",
+      "name": "Orzhov Aggro #021",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Skyehst, Magic Spotlight: Fracture (Beijing) (melee.gg label: Orzhov Aggro; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/6ee8b9a9-e66e-48da-89ed-b4f20072f7a8",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.84
+    },
+    {
+      "file": "022-boros-dwarves.txt",
+      "name": "Boros Dwarves #022",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Justin Sokola, Magic Spotlight: Fracture (Hartford) (melee.gg label: Boros Dwarves; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/7b2375f2-48c5-496f-bb1d-b4ea017bed64",
+      "archetype": "Boros Dwarves",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "023-orzhov-lifegain.txt",
+      "name": "Orzhov Lifegain #023",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "MaryVentura, Magic Spotlight: Fracture (Hartford) (melee.gg label: Orzhov Lifegain; real record 1-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/b1347dba-b8d6-41ac-bb14-b4ed00c3dd64",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.71
+    },
+    {
+      "file": "024-w-u-b-r-control.txt",
+      "name": "W-U-B-R Control #024",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "HaoT, Magic Spotlight: Fracture (Beijing) (melee.gg label: W-U-B-R Control; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/e1180b22-0834-45b0-a0db-b4e000cee86b",
+      "archetype": "Four-Color Control",
+      "archetype_similarity": 0.69
+    },
+    {
+      "file": "025-dimir-midrange.txt",
+      "name": "Dimir Midrange #025",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Shimpo Kosuke, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/e286521a-e1c0-4e4a-a753-b4f201178d0c",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.92
+    },
+    {
+      "file": "026-izzet-elementals.txt",
+      "name": "Izzet Elementals #026",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "fishhot, Magic Spotlight: Fracture (Beijing) (melee.gg label: Izzet Elementals; real record 1-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/00b2e98d-5724-4049-9c40-b4f200b058ee",
+      "archetype": "Izzet Spellementals",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "027-boros-dragons.txt",
+      "name": "Boros Dragons #027",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Yuxing Song, Magic Spotlight: Fracture (Beijing) (melee.gg label: Boros Dragons; real record 3-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/cc590e4f-2f40-47da-b935-b4e800269347",
+      "archetype": "Boros Dragons",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "028-jund-omniscience.txt",
+      "name": "Jund Omniscience #028",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "duiihao, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Omniscience; real record 4-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/7fe33dbe-3ac9-493d-a3e6-b4f2010ef6a9",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.84
+    },
+    {
+      "file": "029-jeskai-midrange.txt",
+      "name": "Jeskai Midrange #029",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "loversnowfox, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jeskai Midrange; real record 1-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/4d16ccb6-43f3-4edb-99bc-b4f3003bd9c0",
+      "archetype": "Azorius Artifacts",
+      "archetype_similarity": 0.89
+    },
+    {
+      "file": "030-azorius-control.txt",
+      "name": "Azorius Control #030",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "wangchengxin, Magic Spotlight: Fracture (Beijing) (melee.gg label: Azorius Control; real record 4-3-1)",
+      "source_url": "https://melee.gg/Decklist/View/d4d6f5f7-5a8e-4060-ac9d-b4f2005bb299",
+      "archetype": "Azorius Momo",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "031-dimir-excruciator.txt",
+      "name": "Dimir Excruciator #031",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "BestSmurgNA, Magic Spotlight: Fracture (Hartford) (melee.gg label: Dimir Excruciator; real record 8-7-0)",
+      "source_url": "https://melee.gg/Decklist/View/ea991c8c-0bd6-46f4-b99c-b4ec014dbcdd",
+      "archetype": "Dimir Excruciator",
+      "archetype_similarity": 0.87
+    },
+    {
+      "file": "032-dimir-uldaros.txt",
+      "name": "Dimir Uldaros #032",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "logan underwood, Magic Spotlight: Fracture (Hartford) (melee.gg label: Dimir Uldaros; real record 4-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/4256d9e9-68bf-4d79-985c-b4ed002a915d",
+      "archetype": "Dimir Uldaros",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "033-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #033",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "kita137, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Sacrifice; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/abbb925f-3c15-405f-b7ce-b4f100b65d0b",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.88
+    },
+    {
+      "file": "034-boros-dragons.txt",
+      "name": "Boros Dragons #034",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Nicholas Roseboom, Magic Spotlight: Fracture (Hartford) (melee.gg label: Boros Dragons; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/1ce9d312-def0-4495-a6ea-b4ed0034e075",
+      "archetype": "Boros Dragons",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "035-jund-combo.txt",
+      "name": "Jund Combo #035",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "pengshen chen, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Combo; real record 1-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/59e02902-85f1-479f-ac7a-b4f100999caf",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.86
+    },
+    {
+      "file": "036-jeskai-combo.txt",
+      "name": "Jeskai Combo #036",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "1754971012, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jeskai Combo; real record 3-4-1)",
+      "source_url": "https://melee.gg/Decklist/View/0899859f-4899-49e2-8284-b4f300a09ba6",
+      "archetype": "Azorius Artifacts",
+      "archetype_similarity": 0.93
+    },
+    {
+      "file": "037-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #037",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "henrymorehouse, Magic Spotlight: Fracture (Hartford) (melee.gg label: Jund Sacrifice; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/0695109a-cb83-457b-8d5e-b4ec002e53e1",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.7
+    },
+    {
+      "file": "038-dimir-midrange.txt",
+      "name": "Dimir Midrange #038",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Yameng Kang, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 7-7-0)",
+      "source_url": "https://melee.gg/Decklist/View/06f5bfa1-6be6-48e8-b8a5-b4f200f0e7e4",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.9
+    },
+    {
+      "file": "039-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #039",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Steven Rybarczyk, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-Green Landfall; real record 4-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/bdb0f68a-4fbe-4aa6-a680-b4ed00d3dd97",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.77
+    },
+    {
+      "file": "040-dimir-tempo.txt",
+      "name": "Dimir Tempo #040",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "beitianjay, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Tempo; real record 12-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/9ddce1dc-1714-4629-b934-b4f300a3d7d9",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "041-dimir-midrange.txt",
+      "name": "Dimir Midrange #041",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "tteql, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 12-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/0267ec7c-4cb3-4f6d-ac83-b4f200d4b80f",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.98
+    },
+    {
+      "file": "042-dimir-midrange.txt",
+      "name": "Dimir Midrange #042",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "jinzian1997, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 8-5-2)",
+      "source_url": "https://melee.gg/Decklist/View/6ca464df-3385-4114-8166-b4f00030082a",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.9
+    },
+    {
+      "file": "043-orzhov-combo.txt",
+      "name": "Orzhov Combo #043",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "himarabit, Magic Spotlight: Fracture (Beijing) (melee.gg label: Orzhov Combo; real record 4-3-2)",
+      "source_url": "https://melee.gg/Decklist/View/c8700e8c-544f-4fd1-a29f-b4f30069deb4",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "044-grixis-reanimator.txt",
+      "name": "Grixis Reanimator #044",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Jacob DuBois, Magic Spotlight: Fracture (Hartford) (melee.gg label: Grixis Reanimator; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/3f0c8ac3-3f98-48af-8d54-b4ed00cc439b",
+      "archetype": "Grixis Reanimator",
+      "archetype_similarity": 0.77
+    },
+    {
+      "file": "045-selesnya-aggro.txt",
+      "name": "Selesnya Aggro #045",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Tim Schmeltz, Magic Spotlight: Fracture (Hartford) (melee.gg label: Selesnya Aggro; real record 3-3-1)",
+      "source_url": "https://melee.gg/Decklist/View/7807a878-68f0-4108-98de-b4ed0026e3a3",
+      "archetype": "other",
+      "archetype_similarity": 0.35
+    },
+    {
+      "file": "046-orzhov-lifegain.txt",
+      "name": "Orzhov Lifegain #046",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Marco Wefers, Magic Spotlight: Fracture (Hartford) (melee.gg label: Orzhov Lifegain; real record 7-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/d680dd1e-697a-414a-aa19-b4e3011ad70b",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.84
+    },
+    {
+      "file": "047-u-b-r-g-rhythm.txt",
+      "name": "U-B-R-G Rhythm #047",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Yimin Zhi, Magic Spotlight: Fracture (Beijing) (melee.gg label: U-B-R-G Rhythm; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/081b684c-cae2-4b37-ad4c-b4f2011a40c8",
+      "archetype": "Sultai Reanimator",
+      "archetype_similarity": 0.71
+    },
+    {
+      "file": "048-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #048",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Huachao Song, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Sacrifice; real record 8-7-0)",
+      "source_url": "https://melee.gg/Decklist/View/9a53c408-5928-4a21-b4ee-b4f200ea9946",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "049-dimir-midrange.txt",
+      "name": "Dimir Midrange #049",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "ryuji mimido, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/40265a47-5e25-449d-aaf1-b4f3009669d6",
+      "archetype": "Dimir Uldaros",
+      "archetype_similarity": 0.95
+    },
+    {
+      "file": "050-sultai-reanimator.txt",
+      "name": "Sultai Reanimator #050",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Lawrence Garden, Magic Spotlight: Fracture (Hartford) (melee.gg label: Sultai Reanimator; real record 4-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/7d2a2e3b-edba-4f20-94c7-b4ed00425b28",
+      "archetype": "other",
+      "archetype_similarity": 0.59
+    },
+    {
+      "file": "051-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #051",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Carlo De Gaetano, Arena Championship 13 (melee.gg label: Mono-Green Landfall; real record 4-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/8fcacaab-4f5d-425e-b933-b4e701431335",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.66
+    },
+    {
+      "file": "052-azorius-artifacts.txt",
+      "name": "Azorius Artifacts #052",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Jordan Sinclair, Arena Championship 13 (melee.gg label: Azorius Artifacts; real record 7-2-0)",
+      "source_url": "https://melee.gg/Decklist/View/a0f3e517-4f8b-4694-b684-b4de002faf51",
+      "archetype": "Azorius Artifacts",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "053-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #053",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "HaoS, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Sacrifice; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/430aa006-35c6-43f1-af0b-b4e6003b99a6",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.89
+    },
+    {
+      "file": "054-izzet-spellementals.txt",
+      "name": "Izzet Spellementals #054",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "George Funk, Magic Spotlight: Fracture (Hartford) (melee.gg label: Izzet Spellementals; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/639dd88d-f7a9-40e8-a993-b4ed000ef22c",
+      "archetype": "Izzet Spellementals",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "055-bant.txt",
+      "name": "Bant #055",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "USJATL80, Magic Spotlight: Fracture (Beijing) (melee.gg label: Bant; real record 0-2-0)",
+      "source_url": "https://melee.gg/Decklist/View/42c15e82-14c2-4d1f-86cb-b4f0005d5f22",
+      "archetype": "other",
+      "archetype_similarity": 0.03
+    },
+    {
+      "file": "056-izzet-elementals.txt",
+      "name": "Izzet Elementals #056",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "YI DING, Magic Spotlight: Fracture (Beijing) (melee.gg label: Izzet Elementals; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/c587599b-1359-452f-ad14-b4f30092522f",
+      "archetype": "Izzet Spellementals",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "057-azorius-tempo.txt",
+      "name": "Azorius Tempo #057",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Dustin Endicott, Magic Spotlight: Fracture (Hartford) (melee.gg label: Azorius Tempo; real record 3-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/3f585bf1-a7d7-4816-be14-b4ec0189ecc9",
+      "archetype": "other",
+      "archetype_similarity": 0.58
+    },
+    {
+      "file": "058-selesnya-offense.txt",
+      "name": "Selesnya Offense #058",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "MapesJane, Magic Spotlight: Fracture (Hartford) (melee.gg label: Selesnya Offense; real record 0-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/859efbae-cffc-407d-a385-b4ed00c268b8",
+      "archetype": "other",
+      "archetype_similarity": 0.38
+    },
+    {
+      "file": "059-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #059",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Onoda Kenji, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mono-Green Landfall; real record 5-3-1)",
+      "source_url": "https://melee.gg/Decklist/View/52430f67-07f0-4d32-bf2e-b4f3007e7b70",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.87
+    },
+    {
+      "file": "060-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #060",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Jordan Maier, Arena Championship 13 (melee.gg label: Jund Sacrifice; real record 7-2-0)",
+      "source_url": "https://melee.gg/Decklist/View/068fa7a3-079a-4ae1-a2f6-b4e70155ddec",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.77
+    },
+    {
+      "file": "061-boros-dwarves.txt",
+      "name": "Boros Dwarves #061",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "TonW, Magic Spotlight: Fracture (Beijing) (melee.gg label: Boros Dwarves; real record 4-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/76a11894-8f53-4024-994d-b4f30045fb1b",
+      "archetype": "Boros Dwarves",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "062-dimir-uldaros.txt",
+      "name": "Dimir Uldaros #062",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Jonathan Rivera, Magic Spotlight: Fracture (Hartford) (melee.gg label: Dimir Uldaros; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/f5c41792-de84-427d-87f4-b4ed00b894b8",
+      "archetype": "Dimir Excruciator",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "063-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #063",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "WEIWEN KONG, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Sacrifice; real record 5-2-2)",
+      "source_url": "https://melee.gg/Decklist/View/a2170dfb-ef1e-4ec4-b2e0-b4f300a310d2",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.89
+    },
+    {
+      "file": "064-dimir-midrange.txt",
+      "name": "Dimir Midrange #064",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Pedro da Silva, Magic Spotlight: Fracture (Hartford) (melee.gg label: Dimir Midrange; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/bb134d97-6232-47c3-8a00-b4ec003dbff1",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.9
+    },
+    {
+      "file": "065-w-u-b-r-control.txt",
+      "name": "W-U-B-R Control #065",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "XueW, Magic Spotlight: Fracture (Beijing) (melee.gg label: W-U-B-R Control; real record 2-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/1c6643ac-1974-4766-bcc4-b4ed0074747b",
+      "archetype": "Four-Color Control",
+      "archetype_similarity": 0.64
+    },
+    {
+      "file": "066-mono-green-midrange.txt",
+      "name": "Mono-Green Midrange #066",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "BanyanYang, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mono-Green Midrange; real record 0-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/368ce7a9-7e2b-4244-a8c1-b4f100f998bc",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.87
+    },
+    {
+      "file": "067-grixis-reanimator.txt",
+      "name": "Grixis Reanimator #067",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Carlo Favretto, Magic Spotlight: Fracture (Hartford) (melee.gg label: Grixis Reanimator; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/b7af70c9-25b5-494b-9c87-b4ed002aca5f",
+      "archetype": "Grixis Reanimator",
+      "archetype_similarity": 0.76
+    },
+    {
+      "file": "068-orzhov-lifegain.txt",
+      "name": "Orzhov Lifegain #068",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Christopher Turnbull, Magic Spotlight: Fracture (Hartford) (melee.gg label: Orzhov Lifegain; real record 6-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/d561eb5e-27ef-4ee0-ab78-b4e9010b7453",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.93
+    },
+    {
+      "file": "069-orzhov-lifegain.txt",
+      "name": "Orzhov Lifegain #069",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Adriano Melo, Arena Championship 13 (melee.gg label: Orzhov Lifegain; real record 2-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/fc0ea81c-b7d1-4a50-bf0c-b4e800339fae",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.88
+    },
+    {
+      "file": "070-golgari-midrange.txt",
+      "name": "Golgari Midrange #070",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Thomas Ellis, Magic Spotlight: Fracture (Hartford) (melee.gg label: Golgari Midrange; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/540636cf-f5d2-428a-bd46-b4eb00350193",
+      "archetype": "Golgari Midrange",
+      "archetype_similarity": 0.73
+    },
+    {
+      "file": "071-boros-artifacts.txt",
+      "name": "Boros Artifacts #071",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "ShoutcasterMage, Magic Spotlight: Fracture (Hartford) (melee.gg label: Boros Artifacts; real record 3-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/23038059-4c86-4a1f-ab92-b4ec012b36aa",
+      "archetype": "other",
+      "archetype_similarity": 0.3
+    },
+    {
+      "file": "072-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #072",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Cole Weinstein, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-Green Landfall; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/dbd15b2e-6b80-4390-a8ca-b4ec017db4ad",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.72
+    },
+    {
+      "file": "073-izzet-control.txt",
+      "name": "Izzet Control #073",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "justKenneth, Magic Spotlight: Fracture (Hartford) (melee.gg label: Izzet Control; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/5df2be5c-d4d0-4dd1-9ae4-b4ed00aa3a37",
+      "archetype": "other",
+      "archetype_similarity": 0.39
+    },
+    {
+      "file": "074-jeskai-planeswalkers.txt",
+      "name": "Jeskai Planeswalkers #074",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "turnmeupjcogs, Arena Championship 13 (melee.gg label: Jeskai Planeswalkers; real record 1-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/d246d2a0-a4bd-4e84-a3ab-b4e8002f0e79",
+      "archetype": "Jeskai Planeswalkers",
+      "archetype_similarity": 0.74
+    },
+    {
+      "file": "075-mono-green.txt",
+      "name": "Mono-Green #075",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "baishuo 张, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mono-Green; real record 3-4-1)",
+      "source_url": "https://melee.gg/Decklist/View/918a6d8d-290a-4aab-8ae0-b4f300030b54",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "076-temur-otters.txt",
+      "name": "Temur Otters #076",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Raymond Menkov, Magic Spotlight: Fracture (Hartford) (melee.gg label: Temur Otters; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/93a73147-d163-4ed1-aa4f-b4e301554692",
+      "archetype": "other",
+      "archetype_similarity": 0.33
+    },
+    {
+      "file": "077-dimir-midrange.txt",
+      "name": "Dimir Midrange #077",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "IceXXX, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/f43ecef6-d0d7-4e51-91c3-b4f0008599ff",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.98
+    },
+    {
+      "file": "078-jund-sacrifice.txt",
+      "name": "Jund Sacrifice #078",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Wenbo Li, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Sacrifice; real record 12-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/c41a6fce-514e-45da-b663-b4f300798e37",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.88
+    },
+    {
+      "file": "079-dimir.txt",
+      "name": "Dimir #079",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Lixiaochuan, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir; real record 2-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/37ac318b-5e0d-44ac-a91c-b4ea00ede0ed",
+      "archetype": "Dimir Uldaros",
+      "archetype_similarity": 0.95
+    },
+    {
+      "file": "080-boros-dwarves.txt",
+      "name": "Boros Dwarves #080",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "PartyMegatron, Magic Spotlight: Fracture (Beijing) (melee.gg label: Boros Dwarves; real record 3-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/563427bb-69f1-48ed-9c45-b4f3009f7555",
+      "archetype": "Boros Dwarves",
+      "archetype_similarity": 0.93
+    },
+    {
+      "file": "081-mardu-aggro.txt",
+      "name": "Mardu Aggro #081",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "miraclechen, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mardu Aggro; real record 1-3-0)",
+      "source_url": "https://melee.gg/Decklist/View/512c5e59-bee5-4a66-9915-b4f3009f4b7c",
+      "archetype": "Mardu Discard",
+      "archetype_similarity": 1.0
+    },
+    {
+      "file": "082-grixis-combo.txt",
+      "name": "Grixis Combo #082",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Mofeilin, Magic Spotlight: Fracture (Beijing) (melee.gg label: Grixis Combo; real record 1-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/aae0c0be-dd09-4676-90da-b4dd00d268d3",
+      "archetype": "other",
+      "archetype_similarity": 0.29
+    },
+    {
+      "file": "083-dimir-deceit.txt",
+      "name": "Dimir Deceit #083",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "VladNadel, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Deceit; real record 9-5-1)",
+      "source_url": "https://melee.gg/Decklist/View/90e4867d-faf4-4cc8-b794-b4f30090ad26",
+      "archetype": "Dimir Uldaros",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "084-jund-landfall.txt",
+      "name": "Jund Landfall #084",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "hannb, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Landfall; real record 7-7-1)",
+      "source_url": "https://melee.gg/Decklist/View/f847f799-387d-4d85-b116-b4f001108881",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.88
+    },
+    {
+      "file": "085-azorius-momo.txt",
+      "name": "Azorius Momo #085",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "yLoup, Magic Spotlight: Fracture (Hartford) (melee.gg label: Azorius Momo; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/92af5f35-a580-472a-88be-b4ec0170e152",
+      "archetype": "Azorius Momo",
+      "archetype_similarity": 0.94
+    },
+    {
+      "file": "086-dimir-combo.txt",
+      "name": "Dimir Combo #086",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Sonnyxx, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Combo; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/6fda1830-88c8-4db3-8672-b4f3009be30c",
+      "archetype": "Dimir Uldaros",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "087-jund-midrange.txt",
+      "name": "Jund Midrange #087",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "GongHe, Magic Spotlight: Fracture (Beijing) (melee.gg label: Jund Midrange; real record 3-4-1)",
+      "source_url": "https://melee.gg/Decklist/View/ab8dd621-1fcc-47f6-a0a1-b4f300295fd7",
+      "archetype": "Jund Sacrifice",
+      "archetype_similarity": 0.96
+    },
+    {
+      "file": "088-izzet-spellementals.txt",
+      "name": "Izzet Spellementals #088",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Brendan Moon, Magic Spotlight: Fracture (Hartford) (melee.gg label: Izzet Spellementals; real record 9-6-0)",
+      "source_url": "https://melee.gg/Decklist/View/fa033dd4-d07a-4a85-8db9-b4e200302b9e",
+      "archetype": "Izzet Spellementals",
+      "archetype_similarity": 0.9
+    },
+    {
+      "file": "089-izzet-lessons.txt",
+      "name": "Izzet Lessons #089",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "JrodJarred, Magic Spotlight: Fracture (Hartford) (melee.gg label: Izzet Lessons; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/0958aba9-4683-4ce9-af14-b4ec005be854",
+      "archetype": "other",
+      "archetype_similarity": 0.3
+    },
+    {
+      "file": "090-azorius-momo.txt",
+      "name": "Azorius Momo #090",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Michael Innace, Magic Spotlight: Fracture (Hartford) (melee.gg label: Azorius Momo; real record 8-6-1)",
+      "source_url": "https://melee.gg/Decklist/View/8aa5a32c-126b-4391-a82d-b4ec015445ab",
+      "archetype": "Azorius Momo",
+      "archetype_similarity": 0.92
+    },
+    {
+      "file": "091-boros-dragons.txt",
+      "name": "Boros Dragons #091",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "TreePowers, Magic Spotlight: Fracture (Hartford) (melee.gg label: Boros Dragons; real record 1-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/46375ae9-f7b9-408b-a6bc-b4ed00d4986e",
+      "archetype": "Boros Dragons",
+      "archetype_similarity": 0.98
+    },
+    {
+      "file": "092-dimir-midrange.txt",
+      "name": "Dimir Midrange #092",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "shenmeng, Magic Spotlight: Fracture (Beijing) (melee.gg label: Dimir Midrange; real record 5-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/dbd97cf4-cfbf-4afc-820d-b4f3007c2ac1",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.98
+    },
+    {
+      "file": "093-selesnya-offense.txt",
+      "name": "Selesnya Offense #093",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Olin Rubinow, Magic Spotlight: Fracture (Hartford) (melee.gg label: Selesnya Offense; real record 4-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/e9a65fda-1b2f-49d7-aebb-b4ec014f98d6",
+      "archetype": "Selesnya Offense",
+      "archetype_similarity": 0.86
+    },
+    {
+      "file": "094-azorius-tempo.txt",
+      "name": "Azorius Tempo #094",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Grant Skinner, Magic Spotlight: Fracture (Hartford) (melee.gg label: Azorius Tempo; real record 3-5-0)",
+      "source_url": "https://melee.gg/Decklist/View/72912a83-46fc-49a7-890e-b4ea00e8b64d",
+      "archetype": "Azorius Prison",
+      "archetype_similarity": 0.69
+    },
+    {
+      "file": "095-mono-green-landfall.txt",
+      "name": "Mono-Green Landfall #095",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "RickyLi, Magic Spotlight: Fracture (Beijing) (melee.gg label: Mono-Green Landfall; real record 2-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/75cc93b3-b791-42b0-aa44-b4f00090e27f",
+      "archetype": "Mono-Green Landfall",
+      "archetype_similarity": 0.87
+    },
+    {
+      "file": "096-dimir-midrange.txt",
+      "name": "Dimir Midrange #096",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Dylan Morgan, Magic Spotlight: Fracture (Hartford) (melee.gg label: Dimir Midrange; real record 12-2-1)",
+      "source_url": "https://melee.gg/Decklist/View/c223758d-c978-44b8-bedc-b4e500eb613f",
+      "archetype": "Dimir Midrange",
+      "archetype_similarity": 0.92
+    },
+    {
+      "file": "097-mono-white-tokens.txt",
+      "name": "Mono-White Tokens #097",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "LadyNova, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-White Tokens; real record 0-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/32d86d12-02e6-42d9-9900-b4bc010e9805",
+      "archetype": "other",
+      "archetype_similarity": 0.42
+    },
+    {
+      "file": "098-orzhov-life-gain.txt",
+      "name": "Orzhov Life Gain #098",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Swamp233, Magic Spotlight: Fracture (Beijing) (melee.gg label: Orzhov Life Gain; real record 7-6-2)",
+      "source_url": "https://melee.gg/Decklist/View/68d2ba29-265f-4721-8afd-b4f101326035",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.89
+    },
+    {
+      "file": "099-orzhov-lifegain.txt",
+      "name": "Orzhov Lifegain #099",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "Franklin Fulks, Magic Spotlight: Fracture (Hartford) (melee.gg label: Orzhov Lifegain; real record 1-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/9f4cb74b-91c0-4d21-8aa1-b4eb003d337f",
+      "archetype": "Orzhov Lifegain",
+      "archetype_similarity": 0.91
+    },
+    {
+      "file": "100-mono-green-aggro.txt",
+      "name": "Mono-Green Aggro #100",
+      "meta_share": 1.0,
+      "list_type": "tournament list",
+      "pilot": "sdst21318, Magic Spotlight: Fracture (Hartford) (melee.gg label: Mono-Green Aggro; real record 1-4-0)",
+      "source_url": "https://melee.gg/Decklist/View/cf3a81ac-7ced-42f8-88fc-b4ed00093083",
+      "archetype": "other",
+      "archetype_similarity": 0.35
+    }
+  ]
+}
