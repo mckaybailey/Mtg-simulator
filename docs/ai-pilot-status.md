@@ -5,6 +5,104 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
+## CHECKPOINT 17 Nov 2026 (latest): options discussed with the user; decision pending
+
+**Read this first.** No code or runs changed in this session; it was a discussion with the user
+about where to take the AI pilot after `--mc deep` failed (next section). The facts it rests on are
+in the sections below and in `VALIDATION.md`; this records the conclusions, two corrections and
+the options now on the table. **Ask the user which option to take before doing more work.**
+
+**State of the numbers** (calibration `runs/rr18-cal`, 18 decks, 14 patches, 4,590 games): rank
+correlation 0.14 (noise 0.04–0.19), mean gap 11.4 points, SD 14.0 against a real 6.0.
+**Correction:** a pilot that put every deck at exactly 50% would score a mean gap of 4.7 points
+(4.1 share-weighted), better than any simulation. SD and mean gap reward compression toward 50%
+however it is achieved, so judge pilot changes on the ranking and on the sign errors (Jund
+Sacrifice and Dimir Uldaros below 50%, Boros Dragons and Boros Dwarves above), and report the 4.7
+baseline beside the gap. (An earlier remark in the discussion gave 3.5 from the old 12-deck table.)
+
+**Conclusions of the discussion:**
+
+- **Forge's AI is not a trained model**: about 80,000 lines of rules (156 `ability/*Ai` classes,
+  attack/block controllers, card-script hints), a hand-weighted evaluator (card in hand 5, life
+  point 2, a 2/2 about 150) and profiles of ~140 settings, many of them dice rolls. "Swap or upgrade
+  the model" therefore means rewriting rules, the evaluator or the decision-maker. Settings were
+  tuned (no effect), rules patched (one deck at a time), search tried at two budgets (`fixed`,
+  `deep`): search is saturated because its playouts and evaluator, not its sample count, limit it.
+- **Realistic win rates are a necessary check, not proof of human-like play.** Many pilots fit 18
+  numbers (a coin flip fits the gap best), and real rates come from a population: mixed skill,
+  skill correlated with deck choice, best-of-three with human sideboarding, metagame adaptation,
+  noisy small decks (20–25 players each). Better checks: matchup-level results, game shape (length,
+  kill turn, mulligans, counters held up), agreement on single decisions.
+- **A skill spectrum** (seats of mixed strength) only shrinks rates toward 50% and keeps the
+  ranking; with the calibration numbers a uniform shrink of 57% matches the SD but leaves Dragons
+  above and Jund below 50%. It helps only if the upper levels play planning decks better than
+  Forge, and search cannot supply that level. Any mix must be set from outside data (how much
+  strong players outperform average ones), never fitted to the 18 rates.
+- **An LLM (or SLM) for every decision is not viable as the engine.** `PlayerController` has 113
+  abstract decision methods; about 30–80 decisions per player per game matter, ~100 calls a game
+  with both seats (est.). At the per-decision costs in `docs/stronger-ai.md`: about $0.05 (Haiku
+  5.5), $0.90 (Sonnet 5.5), $1.80 (Opus 5.5) per game, minutes per game instead of 2.8 s, a round
+  robin in one to two days; answers do not replay from the seed (no temperature; needs a decision
+  log). A small local model is not viable in this container (4 cores, 15 GB, no GPU) and has no
+  training data (no human Constructed logs; Forge self-play is circular). LLM decisions are useful
+  only for the 5–15 high-leverage decisions per game, or for a one-off study of a few hundred games.
+- **Why planning decks lose** (Jund Sacrifice, Dimir Uldaros, Izzet Spellementals, Four-Color
+  Control, Dimir Excruciator, Azorius Control): the evaluator scores held answers and open mana at
+  almost nothing, the AI never plans across turns, and search scores with the same evaluator and
+  plays out lines with the same heuristics. With search ruled out, a planning-aware evaluator is
+  less promising than it looked (it would act mainly through search); the main untried lever is an
+  LLM for the planning decisions.
+- **Matchup and pairing structure.** Meta-share weighting and wider fields were tested and ruled
+  out (sections below; `tools/field_bound.py`). Untested: Swiss pairing, mirrors in the real
+  figures, deck choice and adaptation. Probably secondary, because the simulated matchups
+  themselves correlate only 0.15 with the unverified real matchup figures.
+- **An app** (user submits a list and a play guide): realistic as a tool for consistency
+  (mulligans, colour screw, curve, goldfish kill turn: little dependent on the AI) and A/B
+  comparisons of two lists; the guide could become mulligan rules and card priorities, later the
+  prompt for LLM decisions (about $6 Haiku or ~$100 Sonnet per 1,200-game gauntlet on one seat,
+  est.). Not realistic as a predictor of tournament win rates. Forge is GPL-3 (hosting is allowed;
+  distributing a modified Forge requires source); card names and images fall under Wizards' fan
+  content policy, which restricts charging.
+
+**The options now (the user's decision):**
+
+1. **Reposition mtgsim** (option (a) below, still the recommendation, stronger now that search is
+   ruled out): a tool for comparing versions of one deck and for consistency, with the limits
+   stated. The user wants to review the wording before it is committed.
+2. **Swiss check, then the LLM probe**, before any more pilot work (pilot work: anything that
+   changes how the decks are played, i.e. patches, settings, search, an LLM; as opposed to the
+   format, the field or how results are reported). The Swiss check is the cheaper one and could
+   weaken the case for spending days on the AI.
+3. **More single-error hunting** (option (c) below): every fix so far moved one deck.
+
+**The Swiss check** (not built; a small stdlib Python tool in `tools/`, an hour or two):
+1. Needs the calibration matchup table. **Correction:** `runs/rr18-cal` is git-ignored and not in a
+   fresh container; replay it first with `matrix decks/standard/meta -n 30 --seed 1 --out
+   $PWD/runs/rr18-cal` (about an hour on 4 cores; detached, see "Long runs" below).
+2. Convert each pairing's game win rate to a best-of-three match win rate (the real figures are
+   match results; this widens the spread before Swiss narrows it).
+3. Simulate about 1,000 events of the real size (~1,810 players) with decks drawn by real meta
+   share: Swiss rounds paired by record, no repeat pairings, matches decided by the converted
+   rates; optionally drops after several losses and a day-2 cut.
+4. Compute each deck's win rate as the coverage does (check in the Magic.gg article whether
+   mirrors and day 2 are included) and compare SD, mean gap, rank correlation and sign errors with
+   the plain round robin and with the real rates.
+Reading: if the SD falls far toward 6.0, part of the gap is how the real numbers are produced, and
+mtgsim should report meta rates as a simulated Swiss event. If it falls little (expected), pairing
+is ruled out and the matchups themselves are wrong. It cannot fix the ranking much.
+
+**The LLM probe** (not built; needs an API key, which this environment does not have):
+1. A decision audit of the planning decks from `--save-logs` games: turns tapped out on the AI's own
+   turn while holding an instant it could have held up, counters and instant removal used versus
+   held until the end, sweepers against creature counts, engines assembled versus parts drawn.
+2. About 200 logged decisions (counter, hold up mana, sweep, mulligan), state limited to what the
+   deciding player may know, answered by a model and read by a human; a few dollars.
+3. Only if the model beats Forge on them: one call per turn to choose a plan (develop, hold up
+   interaction, sweep, go for the engine) that Forge's rules carry out, ~10 calls per seat per
+   game; driver design and costs in `docs/stronger-ai.md`, section 4. Gate: planning decks gain
+   relative to creature decks with the change on every seat, then the 18-deck ranking and sign
+   errors improve.
+
 ## CHECKPOINT 17 Nov 2026: step 4 (the pilot) done; no lever in the plan closes the gap
 
 **Where things stand:** all four steps of the plan are done, and none brings the spread near the
