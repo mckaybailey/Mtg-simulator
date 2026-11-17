@@ -16,7 +16,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Mirror match (identical decks, 400 games) | 48.9%, 95% CI 44–54% (expected 50%) |
 | Lopsided match (meta deck vs 40 lands + 20 Llanowar Elves) | 93.3%, CI 84–97% |
 | A/B with a deliberately worse variant | detected: +12.5 points, CI +6.8 to +18.2, p < 0.001 |
-| Simulated vs real meta win rates | weak agreement: rank correlation 0.23 over twelve decks with all eleven Forge patches (noise 0.08–0.36), mean gap 11.4 points; 0.24 and 13.0 on unpatched Forge with eleven decks; see below |
+| Simulated vs real meta win rates | weak agreement: rank correlation 0.14 over eighteen decks with all fourteen Forge patches (noise 0.04–0.19), mean gap 11.4 points, SD 14.0 against a real 6.0 ("Calibration" below); 0.23 and 11.4 over twelve decks with eleven patches; 0.24 and 13.0 on unpatched Forge with eleven decks |
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
@@ -709,6 +709,29 @@ What this leaves: the two remaining levers in the plan, the format and the field
 a stronger pilot (this step), each move single decks but not the spread. The simulator's ranking of
 these meta decks should be reported as it is: decided matchups and A/B differences between lists
 of one deck are what mtgsim measures well; the meta win rates of a deck against the field are not.
+
+## Calibration with fourteen patches (17 November 2026)
+
+The standard calibration run after patches 0013 and 0014: `matrix decks/standard/meta -n 30
+--seed 1` (`runs/rr18-cal`), 18 decks, best-of-one, 153 pairings, 4,590 games, Forge commit
+7db198d72e with the fourteen shipped patches (combined hash e689217ab372); no time-outs or
+errors. `tools/calibration.py runs/rr18-cal --reps 1000`:
+
+| 18 decks | Equal-weighted (noise range) | Share-weighted (noise range) |
+|---|---|---|
+| Spearman | 0.14 (0.04–0.19) | 0.14 (0.03–0.21) |
+| Pearson | 0.31 (0.24–0.36) | 0.30 (0.22–0.36) |
+| Mean absolute gap | 11.4 (10.9–12.4) | 11.6 (10.7–12.8) |
+| SD (real 6.0) | 14.0 (13.4–15.0) | 14.0 (13.3–15.2) |
+
+It agrees with the 20-game default arm of (iii) within noise (share-weighted SD 13.8, gap 11.5,
+Spearman 0.16). Over-rated by 18–23 points: Mono-Black Aggro, Boros Dwarves, Rakdos Lizards,
+Boros Dragons; by 12–14: Mono-Green Landfall, Orzhov Lifegain. Under-rated by 14–19: Jund
+Sacrifice, Dimir Uldaros, Dimir Excruciator; by 10–11: Azorius Artifacts, Izzet Spellementals.
+Four-Color Control is now within 2 points of its real rate (38.5% against eleven opponents
+before 0014, 50.0% against seventeen after; the fields differ, so the two figures are not a
+paired comparison). `tools/update_calibration.py` wrote these figures into
+`decks/standard/meta/gauntlet.json`; the table is in `decks/standard/meta/README.md`.
 
 ## The goldfish model
 

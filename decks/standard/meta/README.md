@@ -40,38 +40,47 @@ only about 20–25 players each (1.0–1.4% of the field), so they are noisy (ro
 ## How well the AI plays each deck
 
 Results against this gauntlet depend heavily on how well Forge's AI pilots each opponent.
-To measure that, the first twelve decks were played against each other in the simulator (1,980
-games, 30 per pairing, seed 1) and each deck's simulated win rate was set beside its real-world
-match win rate from the same Magic.gg table. "Simulated" is on Forge with mtgsim's eleven Forge
-patches (`mtgsim/forge_patches/`); the last column is the eleven-deck round robin played with
-the first eight:
+To measure that, all eighteen decks were played against each other in the simulator (4,590
+games, best-of-one, 30 per pairing, seed 1, 17 November 2026) and each deck's simulated win rate
+was set beside its real-world match win rate from the same Magic.gg table. "Simulated" is the
+average over the other seventeen decks, on Forge with mtgsim's fourteen Forge patches
+(`mtgsim/forge_patches/`):
 
-| Deck | Real win rate | Simulated | Gap | AI pilot | Before patches 0009–0011 (eleven decks) |
-|---|---|---|---|---|---|
-| Boros Dragons | 45.0% | 63.9% | +18.9 | strong | 63.7% |
-| Boros Dwarves | 50.2% | 68.8% | +18.6 | strong | 70.0% |
-| Mono-Green Landfall | 53.4% | 67.0% | +13.6 | strong | 49.3% |
-| Orzhov Lifegain | 53.6% | 66.1% | +12.5 | strong | 65.0% |
-| Azorius Momo | 48.8% | 50.3% | +1.5 | fair | 50.7% |
-| Dimir Midrange | 54.5% | 54.2% | −0.3 | fair | 58.0% |
-| Azorius Control | 46.6% | 43.0% | −3.6 | fair | 42.7% |
-| Azorius Artifacts | 54.8% | 47.3% | −7.5 | fair | 46.7% |
-| Four-Color Control | 48.8% | 38.5% | −10.3 | weak | not included |
-| Izzet Spellementals | 44.3% | 30.9% | −13.4 | weak | 33.7% |
-| Dimir Uldaros | 49.2% | 31.8% | −17.4 | weak | 32.7% |
-| Jund Sacrifice | 57.6% | 38.2% | −19.4 | weak | 37.7% |
+| Deck | Real win rate | Simulated | Gap | AI pilot |
+|---|---|---|---|---|
+| Mono-Black Aggro | 42.6% | 65.9% | +23.3 | strong |
+| Boros Dwarves | 50.2% | 71.4% | +21.2 | strong |
+| Rakdos Lizards | 42.9% | 62.7% | +19.8 | strong |
+| Boros Dragons | 45.0% | 63.3% | +18.3 | strong |
+| Mono-Green Landfall | 53.4% | 67.1% | +13.7 | strong |
+| Orzhov Lifegain | 53.6% | 65.3% | +11.7 | strong |
+| Golgari Midrange | 47.5% | 54.1% | +6.6 | fair |
+| Azorius Momo | 48.8% | 51.0% | +2.2 | fair |
+| Four-Color Control | 48.8% | 50.0% | +1.2 | fair |
+| Dimir Midrange | 54.5% | 54.7% | +0.2 | fair |
+| Azorius Control | 46.6% | 43.9% | −2.7 | fair |
+| Grixis Reanimator | 52.7% | 48.8% | −3.9 | fair |
+| Izzet Prowess | 30.6% | 22.4% | −8.2 | fair |
+| Izzet Spellementals | 44.3% | 34.3% | −10.0 | fair |
+| Azorius Artifacts | 54.8% | 44.1% | −10.7 | weak |
+| Dimir Excruciator | 46.0% | 31.8% | −14.2 | weak |
+| Dimir Uldaros | 49.2% | 30.8% | −18.4 | weak |
+| Jund Sacrifice | 57.6% | 38.4% | −19.2 | weak |
+
+The six newer decks' real win rates rest on only 20–25 players each (about ±7 points). Izzet
+Spellementals sits on the 10-point line between "fair" and "weak"; treat it as weak.
 
 The patches fix cards the AI could not cast or used wrongly, and each moved its deck a lot
 (Azorius Control could not cast seven of its sixty cards and won one game in five; Mono-Green
-Landfall spent its mana on Ba Sing Se every turn and gained 20 points once that was fixed), but
-the two columns still barely agree on the order: rank correlation 0.23 (game noise alone moves
-it between 0.08 and 0.36), mean gap 11.4 points. The AI wins with decks that turn creatures
-sideways and loses with decks that need planning: Jund Sacrifice, the best deck in the real
-field, comes out third from the bottom. Part of this is not the AI. The simulation is the
-first game of a match, without sideboards, and creature decks are at their best there; the real
-figures are best-of-three matches with sideboards against the whole field, played by people of
-varying skill. `VALIDATION.md` ("More card fixes, and why the creature decks win") has what the
-game logs show. Gaps of 17 to 19 points are still far outside the comparison's error.
+Landfall spent its mana on Ba Sing Se every turn and gained 20 points once that was fixed;
+Four-Color Control gained 12 points from patch 0014), but the two columns still barely agree on
+the order: rank correlation 0.14 (game noise alone moves it between 0.04 and 0.19), mean gap 11.4
+points, and a spread (SD) of 14.0 points against the real 6.0. The AI wins with decks that turn
+creatures sideways and loses with decks that need planning: Jund Sacrifice, the best deck in the
+real field, comes out fifth from the bottom. Best-of-three with Forge's sideboarding, a wider
+field and a Monte Carlo search pilot were all tried and leave this where it is; `VALIDATION.md`
+has the numbers and what the game logs show. Gaps of 18 to 23 points are far outside the
+comparison's error.
 
 What this means in practice:
 
@@ -113,11 +122,11 @@ format `mtgsim tune --matchups` expects, deliberately: verify and de-duplicate i
   every card is Standard-legal and unbanned according to Forge's format file.
 - The only combo-like deck is Grixis Reanimator (1.0%). The six smaller archetypes' real win
   rates are Dimir Excruciator 46.0%, Rakdos Lizards 42.9%, Izzet Prowess 30.6%, Mono-Black Aggro
-  42.6%, Golgari Midrange 47.5% and Grixis Reanimator 52.7%. They have no `sim_win_rate` or
-  `ai_pilot` yet: the 18-deck round robin has not been run.
+  42.6%, Golgari Midrange 47.5% and Grixis Reanimator 52.7%. Their `sim_win_rate` and
+  `ai_pilot` come from the 18-deck round robin of 17 November 2026 (table above).
 - Forge's AI pilots these decks, and it is much better with the creature decks than with Jund
-  Sacrifice, Dimir Uldaros, the spell-heavy Izzet deck and Four-Color Control. Results against
-  those four say more about the AI than the matchup.
+  Sacrifice, Dimir Uldaros, Dimir Excruciator, Azorius Artifacts and the spell-heavy Izzet deck.
+  Results against those say more about the AI than the matchup.
 
 ## Using your own field
 

@@ -111,11 +111,12 @@ How the findings were made, for the next card or deck:
 
 Always pass on the limits with the numbers:
 
-- The pilot is Forge's AI. Simulated meta win rates barely track real ones (18 decks, 14 Forge
-  patches, best-of-one: rank correlation 0.16, noise 0.04–0.23; mean gap 11.5 points; SD 13.8
-  against a real 6.0): creature decks (Boros Dwarves, Boros Dragons, Mono-Black Aggro, Mono-Green
-  Landfall, Rakdos Lizards) are overrated, Jund Sacrifice, Dimir Uldaros, Dimir Excruciator and
-  Izzet Spellementals underrated.
+- The pilot is Forge's AI. Simulated meta win rates barely track real ones (calibration run of
+  17 Nov, 18 decks, 14 Forge patches, best-of-one, 4,590 games: rank correlation 0.14, noise
+  0.04–0.19; mean gap 11.4 points; SD 14.0 against a real 6.0): creature decks (Boros Dwarves,
+  Boros Dragons, Mono-Black Aggro, Mono-Green Landfall, Rakdos Lizards, Orzhov Lifegain) are
+  overrated, Jund Sacrifice, Dimir Uldaros, Dimir Excruciator, Azorius Artifacts and Izzet
+  Spellementals underrated.
   Wins against opponents marked `ai_pilot: weak` say little.
 - Games are best-of-one without sideboards unless `--bo3` is passed. In the logs the creature
   decks' results turn on how much removal the opponent draws, but best-of-three with Forge's

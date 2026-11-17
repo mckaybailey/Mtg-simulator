@@ -13,7 +13,7 @@
    "source_url": "https://melee.gg/Decklist/View/a2eca677-626f-4322-9d84-b4e7010629fc",
    "source_date": "2026-10-24",
    "real_win_rate": 53.4,
-   "sim_win_rate": 67.0,
+   "sim_win_rate": 67.1,
    "ai_pilot": "strong"
   },
   {
@@ -26,7 +26,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 54.5,
-   "sim_win_rate": 54.2,
+   "sim_win_rate": 54.7,
    "ai_pilot": "fair"
   },
   {
@@ -39,7 +39,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 49.2,
-   "sim_win_rate": 31.8,
+   "sim_win_rate": 30.8,
    "ai_pilot": "weak"
   },
   {
@@ -52,8 +52,8 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 44.3,
-   "sim_win_rate": 30.9,
-   "ai_pilot": "weak"
+   "sim_win_rate": 34.3,
+   "ai_pilot": "fair"
   },
   {
    "file": "jund-sacrifice.txt",
@@ -65,7 +65,7 @@
    "source_url": "https://melee.gg/Decklist/View/5e81449d-aa58-4409-b137-b4ed0006ea1c",
    "source_date": "2026-10-24",
    "real_win_rate": 57.6,
-   "sim_win_rate": 38.2,
+   "sim_win_rate": 38.4,
    "ai_pilot": "weak"
   },
   {
@@ -78,7 +78,7 @@
    "source_url": "https://melee.gg/Decklist/View/423954dd-0eac-429c-94c9-b4e3014be08b",
    "source_date": "2026-10-24",
    "real_win_rate": 53.6,
-   "sim_win_rate": 66.1,
+   "sim_win_rate": 65.3,
    "ai_pilot": "strong"
   },
   {
@@ -91,7 +91,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 46.6,
-   "sim_win_rate": 43.0,
+   "sim_win_rate": 43.9,
    "ai_pilot": "fair"
   },
   {
@@ -104,8 +104,8 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 48.8,
-   "sim_win_rate": 38.5,
-   "ai_pilot": "weak"
+   "sim_win_rate": 50.0,
+   "ai_pilot": "fair"
   },
   {
    "file": "boros-dragons.txt",
@@ -117,7 +117,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 45.0,
-   "sim_win_rate": 63.9,
+   "sim_win_rate": 63.3,
    "ai_pilot": "strong"
   },
   {
@@ -130,8 +130,8 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 54.8,
-   "sim_win_rate": 47.3,
-   "ai_pilot": "fair"
+   "sim_win_rate": 44.1,
+   "ai_pilot": "weak"
   },
   {
    "file": "boros-dwarves.txt",
@@ -143,7 +143,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 50.2,
-   "sim_win_rate": 68.8,
+   "sim_win_rate": 71.4,
    "ai_pilot": "strong"
   },
   {
@@ -156,7 +156,7 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 48.8,
-   "sim_win_rate": 50.3,
+   "sim_win_rate": 51.0,
    "ai_pilot": "fair"
   },
   {
@@ -168,7 +168,9 @@
    "pilot": "LiShuhao, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Dimir Control)",
    "source_url": "https://melee.gg/Decklist/View/64690f57-80b3-4931-971c-b4f3009982fb",
    "source_date": "2026-11-05",
-   "real_win_rate": 46.0
+   "real_win_rate": 46.0,
+   "sim_win_rate": 31.8,
+   "ai_pilot": "weak"
   },
   {
    "file": "rakdos-lizards.txt",
@@ -179,7 +181,9 @@
    "pilot": "EddieWong, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Rakdos Aggro)",
    "source_url": "https://melee.gg/Decklist/View/fb8785e7-aefe-414c-a6ae-b4f3001e7e65",
    "source_date": "2026-11-05",
-   "real_win_rate": 42.9
+   "real_win_rate": 42.9,
+   "sim_win_rate": 62.7,
+   "ai_pilot": "strong"
   },
   {
    "file": "izzet-prowess.txt",
@@ -190,7 +194,9 @@
    "pilot": "梁 Liang, 辰 Chen, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Temur)",
    "source_url": "https://melee.gg/Decklist/View/1ffec100-e981-4831-94ee-b4f3009b1ca1",
    "source_date": "2026-11-05",
-   "real_win_rate": 30.6
+   "real_win_rate": 30.6,
+   "sim_win_rate": 22.4,
+   "ai_pilot": "fair"
   },
   {
    "file": "mono-black-aggro.txt",
@@ -201,7 +207,9 @@
    "pilot": "Fraser, Jeremy, Magic Spotlight: Fracture (Hartford); the list Magic.gg links for the archetype (melee.gg calls it Mono-Black Aggro)",
    "source_url": "https://melee.gg/Decklist/View/428574bc-8312-4a3b-abfb-b4ec0128588b",
    "source_date": "2026-11-05",
-   "real_win_rate": 42.6
+   "real_win_rate": 42.6,
+   "sim_win_rate": 65.9,
+   "ai_pilot": "strong"
   },
   {
    "file": "golgari-midrange.txt",
@@ -212,7 +220,9 @@
    "pilot": "wgzzg, Magic Spotlight: Fracture (Beijing); the list Magic.gg links for the archetype (melee.gg calls it Golgari Control)",
    "source_url": "https://melee.gg/Decklist/View/1fe0f367-19e2-4fd9-b67c-b4f100d429c8",
    "source_date": "2026-11-05",
-   "real_win_rate": 47.5
+   "real_win_rate": 47.5,
+   "sim_win_rate": 54.1,
+   "ai_pilot": "fair"
   },
   {
    "file": "grixis-reanimator.txt",
@@ -223,8 +233,10 @@
    "pilot": "Ebady, Amin 🦎, Magic Spotlight: Fracture (Hartford); the list Magic.gg links for the archetype (melee.gg calls it Grixis Reanimator)",
    "source_url": "https://melee.gg/Decklist/View/aa1117a5-b136-43ee-86fd-b4ec018542d7",
    "source_date": "2026-11-05",
-   "real_win_rate": 52.7
+   "real_win_rate": 52.7,
+   "sim_win_rate": 48.8,
+   "ai_pilot": "fair"
   }
  ],
- "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05 (checked against the article on 2026-11-14). sim_win_rate is its average win rate against the other eleven decks in a 1,980-game mtgsim round robin (30 games per pairing, seed 1, Forge AI on both sides, Forge commit 7db198d72e with mtgsim's eleven Forge patches, combined hash d213be512ff8, applied; measured 2026-11-15). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
+ "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05 (checked against the article on 2026-11-14). sim_win_rate is its average win rate against the other seventeen decks in a 4,590-game mtgsim round robin (best-of-one, 30 games per pairing, seed 1, Forge AI on both sides, Forge commit 7db198d72e with mtgsim's fourteen Forge patches, combined hash e689217ab372, applied; measured 2026-11-17). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
 }
