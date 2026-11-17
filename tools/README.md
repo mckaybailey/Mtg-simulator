@@ -36,7 +36,7 @@ creature decks win"). Run from the repository root, with the run in `MTGSIM_RUN`
 `basic` (records, play/draw, game length), `combat` and `blockavail` (attacks and blocks),
 `lethal` (the turn before a kill), `removal DECK`, `remuse`, `remwr DECK` (removal aimed at a deck
 and win rate by amount), `equip` (equipment, and when removal was cast), `ward` (spells lost to
-Lavaspur Boots' ward). Deck names and several card lists are written for Boros Dwarves and Boros
+Lavaspur Boots' ward). `activations.py DECK [--min N]` prints one deck's activated abilities per game and by phase, and its win rate and spells cast with and without each of its permanents on the battlefield (the Ba Sing Se method: a mana sink or a wrong-phase activation shows as fewer spells when the permanent is out); it found patches 0013 and 0014.  Deck names and several card lists are written for Boros Dwarves and Boros
 Dragons; treat the output as a pointer to logs worth reading, not as exact counts.
 
 `sideboard_plans.py [FOLDER] [--json OUT]` prints, for every pairing of a deck folder, the swaps Forge's

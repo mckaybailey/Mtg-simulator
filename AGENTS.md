@@ -27,7 +27,9 @@ plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3
 run the 18-deck round robin in best-of-three (done 16 Nov: the format widens the spread and Forge's
 sideboards do not pull it back beyond noise, so best-of-one is not the explanation); a field of
 the 13 "Other" decks (done 16 Nov: SD 14.9 → 14.5, within noise); a random sample of 100 real lists in best-of-three
-(done 17 Nov: match SD 19.8 → 18.6, one point of the thirteen needed); now the pilot. The earlier plan of
+(done 17 Nov: match SD 19.8 → 18.6, one point of the thirteen needed); the pilot (done 17 Nov:
+three measured AI fixes and `--mc fixed` for every seat leave the 18-deck SD at 13.2–13.8 against
+6.0, see `VALIDATION.md`, "The pilot"). None of the levers in the plan closes the gap. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
 "CHECKPOINT" section at the top of `docs/ai-pilot-status.md`.
@@ -35,10 +37,10 @@ near the real one, because it comes from lopsided matchups, not from a zero-sum 
 ## The AI pilot: what is settled, so it is not repeated
 
 `docs/ai-pilot-status.md` has the detail and the ordered next steps; `VALIDATION.md` has every
-number. In short, as of 15 November 2026:
+number. In short, as of 17 November 2026:
 
 - **The simulator's ranking of the meta decks does not match the real one, and fixing the AI's
-  mistakes has not changed that.** Twelve Forge patches ship. Three moved a deck a lot (Azorius
+  mistakes has not changed that.** Fourteen Forge patches ship. Three moved a deck a lot (Azorius
   Control +25 points, Mono-Green Landfall +20, Azorius Momo +9); none moved the rank correlation
   or the mean gap beyond noise. A deck the AI learns to pilot becomes one more overrated
   creature deck.
@@ -48,8 +50,13 @@ number. In short, as of 15 November 2026:
 - **Read and found sensible, no patch:** the AI's rules for Pinnacle Starcage, Day of Judgment,
   Torch the Tower and Seam Rip; how opponents block and aim removal against Boros Dwarves and
   Boros Dragons; those two decks' card scripts.
-- **Not established either way:** whether `--mc fixed` plays better (+6.0 points, interval −2.9
-  to +14.8, one pairing).
+- **Settled (17 Nov):** `--mc fixed` plays better on one seat against default opponents (Azorius
+  Control +9.0, Jund Sacrifice +10.3, Dimir Uldaros +13.7, Boros Dwarves +2.9 points), but a round
+  robin with it on every seat does not narrow the spread (SD 13.8 → 13.2, −0.6, −2.5 to +1.3; gap
+  11.5 → 10.6, within noise).
+- **Patches 0013 (Stoke Genius) and 0014 (Great Hall of the Biblioplex) (17 Nov):** found with
+  `tools/log_analysis/activations.py`; Izzet Spellementals +3.3, Four-Color Control +12.1 points.
+  0012 (Umbral Collar Zealot) was measured and dropped. The two Dimir decks showed no mana-sink error.
 - **Tested and rejected (16 Nov):** that best-of-one without sideboards explains the creature
   decks' excess. In the 18-deck best-of-three round robin, Forge-sideboarded games 2 and 3 have
   the same spread as game 1s (SD 14.2 vs 14.5) and match results with and without sideboards
@@ -103,10 +110,11 @@ How the findings were made, for the next card or deck:
 
 Always pass on the limits with the numbers:
 
-- The pilot is Forge's AI. Simulated meta win rates barely track real ones (rank correlation
-  0.23 over twelve decks with mtgsim's Forge patches, noise 0.08–0.36; mean gap 11.4 points):
-  creature decks (Boros Dwarves, Boros Dragons, Mono-Green Landfall, Orzhov Lifegain) are
-  overrated, Jund Sacrifice, Dimir Uldaros, Izzet Spellementals and Four-Color Control underrated.
+- The pilot is Forge's AI. Simulated meta win rates barely track real ones (18 decks, 14 Forge
+  patches, best-of-one: rank correlation 0.16, noise 0.04–0.23; mean gap 11.5 points; SD 13.8
+  against a real 6.0): creature decks (Boros Dwarves, Boros Dragons, Mono-Black Aggro, Mono-Green
+  Landfall, Rakdos Lizards) are overrated, Jund Sacrifice, Dimir Uldaros, Dimir Excruciator and
+  Izzet Spellementals underrated.
   Wins against opponents marked `ai_pilot: weak` say little.
 - Games are best-of-one without sideboards unless `--bo3` is passed. In the logs the creature
   decks' results turn on how much removal the opponent draws, but best-of-three with Forge's
@@ -121,9 +129,9 @@ Always pass on the limits with the numbers:
   proof that the AI misplayed them.
 - `--mc on|max` (Monte Carlo search) plays better but ~6x slower, and its games are not
   reproducible from the seed. `--mc fixed` (or `ai_mc: fixed` for one deck) is the same search
-  with a counted budget: its games do replay, it costs about 9 times the engine time per
-  searching player, and the one A/B so far (Azorius Control vs Boros Dwarves, 200 games per arm)
-  gave +6.0 points with an interval of −2.9 to +14.8, so do not present it as stronger.
+  with a counted budget: its games do replay and it costs about 6–9 times the engine time per
+  searching player. On one seat against the default AI it wins 3–14 points more (`VALIDATION.md`,
+  "The pilot"); with it on every seat the meta ranking is no closer to the real one.
 
 ## Working on the code
 

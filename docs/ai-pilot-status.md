@@ -5,6 +5,30 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
+## CHECKPOINT 17 Nov 2026: step 4 (the pilot) done; no lever in the plan closes the gap
+
+**Where things stand:** all four steps of the plan are done, and none brings the spread near the
+real one. Format (best-of-three, step 2), field (13 "Other" decks, step 3; 100 real lists,
+`VALIDATION.md` "A random sample") and pilot (step 4) each move single decks, not the spread.
+Step 4, in `VALIDATION.md`, "The pilot":
+- (i) `tools/log_analysis/activations.py` on the five underrated decks found three AI errors.
+  Shipped: 0013 Stoke Genius (Izzet Spellementals +3.3) and 0014 Great Hall of the Biblioplex /
+  Soulstone Sanctuary (Four-Color Control +12.1; Mono-Black Aggro and Dimir Midrange within noise,
+  after two revisions). Dropped: 0012 Umbral Collar Zealot (−0.5). The Dimir decks had none.
+- (ii) `--mc fixed` on one seat: Azorius Control +9.0, Jund Sacrifice +10.3, Dimir Uldaros +13.7,
+  Boros Dwarves +2.9 points (1,020 games per arm, paired intervals exclude zero except Dwarves).
+- (iii) 18-deck round robin, 20 games per pairing, with and without `--mc fixed` on every seat:
+  share-weighted SD 13.8 → 13.2 (−0.6, −2.5 to +1.3), gap 11.5 → 10.6 (−1.0, −2.5 to +1.2),
+  Spearman 0.16 → 0.10. Within noise: the one-seat gains vanish when the opponents search too.
+
+**What is left, for the user to choose:** (a) accept that mtgsim measures matchups and A/B list
+changes, not meta win rates, and say so in `README.md`; (b) a much stronger search budget than
+`fixed`'s 100 rollouts a turn (cost grows with it; `--mc max` is not reproducible); (c) more AI
+fixes found with the activation method on the overrated creature decks' opponents (the overrated
+decks win because their opponents' removal and blocks are played badly is unproven: the logs in
+"More card fixes" did not show it). Long runs: the cloud container stops about 10–20 minutes after
+the session goes idle, so keep a turn open (repeated 10-minute waits) for runs longer than that.
+
 ## CHECKPOINT 16 Nov 2026: format and field ruled out; next is the pilot (step 4)
 
 **Where things stand:** steps 1–3 below are done. Best-of-three with Forge's sideboards (step 2)
