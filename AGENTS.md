@@ -32,7 +32,8 @@ three measured AI fixes and `--mc fixed` for every seat leave the 18-deck SD at 
 6.0, see `VALIDATION.md`, "The pilot"). None of the levers in the plan closes the gap. The earlier plan of
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
-"CHECKPOINT" section at the top of `docs/ai-pilot-status.md`.
+"CHECKPOINT" section at the top of `docs/ai-pilot-status.md`: a decision about what to do next is
+pending with the user (options there).
 
 ## The AI pilot: what is settled, so it is not repeated
 
@@ -156,7 +157,10 @@ Always pass on the limits with the numbers:
   both. Commit messages explain why, not just what. Exception: the AI pilot work is on
   `claude/ai-decision-engine`, not yet merged into `main` (the sessions that wrote it could push
   only that branch); merge it or open a pull request only when the user asks.
-- The cloud container restarts without warning and takes `runs/`, `/tmp` and background jobs
-  with it. Commit after each milestone, start long runs detached, and continue them with
-  `--resume RUN_DIR` (repeat the original arguments). Pass `--out` to keep run names predictable.
+- The cloud container restarts without warning, and stops within about 10 minutes of the
+  session going idle; background jobs and `/tmp` go with it (`runs/` usually survives a restart,
+  not a new container). Commit after each milestone, start long runs detached from a script that
+  resumes, and keep the turn open with repeated foreground waits under the 10-minute tool limit;
+  scheduled check-ins do not keep it awake. Continue with `--resume RUN_DIR` (repeat the original
+  arguments). Pass `--out` to keep run names predictable.
 - Never commit `runs/`, Forge itself, or anything from `~/.mtgsim`.

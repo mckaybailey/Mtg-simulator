@@ -21,13 +21,37 @@ Step 4, in `VALIDATION.md`, "The pilot":
   share-weighted SD 13.8 → 13.2 (−0.6, −2.5 to +1.3), gap 11.5 → 10.6 (−1.0, −2.5 to +1.2),
   Spearman 0.16 → 0.10. Within noise: the one-seat gains vanish when the opponents search too.
 
-**What is left, for the user to choose:** (a) accept that mtgsim measures matchups and A/B list
-changes, not meta win rates, and say so in `README.md`; (b) a much stronger search budget than
-`fixed`'s 100 rollouts a turn (cost grows with it; `--mc max` is not reproducible); (c) more AI
-fixes found with the activation method on the overrated creature decks' opponents (the overrated
-decks win because their opponents' removal and blocks are played badly is unproven: the logs in
-"More card fixes" did not show it). Long runs: the cloud container stops about 10–20 minutes after
-the session goes idle, so keep a turn open (repeated 10-minute waits) for runs longer than that.
+**A decision is pending with the user (17 Nov). Ask which one before doing more work:**
+
+- **(a) Recommended: accept what mtgsim measures well and say so.** No more searching for realistic
+  meta win rates. Rewrite the opening of `README.md` (and the caveat in reports, `mtgsim/report.py`)
+  so mtgsim is described as a tool for A/B comparisons of one deck's lists (same opponents, same
+  seeds: the pilot's bias largely cancels in the paired difference; plausible, not validated
+  against real A/B data), decided matchups for the simulated pilots, and finding cards the AI
+  misplays; not for predicting a deck's win rate against a real field. Quote the numbers: 18 decks,
+  rank correlation 0.16, SD 13.8 against a real 6.0, mean gap 11.5; which decks are over- and
+  underrated (AGENTS.md "Always pass on the limits"). The user wanted to review the wording
+  before anything is committed: draft it, show it, then commit.
+- **(b) A much larger search budget** than `--mc fixed`'s (about 100 rollouts a turn,
+  `FLAT_MC_*` in patch 0020 and `ForgeBridge.java`). Costs grow with the budget (now 6–9 times the
+  default AI per searching seat; an 18-deck round robin with 20 games per pairing took about 5.5
+  hours with every seat searching). `--mc max` searches more but does not replay from the seed.
+  Measure it the same way as step 4 (iii): `matrix decks/standard/meta -n 20 --seed 1` with and
+  without, `tools/calibration_diff.py`.
+- **(c) Keep hunting single AI errors** with `tools/log_analysis/activations.py` and `misplays`.
+  Every fix so far moved one deck and not the spread.
+
+**Long runs in the cloud container:** it stops within about 10 minutes of the session going idle
+(scheduled check-ins every 10–15 minutes did not prevent it; `uptime` showed 0 minutes at each
+wake-up). What works: start the run detached (`setsid nohup SCRIPT >> LOG 2>&1 < /dev/null &`)
+from a script that resumes on its own, then stay in the turn with repeated foreground waits just
+under the 10-minute tool limit (`timeout 580 bash -c 'until grep -q DONE LOG; do sleep 20; done'`).
+`runs/` survives restarts; `/tmp` and the scratchpad may not.
+
+**Runs behind the step 4 numbers** (git-ignored; replayable from the commands in `VALIDATION.md`,
+"The pilot"): `runs/sinks/<deck>` (logs), `runs/p12-*`, `runs/p13-*`, `runs/p14*-*` (patch arms;
+the without-arms were built on private Forge builds that included the dropped 0012),
+`runs/mcfix-*` (one-seat search A/Bs), `runs/rr18-default`, `runs/rr18-mcfixed`.
 
 ## CHECKPOINT 16 Nov 2026: format and field ruled out; next is the pilot (step 4)
 
@@ -274,13 +298,14 @@ advisor would be a Forge patch, measured like any other.
 
 ## Branch state
 
-- All work is on `claude/ai-decision-engine`, pushed. It contains `main` as of 56151e6. **It has
-  not been merged into `main` and no pull request exists**: the sessions that did this work were
-  only allowed to push this branch. Ask the user before merging or opening a PR.
-- `runs/` is git-ignored and does not survive the cloud container; every run below can be
-  replayed from its command and seed.
-- The cloud environment "Mtg-simulator" now allows `magic.gg` and `mtgdecks.net`. magic.gg works
-  with `curl`; mtgdecks.net answers automated requests with a Cloudflare 403.
+- As of 17 Nov 2026 all AI-pilot work is on `claude/ai-decision-engine`, pushed, including step 4
+  (done on `claude/gifted-mendel-ia018w`, which points at the same commit) and the 100-list sample
+  of the other session. It contains `main` as of 56151e6. **It has not been merged into `main` and
+  no pull request exists.** Ask the user before merging or opening a PR.
+- `runs/` is git-ignored and does not survive a new container; every run can be replayed from its
+  command and seed.
+- The cloud environment "Mtg-simulator" allows `magic.gg`, `mtgdecks.net` and melee.gg. magic.gg
+  and melee.gg work with plain `curl`; mtgdecks.net answers automated requests with a Cloudflare 403.
 
 ## Done
 
@@ -325,6 +350,9 @@ Tests: 284 (277 unit, 7 integration), all passing on the patched engine.
   Do not feed it to `tune --matchups`.
 
 ## Next steps, in order of expected value
+
+*(Superseded 17 Nov 2026: items 2 and 3 were done in step 4, see the CHECKPOINT at the top; the
+next step is the user's decision listed there. Items 4 and 5 are still open leads.)*
 
 1. *(Superseded by `--bo3`, step 2 of the checkpoint plan.)* **Test the sideboard explanation.** Build post-board lists by hand for Boros Dwarves and its
    five or six most-played opponents (their own 15 cards), run `match` at 200+ games per pairing
