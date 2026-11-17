@@ -13,11 +13,12 @@
  *   -Dmtgsim.aiProfileDir=<folder> makes Forge load its AI profiles (*.ai) from that folder instead of
  *           res/ai; the ready line then names it ("aiProfileDir") and counts them ("aiProfiles").
  *   stdin : one job per line, tab separated key=value fields:
- *             id=<text> seed=<long> timeout=<seconds> format=<GameType> mc=<off|on|max|fixed>
+ *             id=<text> seed=<long> timeout=<seconds> format=<GameType> mc=<off|on|max|fixed|deep>
  *             log=<path or empty> deck=<path> deck=<path> ... profile=<name or empty> ...
- *             seatmc=<off|on|max|fixed|empty> ...   (per seat, in deck order; empty follows mc=)
+ *             seatmc=<off|on|max|fixed|deep|empty> ...   (per seat, in deck order; empty follows mc=)
  *           "fixed" is Monte Carlo with a counted budget that never reads the clock, so the game still
  *           replays from its seed; it needs mtgsim's Forge patch 0020 (applied by `mtgsim setup --build`).
+ *           "deep" is the same counted search at depth DEEP_DEPTH: a larger budget, still replayable.
  *           the line "quit" ends the process.
  * Everything Forge itself prints is redirected to stderr so stdout carries only the protocol.
  *
@@ -122,7 +123,13 @@ public final class ForgeBridge {
     /** Game threads get a large stack: deep trigger chains otherwise overflow the default one. */
     private static final long GAME_STACK_BYTES = 64L * 1024 * 1024;
     /** Monte Carlo settings a job may ask for; anything else is an error rather than a silent "on". */
-    private static final Set<String> MC_MODES = new HashSet<>(Arrays.asList("off", "on", "max", "fixed"));
+    private static final Set<String> MC_MODES = new HashSet<>(Arrays.asList("off", "on", "max", "fixed", "deep"));
+    /**
+     * Depth of the counted search a "deep" seat plays (AiController.setFlatMonteCarloCountedDepth, Forge patch 0020):
+     * eight approved and five discovered lines, two target variants, 32 rounds plus 16, 800 rollouts a turn (about 3.6
+     * times the rollouts a decision of "fixed", depth 1, and 3.5 times its engine time, VALIDATION.md).
+     */
+    private static final int DEEP_DEPTH = 8;
     /**
      * Forge's AI gives up on a decision after Game.AI_TIMEOUT seconds (5 by default), which makes play depend on how
      * fast the machine is. A game with a "fixed" seat gets a limit no game reaches; the job's own timeout still ends it.
@@ -353,7 +360,7 @@ public final class ForgeBridge {
         }
         if (!"off".equals(job.monteCarlo)) {
             setFieldIfPresent(game, "AI_FLAT_MONTE_CARLO", Boolean.TRUE);
-            if ("max".equals(job.monteCarlo) || "fixed".equals(job.monteCarlo)) {
+            if ("max".equals(job.monteCarlo) || isCounted(job.monteCarlo)) {
                 setFieldIfPresent(game, "AI_FLAT_MONTE_CARLO_MAX", Boolean.TRUE);
             }
         }
@@ -600,7 +607,7 @@ public final class ForgeBridge {
                 ai.getClass().getMethod("setFlatMonteCarloOverride", Boolean.class).invoke(ai, !"off".equals(mode));
                 // "fixed" is the maximum-strength search at a counted size, see applyFixedMonteCarlo
                 ai.getClass().getMethod("setFlatMonteCarloMaxOverride", Boolean.class)
-                        .invoke(ai, "max".equals(mode) || "fixed".equals(mode));
+                        .invoke(ai, "max".equals(mode) || isCounted(mode));
             } catch (final ReflectiveOperationException e) {
                 throw new IllegalArgumentException("this Forge version does not support per-player Monte Carlo settings");
             }
@@ -613,6 +620,11 @@ public final class ForgeBridge {
      * never reached, so nothing in the game depends on the clock and the seed replays it exactly.
      * Returns whether any seat of this game uses Monte Carlo at all.
      */
+    /** "fixed" and "deep" are the counted search (Forge patch 0020), at depth 1 and DEEP_DEPTH. */
+    private static boolean isCounted(final String mode) {
+        return "fixed".equals(mode) || "deep".equals(mode);
+    }
+
     private static boolean applyFixedMonteCarlo(final Game game, final List<RegisteredPlayer> seats, final Job job) {
         boolean searching = false;
         boolean fixed = false;
@@ -621,7 +633,7 @@ public final class ForgeBridge {
             final String own = seat >= 0 && seat < job.seatMonteCarlo.size() ? job.seatMonteCarlo.get(seat) : "";
             final String mode = own.isEmpty() ? job.monteCarlo : own;
             searching |= !"off".equals(mode);
-            if (!"fixed".equals(mode)) {
+            if (!isCounted(mode)) {
                 continue;
             }
             if (Runtime.getRuntime().maxMemory() <= MIN_FIXED_HEAP_BYTES) {
@@ -631,8 +643,11 @@ public final class ForgeBridge {
             try {
                 final Object ai = p.getController().getClass().getMethod("getAi").invoke(p.getController());
                 ai.getClass().getMethod("setFlatMonteCarloCountOnly", boolean.class).invoke(ai, true);
+                if ("deep".equals(mode)) { // depth 1 ("fixed") is the default, so builds without the setter still play it
+                    ai.getClass().getMethod("setFlatMonteCarloCountedDepth", int.class).invoke(ai, DEEP_DEPTH);
+                }
             } catch (final ReflectiveOperationException e) {
-                throw new IllegalArgumentException("this Forge build cannot play Monte Carlo \"fixed\": it lacks mtgsim's"
+                throw new IllegalArgumentException("this Forge build cannot play Monte Carlo \"" + mode + "\": it lacks (this version of) mtgsim's"
                         + " Forge patch 0020 (counted Monte Carlo); run `python3 -m mtgsim setup --build`");
             }
             fixed = true;

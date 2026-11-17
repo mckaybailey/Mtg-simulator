@@ -71,10 +71,10 @@
   recorded before patches were tracked counts as unpatched). If the driver ever changes how a game is played,
   bump `CACHE_VERSION` in `tune.py`. With Monte Carlo `on` or `max`, cached games are valid samples
   but not replays; with `fixed` they are replays.
-- **Monte Carlo `fixed` must never read the clock.** Its games replay from the seed because the
+- **Monte Carlo `fixed` (and `deep`, the same search at depth 8) must never read the clock.** Its games replay from the seed because the
   search is counted in rollouts (Forge patch 0020) and the driver puts `Game.AI_TIMEOUT` out of
   reach (`bridge/AGENTS.md`). `runner.MONTE_CARLO_MODES` is the one list of settings (`Job.line`
-  refuses anything else); a job with a `fixed` seat gets `RunOptions.fixed_timeout`
+  refuses anything else); a job with a `fixed` or `deep` seat (`runner.COUNTED_MODES`) gets `RunOptions.fixed_timeout`
   (`runner.FIXED_TIMEOUT`, 1,800 s) because a game stopped at the time limit is not a replay.
   Changing the counted budget in the patch changes every `fixed` game: re-measure and say so in
   VALIDATION.md. Games without Monte Carlo must stay bit-identical through any change to this
