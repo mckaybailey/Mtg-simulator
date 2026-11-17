@@ -22,7 +22,9 @@ Measured: Forge 7db198d72e with patches 0001-0008, Azorius Control vs Boros Dwar
   identical before and after. Depth 8 replays: `-n 4 --seed 7 --mc deep` with 2 and 4 workers gave
   identical games and rollout counts. Cost with both seats searching: 6.6 rollouts a decision and
   54 s a game at depth 1, 14.2 and 105 s at depth 4, 23.6 and 186 s at depth 8 (pruning keeps the
-  real growth below the nominal one).
+  real growth below the nominal one). Strength: Dimir Uldaros's seat against the default-piloted
+  meta, 540 games per arm, seed 1: fixed 45.2% (41-49), deep 44.4% (40-49), deep - fixed -0.7
+  (paired -3.6 to +2.1) at 2.9 times the rollouts. No gain; see VALIDATION.md, "The pilot" (iv).
 
 diff --git a/forge-ai/src/main/java/forge/ai/AiController.java b/forge-ai/src/main/java/forge/ai/AiController.java
 index 0fd6cee9..f7db2d28 100644

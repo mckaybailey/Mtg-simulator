@@ -87,7 +87,7 @@ the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay
   `AiController.setFlatMonteCarloCountedDepth(DEEP_DEPTH)` (8; `Config.counted(depth)` in patch
   0020): at most 8 approved + 2 other targets + 5 discovered plays + holding, 32 rounds and 16 more,
   800 rollouts a turn. Pruning keeps the real growth smaller: 23.6 rollouts a decision against 6.6
-  for `fixed`, about 3.5 times its engine time. Everything said above about `fixed` (no clock,
+  for `fixed`, about 3.5 times its engine time; it plays no better than `fixed` (`VALIDATION.md`, "The pilot" (iv)). Everything said above about `fixed` (no clock,
   replays from the seed, heap, timeout) holds for `deep`. `fixed` never calls the depth setter,
   so its games are the same on builds with and without it.
 - After every game with Monte Carlo the driver prints `FlatMonteCarloStats.summary()` to stderr

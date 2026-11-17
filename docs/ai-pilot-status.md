@@ -21,6 +21,16 @@ Step 4, in `VALIDATION.md`, "The pilot":
   share-weighted SD 13.8 → 13.2 (−0.6, −2.5 to +1.3), gap 11.5 → 10.6 (−1.0, −2.5 to +1.2),
   Spearman 0.16 → 0.10. Within noise: the one-seat gains vanish when the opponents search too.
 
+**Update, later on 17 Nov: option (b) was tried and fails at the gate.** The user chose (b), a much
+larger search budget. `--mc deep` (patch 0020 revised: the counted search at depth 8, still
+replayable) uses 2.9 times the rollouts of `fixed` on one seat and wins no more: Dimir Uldaros
+against the default meta, 540 games per arm, `fixed` 45.2%, `deep` 44.4%, −0.7 (paired −3.6 to
++2.1); `fixed` − default +13.1, replicating step 4 (ii). 478 of 540 games end the same way. The
+search is saturated at `fixed`'s size: the rollouts' heuristic playouts and the evaluation limit
+it, not the sample count. The all-seat round robin (~19 h) was therefore not run.
+`VALIDATION.md`, "The pilot" (iv). What remains of the options below: (a), (c), or a different
+kind of pilot change (better rollout policy or evaluation, which is real Forge AI work).
+
 **Open task, independent of the decision below: recalibrate and bring the user docs up to date.**
 The Forge patches changed this session (0013 and 0014 added, now 14 shipped), and `AGENTS.md` asks
 for the standard calibration run after every patch change. It has not been done; the 18-deck round

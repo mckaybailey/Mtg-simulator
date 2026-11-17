@@ -705,6 +705,31 @@ reshuffles (Orzhov Lifegain +10 → −1, Dimir Midrange −3 → −14, Boros D
 coming closer to the real one. The one-seat gains measure "search beats the default AI", not a
 pilot that plays these decks the way people do.
 
+### (iv) A larger budget: `--mc deep` (option (b), 17 Nov)
+
+`--mc deep` is the counted search of `fixed` at depth 8 (patch 0020, `Config.counted(depth)`: up
+to 8 approved and 5 discovered lines, 2 target variants, 32 rounds plus 16, 800 rollouts a turn,
+against 3 + 2, 1, 4 + 2 and 100 for `fixed`). It replays from the seed like `fixed`. The gate
+before an all-seat round robin: is it stronger than `fixed` on one seat? Dimir Uldaros (the deck
+`fixed` helped most) against the default-piloted meta, 30 games per opponent including the
+mirror, 540 games per arm, seed 1, same seeds in every arm (`tools/deep_ab.sh`,
+`runs/deepab/`; Forge with patches 0001–0011, 0013, 0014, 0020):
+
+| Dimir Uldaros's seat | Win rate | Rollouts a decision | Engine time a game |
+|---|---|---|---|
+| Default AI | 32.0% (28–36%) | | |
+| `--mc fixed` | 45.2% (41–49%) | 5.4 | 16.3 s (median 11.9) |
+| `--mc deep` | 44.4% (40–49%) | 15.3 | 46.9 s (median 29.0, longest 1,189) |
+| `fixed` − default | **+13.1** (paired +8.6 to +17.6) | | |
+| `deep` − `fixed` | −0.7 (paired −3.6 to +2.1) | | |
+
+`fixed`'s gain replicates the earlier +13.7. Nearly three times the rollouts buy nothing: 478 of
+540 games end the same way with both, 29 losses become wins and 33 wins losses. The search is
+saturated at `fixed`'s size; what limits it is the rollouts' own play (the heuristic AI plays
+out every line) and the evaluation, not the number of samples. Since `fixed` on every seat did
+not narrow the spread (iii), and `deep` does not even beat `fixed` on one seat, the all-seat
+round robin (about 19 hours at 20 games per pairing) was not run. Budget is not the lever.
+
 What this leaves: the two remaining levers in the plan, the format and the field (steps 1–3) and
 a stronger pilot (this step), each move single decks but not the spread. The simulator's ranking of
 these meta decks should be reported as it is: decided matchups and A/B differences between lists
