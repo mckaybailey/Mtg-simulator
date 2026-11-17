@@ -33,8 +33,10 @@ three measured AI fixes and `--mc fixed` for every seat leave the 18-deck SD at 
 about 100 decks was dropped: `tools/field_bound.py` shows that no outside field can bring the spread
 near the real one, because it comes from lopsided matchups, not from a zero-sum field. Start from the
 "CHECKPOINT" section at the top of `docs/ai-pilot-status.md`. Option (b) there, a larger search
-budget, was tried on 17 Nov (`--mc deep`) and plays no better than `--mc fixed`; options (a) and (c)
-remain with the user.
+budget, was tried on 17 Nov (`--mc deep`) and plays no better than `--mc fixed`. A later
+discussion with the user (the "latest" checkpoint there) laid out what remains: repositioning
+mtgsim, a Swiss-pairing check and an LLM probe, or more single-error hunting; the choice is the
+user's.
 
 ## The AI pilot: what is settled, so it is not repeated
 
