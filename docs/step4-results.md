@@ -56,6 +56,32 @@ The same A/B for the two decks the simulation underrates most (17 Nov, same setu
 The three underrated, planning-heavy decks gain 9–14 points beyond noise and move towards their
 real win rates; the overrated creature deck gains about 3 (interval touching zero). Search helps
 the decks the simulation underrates three to five times as much as the deck it overrates, which
-is what a narrower spread needs. Whether it does narrow when every deck searches (opponents too)
-is the next measurement: a round robin of the 18 meta decks with `--mc fixed` for every seat
-against the same round robin without it. All 4,080 searching games finished without a time-out.
+is what a narrower spread needs. All 4,080 searching games finished without a time-out.
+
+## (iii) Round robin with `--mc fixed` for every seat
+
+The 18 meta decks, best-of-one, 20 games per pairing, seed 1, 3,060 games per arm, Forge with
+patches 0001–0011, 0013, 0014 (17 Nov 2026): `matrix decks/standard/meta -n 20 --seed 1` with
+and without `--mc fixed` (`runs/rr18-default`, `runs/rr18-mcfixed`; no time-outs or errors).
+`tools/calibration.py` and `tools/calibration_diff.py`, 1,000 resamples:
+
+| Share-weighted, 18 decks | Default AI | `--mc fixed` everywhere | B − A (95% interval) |
+|---|---|---|---|
+| SD (real 6.0) | 13.8 | 13.2 | −0.6 (−2.5 to +1.3) |
+| Mean absolute gap | 11.5 | 10.6 | −1.0 (−2.5 to +1.2) |
+| Spearman | 0.16 | 0.10 | −0.06 (−0.20 to +0.08) |
+| Pearson | 0.34 | 0.28 | −0.07 (−0.19 to +0.07) |
+
+Equal-weighted: SD 13.8 → 12.5 (−1.3, −2.6 to +0.3), gap 11.0 → 10.4 (−0.5, −2.1 to +0.9).
+**Nothing changes beyond noise.** Searching on one seat against default opponents lifts the
+planning decks by 9–14 points, but when the opponents search too most of that edge is gone:
+Jund Sacrifice is still 18 points under its real rate (37.1% → 39.7% weighted), Dimir Uldaros
+12 under; Mono-Green Landfall (+24) and Mono-Black Aggro (+25) end further over. The deck order
+reshuffles (Orzhov Lifegain +10 → −1, Dimir Midrange −3 → −14, Boros Dwarves +21 → +14) without
+coming closer to the real one. The one-seat gains measure "search beats the default AI", not a
+pilot that plays these decks the way people do.
+
+What this leaves: the two remaining levers in the plan, the format and the field (steps 1–3) and
+a stronger pilot (this step), each move single decks but not the spread. The simulator's ranking of
+these meta decks should be reported as it is: decided matchups and A/B differences between lists
+of one deck are what mtgsim measures well; the meta win rates of a deck against the field are not.
