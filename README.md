@@ -33,11 +33,12 @@ What you can do with it:
   that need careful sequencing are understated, on both sides of the table. Use the results
   to compare similar decks and to spot weak cards and bad mana, not to predict tournament
   win rates.
-- **Against the meta gauntlet this was measured, and it is a large effect.** In a 1,980-game
-  round robin of the twelve included meta decks, simulated win rates barely tracked the
-  decks' real tournament win rates (rank correlation 0.23, average gap 11 points, even after
-  mtgsim's Forge patches for cards the AI could not cast or misused): creature decks came out on top and
-  the real field's best deck, Jund Sacrifice, near the bottom. Each gauntlet deck
+- **Against the meta gauntlet this was measured, and it is a large effect.** In a 4,590-game
+  round robin of the eighteen included meta decks, simulated win rates barely tracked the
+  decks' real tournament win rates (rank correlation 0.14, average gap 11 points, spread 14
+  points against a real 6, even after mtgsim's fourteen Forge patches for cards the AI could not
+  cast or misused): creature decks came out on top and the real field's best deck, Jund
+  Sacrifice, near the bottom. Each gauntlet deck
   therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
 - **Games are best-of-one with no sideboarding unless you pass `--bo3`.** With `--bo3`, games 2
@@ -146,7 +147,7 @@ are warnings unless you pass `--strict`.
 | `--timeout 180` | seconds before a stalled game is stopped and counted as unfinished (default 180; 1800 for games with `--mc fixed` or `deep`) |
 | `--ai-profile Reckless` | Forge AI personality for every player (`Default`, `Cautious`, `Reckless`, `Experimental`, `Hard`, `Hardest`, or one of yours from `~/.mtgsim/profiles`); overrides per-deck settings |
 | `--mc on` | Forge's Monte Carlo look-ahead on top of the usual AI (`max` for its strongest setting) for every player: slower, and because it thinks against a clock the same seed no longer replays the same game; overrides per-deck settings |
-| `--mc fixed` | the same look-ahead with a budget counted in playouts instead of milliseconds, so the same seed replays the same games on any machine and with any `-j`. About 9 times the engine time for each searching player (some 20 s a game with one, 45 s with both); a gain in play strength over the default AI has not been shown yet (`VALIDATION.md`). Needs the Forge build made by `setup --build` (patch 0020) |
+| `--mc fixed` | the same look-ahead with a budget counted in playouts instead of milliseconds, so the same seed replays the same games on any machine and with any `-j`. About 9 times the engine time for each searching player (some 20 s a game with one, 45 s with both); on one seat against the default AI it wins 3–14 points more, but with it on every seat the meta ranking is no closer to the real one (`VALIDATION.md`, "The pilot"). Needs the Forge build made by `setup --build` (patch 0020) |
 | `--mc deep` | `fixed` with a larger counted budget (depth 8: more lines compared, eight times the rounds; in practice about 3.6 times the playouts a decision). Still replays from the seed; about 3.5 times the engine time of `fixed` (some 3 minutes a game with both players searching). On one seat it wins no more than `fixed` (Dimir Uldaros: −0.7 points, −3.6 to +2.1; `VALIDATION.md`, "The pilot"), so it is there for experiments, not for better results |
 | `--bo3` | best-of-three matches (`match`, `gauntlet`, `matrix`): `-n` counts matches. Game 1 of each match is exactly the best-of-one game with the same seed; in games 2 and 3 the previous game's loser goes first and both decks sideboard against each other's main deck (Forge's `SideboardAdvisor`: at most 7 swaps, chosen from the cards' text). Win rates count matches (two game wins; three games without one is a draw); the report also shows game-1 and later-game results. About 2.5 games per match |
 | `--no-sideboard` | with `--bo3`: play games 2 and 3 with the main decks |
@@ -156,7 +157,7 @@ are warnings unless you pass `--strict`.
 
 Most games take 2–4 seconds of engine time; slow control and artifact decks take longer.
 On a 4-core machine the meta decks ran at about 85 games per minute, so 100 games against
-each of the twelve meta decks takes roughly a quarter of an hour.
+each of the eighteen meta decks takes roughly 20 minutes.
 
 ## How results are produced
 
@@ -282,8 +283,8 @@ folder; mtgsim never changes Forge's.
 ## Included decks
 
 - `decks/standard/meta/` – eighteen of the most-played Standard archetypes as of early
-  November 2026 (81% of the field), with metagame shares and real win rates; twelve of them
-  have been calibrated against those win rates so far. See the README in that folder for sources and limits.
+  November 2026 (81% of the field), with metagame shares and real win rates, all calibrated
+  against those win rates. See the README in that folder for sources and limits.
 - `decks/standard/casual/` – five simple one-colour decks built from Foundations commons and
   uncommons, as kitchen-table opponents.
 
