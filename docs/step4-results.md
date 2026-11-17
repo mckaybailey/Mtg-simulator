@@ -51,8 +51,11 @@ The same A/B for the two decks the simulation underrates most (17 Nov, same setu
 | Azorius Control (46.6%) | 42.1% (39–45%) | 51.1% (48–54%) | +9.0 (+5.7 to +12.4) |
 | Jund Sacrifice (57.6%) | 40.1% (37–43%) | 50.4% (47–53%) | +10.3 (+7.3 to +13.3) |
 | Dimir Uldaros (49.2%) | 30.0% (27–33%) | 43.7% (41–47%) | +13.7 (+10.4 to +17.0) |
+| Boros Dwarves (50.2%), control | 73.7% (71–76%) | 76.7% (74–79%) | +2.9 (+0.0 to +5.9) |
 
-All three gain beyond noise and move towards their real win rates. That alone does not show that
-search would narrow the spread: if the overrated creature decks gained as much from it, a field in
-which every deck searches would be as spread out as now. The control is the same A/B for Boros
-Dwarves (real 50.2%, simulated about 69%), running.
+The three underrated, planning-heavy decks gain 9–14 points beyond noise and move towards their
+real win rates; the overrated creature deck gains about 3 (interval touching zero). Search helps
+the decks the simulation underrates three to five times as much as the deck it overrates, which
+is what a narrower spread needs. Whether it does narrow when every deck searches (opponents too)
+is the next measurement: a round robin of the 18 meta decks with `--mc fixed` for every seat
+against the same round robin without it. All 4,080 searching games finished without a time-out.
