@@ -47,3 +47,11 @@ First revision measured (16–17 Nov, against the same without-arms): Four-Color
 holds nine instant removal spells, so one in hand stopped the precombat animate even with mana
 to spare. A second revision (`0014-land-animate-revised-mana.patch.txt`) allows it when the mana
 left afterwards still pays for the cheapest instant or flash card in hand; being measured.
+
+Second revision measured: Mono-Black Aggro −0.1 (paired −1.0 to +0.9), but Four-Color Control
+only +4.6 (paired +2.4 to +6.7, 1,534 of 1,700 games): its cheapest instant costs two, so it went
+back to tapping five lands in its first main phase. Third revision
+(`0014-land-animate-revised-attack.patch.txt`): before the AI's own attack, the animated land
+must attack this turn (`ComputerUtilCard.doesSpecifiedCreatureAttackAI`, which Forge already
+uses for temporary animates) and the mana left must pay for all instant and flash cards in hand.
+Being measured.
