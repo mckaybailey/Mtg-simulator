@@ -30,6 +30,10 @@ search is saturated at `fixed`'s size: the rollouts' heuristic playouts and the 
 it, not the sample count. The all-seat round robin (~19 h) was therefore not run.
 `VALIDATION.md`, "The pilot" (iv). What remains of the options below: (a), (c), or a different
 kind of pilot change (better rollout policy or evaluation, which is real Forge AI work).
+Decision with the user (17 Nov): the result is kept, not deleted, so the experiment is not
+repeated. `--mc deep` stays as an experiment setting (it gives no better results than `fixed`;
+`fixed` games are unchanged by it) and the branch `claude/intelligent-bohr-0rx7cq` goes to `main`
+by pull request. Dropping the code later is safe: the experiment rebuilds from commit `8aa373d`.
 
 **Open task, independent of the decision below: recalibrate and bring the user docs up to date.**
 The Forge patches changed this session (0013 and 0014 added, now 14 shipped), and `AGENTS.md` asks
