@@ -1,0 +1,979 @@
+{
+ "description": "Per-pairing results of the 17 Nov 2026 calibration round robin (matrix decks/standard/meta -n 30 --seed 1, 14 Forge patches, best-of-one), exported from runs/rr18-cal/summary.json so later checks (tools/swiss_check.py) need no replay. wins are a's wins out of decided games.",
+ "entrants": {
+  "azorius-artifacts": {
+   "name": "Azorius Artifacts"
+  },
+  "azorius-control": {
+   "name": "Azorius Control"
+  },
+  "azorius-momo": {
+   "name": "Azorius Momo"
+  },
+  "boros-dragons": {
+   "name": "Boros Dragons"
+  },
+  "boros-dwarves": {
+   "name": "Boros Dwarves"
+  },
+  "dimir-excruciator": {
+   "name": "Dimir Excruciator"
+  },
+  "dimir-midrange": {
+   "name": "Dimir Midrange"
+  },
+  "dimir-uldaros": {
+   "name": "Dimir Uldaros"
+  },
+  "four-color-control": {
+   "name": "Four-Color Control"
+  },
+  "golgari-midrange": {
+   "name": "Golgari Midrange"
+  },
+  "grixis-reanimator": {
+   "name": "Grixis Reanimator"
+  },
+  "izzet-prowess": {
+   "name": "Izzet Prowess"
+  },
+  "izzet-spellementals": {
+   "name": "Izzet Spellementals"
+  },
+  "jund-sacrifice": {
+   "name": "Jund Sacrifice"
+  },
+  "mono-black-aggro": {
+   "name": "Mono-Black Aggro"
+  },
+  "mono-green-landfall": {
+   "name": "Mono-Green Landfall"
+  },
+  "orzhov-lifegain": {
+   "name": "Orzhov Lifegain"
+  },
+  "rakdos-lizards": {
+   "name": "Rakdos Lizards"
+  }
+ },
+ "pairings": [
+  {
+   "a": "azorius-artifacts",
+   "b": "azorius-control",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "azorius-momo",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "boros-dragons",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "boros-dwarves",
+   "wins": 16,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "dimir-excruciator",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "dimir-midrange",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "dimir-uldaros",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "four-color-control",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "golgari-midrange",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "grixis-reanimator",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "izzet-prowess",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "izzet-spellementals",
+   "wins": 21,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "jund-sacrifice",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "mono-black-aggro",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "mono-green-landfall",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "orzhov-lifegain",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "azorius-artifacts",
+   "b": "rakdos-lizards",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "azorius-momo",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "boros-dragons",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "boros-dwarves",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "dimir-excruciator",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "dimir-midrange",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "dimir-uldaros",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "four-color-control",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "golgari-midrange",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "grixis-reanimator",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "izzet-prowess",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "izzet-spellementals",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "jund-sacrifice",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "mono-black-aggro",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "mono-green-landfall",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "orzhov-lifegain",
+   "wins": 4,
+   "decided": 30
+  },
+  {
+   "a": "azorius-control",
+   "b": "rakdos-lizards",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "boros-dragons",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "boros-dwarves",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "dimir-excruciator",
+   "wins": 21,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "dimir-midrange",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "dimir-uldaros",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "four-color-control",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "golgari-midrange",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "grixis-reanimator",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "izzet-prowess",
+   "wins": 27,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "izzet-spellementals",
+   "wins": 20,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "jund-sacrifice",
+   "wins": 16,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "mono-black-aggro",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "mono-green-landfall",
+   "wins": 6,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "orzhov-lifegain",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "azorius-momo",
+   "b": "rakdos-lizards",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "boros-dwarves",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "dimir-excruciator",
+   "wins": 27,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "dimir-midrange",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "dimir-uldaros",
+   "wins": 27,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "four-color-control",
+   "wins": 23,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "golgari-midrange",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "grixis-reanimator",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "izzet-prowess",
+   "wins": 26,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "izzet-spellementals",
+   "wins": 21,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "jund-sacrifice",
+   "wins": 22,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "mono-black-aggro",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "mono-green-landfall",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "orzhov-lifegain",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "boros-dragons",
+   "b": "rakdos-lizards",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "dimir-excruciator",
+   "wins": 28,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "dimir-midrange",
+   "wins": 22,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "dimir-uldaros",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "four-color-control",
+   "wins": 25,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "golgari-midrange",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "grixis-reanimator",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "izzet-prowess",
+   "wins": 28,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "izzet-spellementals",
+   "wins": 22,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "jund-sacrifice",
+   "wins": 23,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "mono-black-aggro",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "mono-green-landfall",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "orzhov-lifegain",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "boros-dwarves",
+   "b": "rakdos-lizards",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "dimir-midrange",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "dimir-uldaros",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "four-color-control",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "golgari-midrange",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "grixis-reanimator",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "izzet-prowess",
+   "wins": 16,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "izzet-spellementals",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "jund-sacrifice",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "mono-black-aggro",
+   "wins": 6,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "mono-green-landfall",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "orzhov-lifegain",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "dimir-excruciator",
+   "b": "rakdos-lizards",
+   "wins": 3,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "dimir-uldaros",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "four-color-control",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "golgari-midrange",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "grixis-reanimator",
+   "wins": 16,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "izzet-prowess",
+   "wins": 25,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "izzet-spellementals",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "jund-sacrifice",
+   "wins": 17,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "mono-black-aggro",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "mono-green-landfall",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "orzhov-lifegain",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "dimir-midrange",
+   "b": "rakdos-lizards",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "four-color-control",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "golgari-midrange",
+   "wins": 7,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "grixis-reanimator",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "izzet-prowess",
+   "wins": 18,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "izzet-spellementals",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "jund-sacrifice",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "mono-black-aggro",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "mono-green-landfall",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "orzhov-lifegain",
+   "wins": 6,
+   "decided": 30
+  },
+  {
+   "a": "dimir-uldaros",
+   "b": "rakdos-lizards",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "golgari-midrange",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "grixis-reanimator",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "izzet-prowess",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "izzet-spellementals",
+   "wins": 28,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "jund-sacrifice",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "mono-black-aggro",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "mono-green-landfall",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "orzhov-lifegain",
+   "wins": 7,
+   "decided": 30
+  },
+  {
+   "a": "four-color-control",
+   "b": "rakdos-lizards",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "grixis-reanimator",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "izzet-prowess",
+   "wins": 27,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "izzet-spellementals",
+   "wins": 24,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "jund-sacrifice",
+   "wins": 20,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "mono-black-aggro",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "mono-green-landfall",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "orzhov-lifegain",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "golgari-midrange",
+   "b": "rakdos-lizards",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "izzet-prowess",
+   "wins": 21,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "izzet-spellementals",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "jund-sacrifice",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "mono-black-aggro",
+   "wins": 3,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "mono-green-landfall",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "orzhov-lifegain",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "grixis-reanimator",
+   "b": "rakdos-lizards",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "izzet-prowess",
+   "b": "izzet-spellementals",
+   "wins": 10,
+   "decided": 30
+  },
+  {
+   "a": "izzet-prowess",
+   "b": "jund-sacrifice",
+   "wins": 13,
+   "decided": 30
+  },
+  {
+   "a": "izzet-prowess",
+   "b": "mono-black-aggro",
+   "wins": 3,
+   "decided": 30
+  },
+  {
+   "a": "izzet-prowess",
+   "b": "mono-green-landfall",
+   "wins": 2,
+   "decided": 30
+  },
+  {
+   "a": "izzet-prowess",
+   "b": "orzhov-lifegain",
+   "wins": 6,
+   "decided": 30
+  },
+  {
+   "a": "izzet-prowess",
+   "b": "rakdos-lizards",
+   "wins": 4,
+   "decided": 30
+  },
+  {
+   "a": "izzet-spellementals",
+   "b": "jund-sacrifice",
+   "wins": 21,
+   "decided": 30
+  },
+  {
+   "a": "izzet-spellementals",
+   "b": "mono-black-aggro",
+   "wins": 3,
+   "decided": 30
+  },
+  {
+   "a": "izzet-spellementals",
+   "b": "mono-green-landfall",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "izzet-spellementals",
+   "b": "orzhov-lifegain",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "izzet-spellementals",
+   "b": "rakdos-lizards",
+   "wins": 11,
+   "decided": 30
+  },
+  {
+   "a": "jund-sacrifice",
+   "b": "mono-black-aggro",
+   "wins": 8,
+   "decided": 30
+  },
+  {
+   "a": "jund-sacrifice",
+   "b": "mono-green-landfall",
+   "wins": 3,
+   "decided": 30
+  },
+  {
+   "a": "jund-sacrifice",
+   "b": "orzhov-lifegain",
+   "wins": 9,
+   "decided": 30
+  },
+  {
+   "a": "jund-sacrifice",
+   "b": "rakdos-lizards",
+   "wins": 5,
+   "decided": 30
+  },
+  {
+   "a": "mono-black-aggro",
+   "b": "mono-green-landfall",
+   "wins": 12,
+   "decided": 30
+  },
+  {
+   "a": "mono-black-aggro",
+   "b": "orzhov-lifegain",
+   "wins": 14,
+   "decided": 30
+  },
+  {
+   "a": "mono-black-aggro",
+   "b": "rakdos-lizards",
+   "wins": 15,
+   "decided": 30
+  },
+  {
+   "a": "mono-green-landfall",
+   "b": "orzhov-lifegain",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "mono-green-landfall",
+   "b": "rakdos-lizards",
+   "wins": 19,
+   "decided": 30
+  },
+  {
+   "a": "orzhov-lifegain",
+   "b": "rakdos-lizards",
+   "wins": 16,
+   "decided": 30
+  }
+ ]
+}

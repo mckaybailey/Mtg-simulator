@@ -5,7 +5,35 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 17 Nov 2026 (latest): options discussed with the user; decision pending
+## CHECKPOINT 21 Nov 2026 (latest): the user chose option 2; the Swiss check is done
+
+The user picked option 2 below (Swiss check, then the LLM probe), with one change: **no API key.**
+The probe's decisions are answered by Claude subagents in the session (blind to Forge's choice and
+to the hypothesis, seeing only what the deciding player may know), and graded side by side by the
+user or a separate agent. Running a model inside live games (probe step 3) stays out of reach
+without a key.
+
+- **Swiss check, done** (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"): the calibration
+  was replayed (`runs/rr18-cal`, same metrics) and its pairing table committed
+  (`decks/standard/meta/sim-matchups.json`). Simulated Swiss events take 1.8–3.4 points off the SD
+  of 14.0 (real 6.0) depending on the event structure, and leave the ranking and the 7–8 sign
+  errors unchanged. Pairing is part of the spread, not the ranking.
+- **Probe step 1, first pass from `games.jsonl`** (the driver's misplay fields, 510 games per deck
+  in `runs/rr18-cal`): Azorius Control let 1,418 opposing spells resolve with a castable counter in
+  hand and cast 1,267 counters; Four-Color Control 546 against 367; Izzet Spellementals 296
+  against 455; Dimir Midrange 273 against 250. Held instant-speed cards through an opponent's turn,
+  per game: Izzet Spellementals 1.84, Dimir Midrange 1.52, Four-Color Control 1.20, Azorius
+  Control 1.11. But **Jund Sacrifice and Dimir Uldaros, the worst sign errors, hold almost nothing**
+  (0.46 and 0.35 per game, no counters to pass), so held answers do not explain them. Their probe
+  cases have to be other decisions: attacks and blocks, sacrifice and engine sequencing, mulligans.
+- **Next: the snapshot.** `--save-logs` logs have no hands, so the probe needs the driver to write
+  the deciding player's visible state (hand, both battlefields with tapped state, graveyards,
+  exile, life, library counts, the stack, phase) at the decision points it already detects (a
+  counter passed, an instant held at cleanup) and at the start of each main phase. Then a logged
+  run of the planning decks against the creature decks, ~200 cases sampled across decision kinds,
+  blind subagent answers, the side-by-side grading sheet.
+
+## CHECKPOINT 17 Nov 2026: options discussed with the user; decision pending
 
 **Read this first.** No code or runs changed in this session; it was a discussion with the user
 about where to take the AI pilot after `--mc deep` failed (next section). The facts it rests on are
