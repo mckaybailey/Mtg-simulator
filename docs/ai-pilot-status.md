@@ -5,7 +5,94 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 23 Nov 2026, evening (latest): probe step A done; next is step B. START HERE
+## CHECKPOINT 23 Nov 2026, night (latest): probe steps B and C done; fix the case gaps, then step D. START HERE
+
+**State of the repository.** Steps B and C and the fix list below are in pull request #11, from
+branch `claude/relaxed-franklin-4vtvog` (open, not merged, as of this note). Everything before
+them is on `main`. The step A work (#10) and everything before it
+is merged.
+
+**What the user asked (23 Nov).** Run step B, answer all 200 step C cases with subagents, write
+the handoff, open a pull request with the documentation, and commit step B's run in it.
+`runs/` is ignored, so the run is committed packed at `probe/run/probe-b.tar.xz` (1 MB, 38 MB
+unpacked), with the script that played it.
+
+**Step B: done.** 420 games: the seven planning decks against the six creature decks, 10 games
+each, seed 1, `--snapshots`. It holds 19,629 decision lines. Details are in the previous
+checkpoint and `VALIDATION.md`, "Decision probe".
+
+**Step C: done.** Everything is in `probe/`; `probe/README.md` is the full account.
+
+- `tools/probe/make_cases.py` sampled 200 close decisions. 175 are the planning decks' (25 a
+  deck, stratified by kind) and 25 the creature decks' as a comparison group.
+- Each case is plain text: the deciding player's visible state, both decklists, the options and
+  an answer format. A card reference with Oracle text for every card named heads each batch of
+  ten.
+- Forge's choices are in a separate `probe/key.jsonl`.
+- Twenty fresh Claude subagents answered one batch each. They read only their own file (checked
+  in their transcripts), with no repository access, no hypothesis and no mention of Forge.
+- `probe/answers.jsonl` holds the answers. Two cases were handled by hand: C159 was skipped and
+  re-asked, and C100 was self-corrected.
+- `tools/probe/collect.py` compares the answers with Forge's choices mechanically and writes
+  `probe/merged.jsonl`.
+
+**What it found: difference, not yet quality.**
+
+| | Agreement with Forge |
+|---|---|
+| All 200 cases | 51% (44–58%) |
+| Planning decks (175) | 49% (41–56%) |
+| Creature decks (25) | 68% (48–83%) |
+| Main phase | 32% |
+| Second main phase | 19% |
+| Combat | about 60% |
+| Mulligans | 71% |
+
+Where they differ on spells, the answer casts more than Forge 33 times and fewer 15 times.
+When both cast the same spells, Forge often casts after combat and the answer before (7 of 11).
+A disagreement is not a Forge mistake until it is graded. (An earlier version of this note said
+C051 and C053 misread card abilities. They do not: Icetill Explorer allows lands from the
+graveyard, and the case text was what misled.)
+
+**Fix before step D (the user asked, 23 Nov).** `probe/README.md`, "Fix before step D", has the
+detail and a suggested fix for each:
+
+1. Eleven token names shown without abilities (Illusion, Pest, Monk, Robot, Treefolk and others).
+2. Choices made for a card not recorded: the type named for Cavern of Souls (53 cases) and
+   every other chosen type, colour, player, number, card name or mode. Record them all from
+   the card's `getChosen*` fields, not Cavern alone.
+3. "Castable now" lists that ignore spree mode costs (C177) and cost reductions.
+4. Main-phase option text that says lands come only from the hand.
+5. No game history in a case.
+6. Restricted mana counted as free.
+7. The three name misreads in the comparison: fixed, but the 102 agreements are not yet read by
+   hand.
+8. Forge's targets not recorded, so 22 agreeing spell cases cannot be checked.
+9. Timing compared loosely.
+
+Items 1, 2, 3 and 8 need the tracker (`mtgsim/bridge/`), checked game for game as in step A.
+Then re-run B, rebuild and re-answer C, and re-collect. Then step D.
+
+**Next, after the fixes above: step D, the grading sheet** (plan below):
+
+- Build a page from `probe/merged.jsonl` that shows each of the 98 disagreeing cases with the
+  two choices as A and B in random order, unnamed. The answer's one-line reason must not show:
+  it would name the model's side.
+- The user marks A better, B better or equal. The 102 agreeing cases count as equal without
+  grading.
+- Use an Artifact with saved state, so the marks survive and can be read back.
+- Report preference with intervals, by kind and for planning versus creature decks.
+- The gate is unchanged: only a clear preference for the model on the planning decks'
+  decisions (interval excluding 50%) makes the in-game step worth discussing.
+
+Notes for D:
+- Show the grader the case text as written (`text`), plus Forge's choice in the same answer
+  format (`forge_text`).
+- Forge's `main` choice lists casts with their phase, and some are instant-speed casts on its
+  own turn. The answers mark timing in words. Both sides should be shown as written.
+- The step D tally needs the grades only, not `agree`, which was computed from parsed text.
+
+## CHECKPOINT 23 Nov 2026, evening: probe steps A and B done (superseded by the checkpoint above)
 
 **State of the repository.** Everything is on `main`: step A (below) was merged by pull request
 #10, the Swiss comparison by #9, the earlier work by #2–#8. No other branch holds unmerged work.
@@ -61,7 +148,15 @@ How the format differs from the plan below, and why:
   restrictions, targets; cost reductions are ignored, so a reduced spell can be missed, never
   wrongly listed.
 
-**Next: step B**, the logged run (as planned below): the seven planning decks against the six
+**Step B, the logged run: done (23 Nov).** `probe/run/probe-b.sh` (the run itself is committed packed, `probe/run/probe-b.tar.xz`):
+one `gauntlet` per planning deck against the six creature decks, `-n 10 --seed 1 --snapshots`,
+into `runs/probe-b/<planning-deck>/`. 420 games, all finished; 420 snapshot files, 19,629
+decision lines (main 6,629, main2 3,888, attack 2,931, upkeep 1,609, draw 1,276, mulligan 1,074,
+block 895, endstep 527, counter 380; both players' decisions). Planning decks' records, 60 games
+each: Azorius Control 26.7%, Four-Color Control 31.7%, Izzet Spellementals 31.7%, Dimir Midrange
+26.7%, Jund Sacrifice 26.7%, Dimir Uldaros 18.3%, Dimir Excruciator 10.0%. If the run is gone in a
+new container, unpack the archive (`tar -C runs -xJf probe/run/probe-b.tar.xz`) or rerun the script (seeded, about 20 minutes on 4 cores). **Next: step C**, sampling
+cases from it (below). The run as planned: the seven planning decks against the six
 creature decks, about 10 games per pairing, seed 1, with `--snapshots --out runs/probe-b` (420
 games, about 5 minutes). Probably a `match` per pairing or a `gauntlet` per planning deck; a
 `matrix` of all 13 would add the pairings within each group. Notes for step C:

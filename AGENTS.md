@@ -48,8 +48,11 @@ Swiss events of the real events' structure take the SD from 14.0 to 11.4 and lea
 Swiss comparison became part of mtgsim (`calibrate`, and every meta `matrix` run) and the metric
 for future iterations (above). Probe step A, the driver's decision snapshots (`--snapshots`:
 the deciding player's visible state and Forge's choice at nine kinds of decision), is done and
-merged (23 Nov); the next step is B, a logged run of the planning decks against the creature decks:
-start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
+merged (23 Nov). Step B, a logged run of the planning decks against the creature decks (420 games
+with snapshots, committed packed in `probe/run/`), and step C, 200 cases answered blind by Claude
+subagents (`probe/`, `tools/probe/`; they agree with Forge on 51%, 44–58%), are done. Before step D
+(the user's blind grading of the disagreements), fix the gaps listed in `probe/README.md`, "Fix
+before step D" (token text, cards' chosen types, colours and names, castable lists, Forge's targets and more): start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 

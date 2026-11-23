@@ -23,6 +23,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
 | Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), three times (as the kinds were added), 40 of 40 with and without snapshots; see "Decision snapshots" |
+| Decision probe, steps B and C (23 Nov): 200 blind cases | a Claude subagent's choice and Forge's agree on 51% (44–58%) of cases, 49% (41–56%) of the planning decks' 175; least on spell decisions (main phase 32%, second main 19%), where the answer usually casts more. Which is better is step D's grading; see "Decision probe" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -878,6 +879,43 @@ On the committed calibration table, `calibrate` gives:
 18-deck meta with fourteen patches. A change that does not move the Swiss SD or gap beyond these
 noise ranges has not brought the simulation closer to the real results. The older figures in this
 file are round-robin game rates and stay as they were measured.
+
+## Decision probe: steps B and C (23 November 2026)
+
+**Step B** is the run the cases are sampled from. The seven planning decks each played the six
+creature decks with `--snapshots`, 10 games per pairing at seed 1, one `gauntlet` per planning
+deck. All 420 games finished, and the snapshots hold 19,629 decision lines for both players. The
+run is committed packed in `probe/run/probe-b.tar.xz`. The planning decks' records against the
+creature decks, 60 games each:
+
+| Deck | Win rate |
+|---|---|
+| Four-Color Control | 31.7% |
+| Izzet Spellementals | 31.7% |
+| Azorius Control | 26.7% |
+| Dimir Midrange | 26.7% |
+| Jund Sacrifice | 26.7% |
+| Dimir Uldaros | 18.3% |
+| Dimir Excruciator | 10.0% |
+
+Each figure has an interval of about ±12 points.
+
+**Step C** is 200 close decisions, written as plain-text cases and answered blind by fresh
+Claude subagents. 175 are by the planning decks (25 each) and 25 by the creature decks; all ten
+answers in a batch came from one subagent. `probe/README.md` covers how the cases were sampled
+and written, how the answerers were kept blind, and what was done by hand (C100, C159).
+
+The answers and Forge's choices agree on 102 of 200 cases, 51% (44–58%). For the planning decks
+it is 85 of 175, 49% (41–56%); for the creature decks 17 of 25, 68% (48–83%). Agreement is
+lowest on spell decisions: main phase 19 of 60 (32%), second main 3 of 16. Where they differ on
+spells, the answer casts more than Forge 33 times and fewer 15 times. Combat and mulligan
+decisions agree on 59–71%.
+
+These figures measure difference, not quality: about half of the planning decks' decisions would
+go another way under a model. Whether the other way is better is step D, where the user grades
+the 98 disagreements blind. The gate is set in `docs/ai-pilot-status.md`. Gaps found in the cases and the
+comparison (token text, choices made for cards such as Cavern of Souls' type, castable lists, Forge's targets not recorded) are
+listed in `probe/README.md`, "Fix before step D", to be fixed and the cases re-answered first.
 
 ## The goldfish model
 
