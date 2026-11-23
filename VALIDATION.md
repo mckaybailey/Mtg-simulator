@@ -776,13 +776,28 @@ robin of games. `tools/swiss_check.py runs/rr18-cal` turns each pairing's game r
 best-of-three match rate p²(3 − 2p), plays simulated Swiss events (decks drawn by `meta_share`,
 the 18.7% of the field outside the 18 decks as "other" beaten 50% of the time, paired by record
 without rematches, 200 seasons) and computes each deck's match win rate with mirrors and byes
-left out. The events' real sizes, rounds and cuts could not be checked (magic.gg is unreachable
-from the container), so they are varied. Noise ranges: 100 bootstrap replicates of the games.
+left out. Noise ranges: 100 bootstrap replicates of the games.
+
+The real structure (checked 23 Nov; `--events real`): the article's rates are match win rates
+"excluding mirror matches, byes, and draws" over 1,810 lists from three events. Arena
+Championship 13 had 176 players and nine rounds of modified Swiss, in which a player stops at 7
+wins or 3 losses (magic.gg viewer's guide). Magic Spotlight: Fracture had 775 players in Hartford
+and 865 in Beijing, nine rounds, 18+ match points (6 wins) to day two, six more rounds (melee.gg
+tournaments 440878 and 457663). The top 16 and top 8 playoffs are left out of the simulation.
+"Other" (18.6% of the field) won 45.7% of its matches, so the meta decks beat it about 54–55% of
+the time; the rate against "other" moves every deck equally and changes no metric here (0.50,
+0.543 and 0.553 give the same SD, gap and sign errors).
 
 | Event structure | SD | Mean gap | Spearman | Sign errors | Swiss minus round-robin matches, SD |
 |---|---|---|---|---|---|
 | round robin, games (the calibration) | 14.0 | 11.6 | 0.14 | 8 | |
 | round robin, best-of-three matches | 14.7 | 12.2 | 0.14 | 8 | |
+| **the three real events, "other" at 54.3%** | **11.4 (10.4–12.0)** | **9.3** | **0.11** | **8** | **−3.3 (−3.7 to −2.7)** |
+
+Before the real structure was known, event structures were varied; they give the same reading:
+
+| Event structure | SD | Mean gap | Spearman | Sign errors | Swiss minus round-robin matches, SD |
+|---|---|---|---|---|---|
 | Swiss, 600 players, 12 rounds | 11.2 (10.5–12.2) | 9.1 | 0.14 | 8 | −3.5 (−4.0 to −2.7) |
 | Swiss, 300 players, 8 rounds | 12.2 | 10.0 | 0.11 | 8 | −2.5 (−3.0 to −1.3) |
 | Swiss, 1,800 players, 15 rounds | 10.6 (9.9–11.4) | 8.6 | 0.11 | 8 | −4.1 (−4.7 to −3.4) |
@@ -795,13 +810,14 @@ from the container), so they are varied. Noise ranges: 100 bootstrap replicates 
 robin of matches has SD 18.3 and Swiss 12.8.)
 
 Reading: Swiss pairing is real and in the right direction. Winning decks meet winning decks, and
-it takes 1.8 to 3.4 points of SD off the calibration's 14.0, a quarter to two fifths of the 8
-points of excess. It does not change the ranking (Spearman 0.11–0.14) or the sign errors (7–8 of
-18). Boros Dragons 63.6% (real 45.0), Boros Dwarves 68.3% (50.2), Jund Sacrifice 39.1% (57.6),
-Dimir Uldaros 32.8% (49.2) under the 600 × 12 structure. Pairing explains part of the spread, not
-the ranking: the simulated matchups themselves are wrong. Meta win rates should be reported as a
-simulated Swiss event when they are compared with real ones, which narrows the gap by about 3
-points without any change in play.
+under the real events it takes 2.6 points of SD off the calibration's 14.0 (to 11.4; 3.3 off the
+round robin of matches, the like-for-like comparison), about a third of the 8 points of excess.
+It does not change the ranking (Spearman 0.11) or the sign errors (8 of 18): Boros Dragons 63.9%
+(real 45.0), Boros Dwarves 69.0% (50.2), Jund Sacrifice 38.9% (57.6), Dimir Uldaros 32.7% (49.2).
+Pairing explains part of the spread, not the ranking: the simulated matchups themselves are
+wrong. Meta win rates should be reported as a simulated Swiss event of the real structure when
+they are compared with real ones, which narrows the gap by about 2–3 points without any change in
+play.
 
 ## The goldfish model
 

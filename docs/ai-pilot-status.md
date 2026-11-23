@@ -15,9 +15,11 @@ without a key.
 
 - **Swiss check, done** (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"): the calibration
   was replayed (`runs/rr18-cal`, same metrics) and its pairing table committed
-  (`decks/standard/meta/sim-matchups.json`). Simulated Swiss events take 1.8–3.4 points off the SD
-  of 14.0 (real 6.0) depending on the event structure, and leave the ranking and the 7–8 sign
-  errors unchanged. Pairing is part of the spread, not the ranking.
+  (`decks/standard/meta/sim-matchups.json`). Simulated Swiss events of the three real events'
+  structure (`--events real`, checked on magic.gg and melee.gg on 23 Nov) take the SD from 14.0 to
+  11.4 (real 6.0) and leave the ranking (Spearman 0.11) and the 8 sign errors unchanged; guessed
+  structures gave 1.8–3.4 points. Pairing is part of the spread, not the ranking. The check needs
+  no games: `tools/swiss_check.py decks/standard/meta/sim-matchups.json --events real`.
 - **Probe step 1, first pass from `games.jsonl`** (the driver's misplay fields, 510 games per deck
   in `runs/rr18-cal`): Azorius Control let 1,418 opposing spells resolve with a castable counter in
   hand and cast 1,267 counters; Four-Color Control 546 against 367; Izzet Spellementals 296
