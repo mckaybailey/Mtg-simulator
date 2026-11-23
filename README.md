@@ -156,7 +156,7 @@ are warnings unless you pass `--strict`.
 | `--bo3` | best-of-three matches (`match`, `gauntlet`, `matrix`): `-n` counts matches. Game 1 of each match is exactly the best-of-one game with the same seed; in games 2 and 3 the previous game's loser goes first and both decks sideboard against each other's main deck (Forge's `SideboardAdvisor`: at most 7 swaps, chosen from the cards' text). Win rates count matches (two game wins; three games without one is a draw); the report also shows game-1 and later-game results. About 2.5 games per match |
 | `--no-sideboard` | with `--bo3`: play games 2 and 3 with the main decks |
 | `--save-logs` | keep Forge's full play-by-play log of every game |
-| `--snapshots` | record, in `RUN_DIR/snapshots/` (one JSON-lines file per game), what the deciding player could see at each decision point (counter windows, first and second main phase, attacks, blocks, the opponent's end step, mulligans) and what Forge chose; the games themselves are unchanged. For the decision probe (`docs/ai-pilot-status.md`); the format is in `mtgsim/bridge/AGENTS.md` |
+| `--snapshots` | record, in `RUN_DIR/snapshots/` (one JSON-lines file per game), what the deciding player could see at each decision point (counter windows, upkeep and draw step, first and second main phase, attacks, blocks, the opponent's end step, mulligans) and what Forge chose; the games themselves are unchanged. For the decision probe (`docs/ai-pilot-status.md`); the format is in `mtgsim/bridge/AGENTS.md` |
 
 ### How long it takes
 

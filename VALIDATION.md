@@ -22,7 +22,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
-| Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), twice (before and after the `main2` and `endstep` kinds), 40 of 40 with and without snapshots; see "Decision snapshots" |
+| Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), three times (as the kinds were added), 40 of 40 with and without snapshots; see "Decision snapshots" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -244,6 +244,13 @@ three pairings, 30 games each, were replayed: 90 of 90 identical to the old driv
 errors, nothing unresolved. New lines in those 90 games: Azorius Control vs Boros Dwarves 355
 `main2` and 70 `endstep` (47 in which something was cast), Jund Sacrifice vs Mono-Green Landfall
 282 and 9, Dimir Uldaros vs Orzhov Lifegain 346 and 12; files grew to 67–87 KB a game.
+
+The player's own upkeep (`upkeep`) and draw step (`draw`), when an instant-speed card in hand is
+castable, came next; again 90 of 90 identical, no errors, nothing unresolved. Upkeep / draw lines:
+Azorius Control vs Boros Dwarves 135 / 113 (cast in 22 / 9), Jund Sacrifice vs Mono-Green Landfall
+21 / 16 (4 / 1), Dimir Uldaros vs Orzhov Lifegain 49 / 20 (29 / 8). The draw line is taken when the
+drawn card reaches the hand: in all 147 turns with both lines and nothing cast in upkeep, the draw
+line's hand is one card larger. Files are 69–100 KB a game.
 
 Same Forge patch set as the calibration run; no tracker errors in the worker logs; no decision
 left unresolved. The snapshots agree with the game records: one `main` line per turn a player

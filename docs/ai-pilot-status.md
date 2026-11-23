@@ -13,19 +13,23 @@ what was learned and what to do next.
 gone in a new container and are not needed.
 
 **What the user asked (23 Nov).** Start the decision probe with step A, the driver snapshots; then
-add two more decision kinds (the second main phase and the opponent's end step) before step B,
-because B's run is what step C samples from. Not every step of the turn: untap and draw hold no
-decision, empty lines would dilute the cases, and `--save-logs` already has the play-by-play.
+add four more decision kinds (the second main phase, the opponent's end step, the player's own
+upkeep and draw step) before step B,
+because B's run is what step C samples from. Not every step of the turn: untap holds no decision,
+the other steps are recorded only when something is castable (empty lines would dilute the cases),
+and `--save-logs` already has the play-by-play.
 
 **Step A, driver snapshots: done.** `--snapshots` (any simulating command) writes
 `RUN_DIR/snapshots/<a>__<b>__<game>.jsonl` (`_g2` / `_g3` for later best-of-three games): a header
 line (`type` `game`: decklists and the result), then one line per decision with the deciding
-player's visible state and Forge's choice under `forge`. Seven kinds; the full format is in
+player's visible state and Forge's choice under `forge`. Nine kinds; the full format is in
 `mtgsim/bridge/AGENTS.md`, "Decision snapshots":
 
 | Kind | When | Forge's choice |
 |---|---|---|
 | `mulligan` | each hand decided on | mulligan, or keep and the cards put on the bottom |
+| `upkeep` | own upkeep, if an instant-speed card in hand is castable | what was cast in that step |
+| `draw` | own draw step, once the card is drawn, if an instant-speed card is castable | what was cast in that step |
 | `main` | first main phase, every turn | everything cast from then to cleanup (with the phase), lands, mana left at cleanup |
 | `main2` | second main phase, if a card in hand is castable | what was cast and played in that phase |
 | `attack` | declare attackers, if a creature could attack | the attackers and what they attacked |
@@ -35,10 +39,10 @@ player's visible state and Forge's choice under `forge`. Seven kinds; the full f
 
 Checked (`VALIDATION.md`, "Decision snapshots"): 90 of 90 seed-1 games of three pairings (Azorius
 Control vs Boros Dwarves, Jund Sacrifice vs Mono-Green Landfall, Dimir Uldaros vs Orzhov Lifegain)
-identical to the old driver's games in `runs/rr18-cal`, both before and after `main2` and
-`endstep` were added; 40 of 40 with and without snapshots, record for record; the lines agree with
+identical to the old driver's games in `runs/rr18-cal`, after each addition of kinds; 40 of 40 with and without snapshots, record for record; the lines agree with
 the records (one `main` per turn taken, mulligans, kept hands of seven with as many bottomed as
-mulligans); no tracker errors, nothing unresolved. 67–87 KB a game. Tests: 3 unit tests in
+mulligans; the draw line's hand is one card larger than the upkeep line's, 147 of 147); no tracker
+errors, nothing unresolved. 69–100 KB a game. Tests: 3 unit tests in
 `tests/test_experiment.py` (paths, the `snap=` field only when asked), an integration test on real
 games; the suite is 318 tests.
 
@@ -51,7 +55,9 @@ How the format differs from the plan below, and why:
   on the player's own turn). `main2` repeats the post-combat part as a decision of its own.
 - A `counter` line counts as countered only when the player aimed a counter at that very spell; a
   spell that left the stack another way is `"left the stack"`.
-- `main2` and `endstep` use the tracker's castability check (`castableNow`): free mana sources,
+- The draw step's event comes before the draw, so its line waits for the drawn card to reach the
+  hand.
+- `upkeep`, `draw`, `main2` and `endstep` use the tracker's castability check (`castableNow`): free mana sources,
   restrictions, targets; cost reductions are ignored, so a reduced spell can be missed, never
   wrongly listed.
 
@@ -64,7 +70,8 @@ games, about 5 minutes). Probably a `match` per pairing or a `gauntlet` per plan
   blockers in a case, and give the options in words.
 - `main` and `main2` choices are lists of what was cast, not single picks; a case should offer the
   realistic alternatives (cast X, cast Y, hold) and map Forge's list onto one of them.
-- Close spots: `counter` and `endstep` lines are choices by construction; for `main`, `attack` and
+- Close spots: `counter`, `upkeep`, `draw` and `endstep` lines are choices by construction (though
+  in most of them casting now is plainly worse than waiting: sample them sparingly); for `main`, `attack` and
   `block` prefer lines with more than one castable card or more than one possible attacker.
 
 ## CHECKPOINT 23 Nov 2026, later: Swiss comparison built in; next is probe step A

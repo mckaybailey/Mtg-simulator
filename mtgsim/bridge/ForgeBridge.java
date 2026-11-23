@@ -942,6 +942,9 @@ public final class ForgeBridge {
             if (snaps != null && !started) {
                 guarded(() -> snapPregameMove(event));
             }
+            if (snaps != null && started && pendingDraw >= 0) {
+                guarded(() -> snapDrawn(event));
+            }
             if (!started || event.from() == null || event.to() == null) {
                 return;
             }
@@ -1862,7 +1865,8 @@ public final class ForgeBridge {
         private List<String> snapDecks = Collections.emptyList();
         private final List<Snap> openCounters = new ArrayList<>();
         private final List<Snap> openCombat = new ArrayList<>();
-        private final List<Snap> openSteps = new ArrayList<>(); // "main2" and "endstep" until their step ends
+        private final List<Snap> openSteps = new ArrayList<>(); // "upkeep", "draw", "main2", "endstep" until their step ends
+        private int pendingDraw = -1; // the active seat in its draw step until the step's draw reaches its hand
         private Snap mainSnap = null;
         private int mainTurn = -1;
         private final List<String> mainCasts = new ArrayList<>();
@@ -2073,6 +2077,7 @@ public final class ForgeBridge {
                 }
             }
             openCombat.clear();
+            pendingDraw = -1;
             closeSteps(event.phase());
             if (!started) {
                 return;
@@ -2092,6 +2097,15 @@ public final class ForgeBridge {
                 mainSnap = addSnap("main", active, seat, -1, null, "{}");
             } else if (ph == PhaseType.CLEANUP && turn == mainTurn) {
                 closeMain();
+            } else if (ph == PhaseType.UPKEEP) {
+                // The player's own upkeep: an instant or flash card could be used before the draw.
+                final List<String> castable = castableNames(active, seat, true);
+                if (!castable.isEmpty()) {
+                    openStep("upkeep", active, seat, ph, castable);
+                }
+            } else if (ph == PhaseType.DRAW) {
+                // The step's event comes before the draw; the snapshot waits for the drawn card (snapDrawn).
+                pendingDraw = seat;
             } else if (ph == PhaseType.MAIN2) {
                 // After combat: only when something in hand could be cast now (sorcery timing).
                 final List<String> castable = castableNames(active, seat, false);
@@ -2143,6 +2157,25 @@ public final class ForgeBridge {
                         openCombat.add(addSnap("block", p, ps, -1, null, "{\"attackers\":[" + String.join(",", attackers) + "]}"));
                     }
                 }
+            }
+        }
+
+        /** The draw step's first draw has reached the active player's hand: now they decide with that card. */
+        private void snapDrawn(final GameEventCardChangeZone event) {
+            if (event.from() == null || event.to() == null || event.from().zoneType() != ZoneType.Library
+                    || event.to().zoneType() != ZoneType.Hand || seatOf(event.to().player()) != pendingDraw
+                    || game.getPhaseHandler().getPhase() != PhaseType.DRAW) {
+                return;
+            }
+            final int seat = pendingDraw;
+            pendingDraw = -1;
+            final Player p = playerOfSeat(seat);
+            if (p == null) {
+                return;
+            }
+            final List<String> castable = castableNames(p, seat, true);
+            if (!castable.isEmpty()) {
+                openStep("draw", p, seat, PhaseType.DRAW, castable);
             }
         }
 

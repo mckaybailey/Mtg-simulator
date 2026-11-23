@@ -123,7 +123,7 @@ class ForgeIntegrationTest(unittest.TestCase):
             for d in decisions:
                 self.assertNotIn("hand", d["state"]["opponent"] or {})  # never the opponent's hand
                 self.assertNotIn("unresolved", d["forge"])
-                self.assertNotIn(d["kind"], ("counter", "endstep"))  # these decks hold no counterspells or instants
+                self.assertNotIn(d["kind"], ("counter", "endstep", "upkeep", "draw"))  # no counterspells or instants
                 if d["kind"] == "main2":
                     self.assertTrue(d["context"]["castable"])
                     self.assertLessEqual(set(d["forge"]["cast"]), {"Grizzly Bears", "Raging Goblin"})
