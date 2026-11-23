@@ -40,7 +40,7 @@ Swiss check and the probe (21 Nov), the probe answered by Claude subagents inste
 The Swiss check is done (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"): simulated
 Swiss events of the real events' structure take the SD from 14.0 to 11.4 and leave the ranking unchanged. The probe's next step
 is a driver snapshot of the deciding player's visible state: start from the 23 Nov checkpoint
-("START HERE"), which also says which branch holds this work.
+("START HERE"). All of this work, the AI pilot included, is on `main` (pull requests #2–#7).
 
 ## The AI pilot: what is settled, so it is not repeated
 
@@ -164,10 +164,10 @@ Always pass on the limits with the numbers:
   numbers (with intervals) in its `Measured:` line. A patch without a measurable effect still
   records that it had none. New AI profiles that mtgsim selects by name (for example one found
   by `tune`) are not Forge changes: they go in `mtgsim/profiles/`, under the same rule.
-- Commit to `main` and keep `claude/mtg-deck-simulator-h1pbfa` pointing at the same commit; push
-  both. Commit messages explain why, not just what. Exception: the AI pilot work is on
-  `claude/ai-decision-engine`, not yet merged into `main` (the sessions that wrote it could push
-  only that branch); merge it or open a pull request only when the user asks.
+- Work reaches `main` through pull requests from each session's own branch (cloud sessions can
+  push only the branch they are given); open or merge one only when the user asks. As of 23 Nov
+  2026 everything is merged and `main` is the only long-lived branch. Commit messages explain why,
+  not just what.
 - The cloud container restarts without warning, and stops within about 10 minutes of the
   session going idle; background jobs and `/tmp` go with it (`runs/` usually survives a restart,
   not a new container). Commit after each milestone, start long runs detached from a script that
