@@ -5,7 +5,94 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 17 Nov 2026 (latest): options discussed with the user; decision pending
+## CHECKPOINT 23 Nov 2026 (latest): Swiss check done; next is the decision probe. START HERE
+
+**State of the repository.** The work since 21 Nov is on branch `claude/relaxed-franklin-4vtvog`
+(three commits after `main`'s `c854a18`: the Swiss tool, its results, the real event structure),
+not yet merged into `main`. Merge it or open a pull request only when the user asks. The session
+could push only that branch. `runs/rr18-cal` (the replayed calibration) is not committed. Nothing
+below needs it except re-deriving the audit numbers, and its pairing table is committed.
+
+**What the user decided (21 Nov).** Option 2 of the 17 Nov checkpoint: the Swiss check, then the
+LLM probe, with one change: **no API key.** The probe's decisions are answered by Claude subagents
+spawned in the session, and graded by the user (or a separate grading agent if they prefer).
+Running a model inside live games (option 2's probe step 3) is out of reach without a key and is
+not part of the plan. It comes back only if the probe shows the model clearly beats Forge.
+
+### Done
+
+- **Swiss check** (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"). The calibration was
+  replayed (`runs/rr18-cal`, the same metrics, two games of 4,590 differ) and its pairing table
+  committed (`decks/standard/meta/sim-matchups.json`). The real win rates are match win rates
+  without mirrors, byes and draws (the Magic.gg article; `magic.gg` is reachable, `www.magic.gg`
+  is not). The three real events (176-player Arena Championship 13, play to 7 wins or 3 losses;
+  Spotlight Hartford 775 and Beijing 865, 9 rounds, 6 wins to day two, 15 rounds; `--events
+  real`) take the SD from 14.0 to 11.4 (real 6.0), Spearman 0.14 to 0.11, and leave the 8 sign
+  errors. Pairing is a third of the excess spread, none of the ranking: the matchups are wrong.
+  Rerun without games: `python3 tools/swiss_check.py decks/standard/meta/sim-matchups.json --events real`.
+  Open (not asked for): mtgsim could report meta rates as a simulated Swiss event when it
+  compares them with real ones.
+- **Probe step 1, first pass** from the driver's misplay fields in `runs/rr18-cal/games.jsonl`
+  (510 games per deck). Opposing spells let resolve with a castable counter in hand, against
+  counters cast: Azorius Control 1,418 / 1,267, Four-Color Control 546 / 367, Izzet Spellementals
+  296 / 455, Dimir Midrange 273 / 250. Instant-speed cards held unused through an opponent's turn,
+  per game: Izzet Spellementals 1.84, Dimir Midrange 1.52, Four-Color Control 1.20, Azorius Control
+  1.11, Jund Sacrifice 0.46, Dimir Excruciator 0.46, Dimir Uldaros 0.35. **The two worst sign
+  errors, Jund Sacrifice and Dimir Uldaros, hold almost nothing**, so held answers do not explain
+  them; their cases must be other decisions (attacks and blocks, sacrifice and engine sequencing,
+  mulligans, what to cast).
+
+### Next: the decision probe, in four steps
+
+**A. Driver snapshots** (`mtgsim/bridge/ForgeBridge.java`; read `mtgsim/bridge/AGENTS.md` first).
+The `--save-logs` logs record events, not hands, so there is no way to know what a player held
+at a decision. Add an optional job field (for example `snap=PATH`, plumbed through `runner.Job`
+and a CLI flag such as `--snapshots`) that appends one JSON line per decision point:
+- *Decision points.* (1) An opposing spell is cast while the player holds a castable counter: the
+  misplay code already detects this for `counter.passed`; record whether the spell was then
+  countered. (2) The start of the player's first main phase: what was cast that turn and what
+  mana was left open. (3) Declare attackers and declare blockers: the assignments made. (4) The
+  mulligan decision: hand and keep or mulligan. Kinds (1) and (2) serve the control decks; (2),
+  (3) and (4) serve Jund Sacrifice and Dimir Uldaros.
+- *State, only what the deciding player may know.* Their hand; both battlefields (tapped,
+  counters, power and toughness, attachments, summoning sickness); both graveyards; face-up exile;
+  the stack; life totals; library and hand counts; turn, phase and whose turn; untapped mana
+  sources. Also their own decklist and the opponent's deck name (players know their 75, and day
+  two at the real events had open decklists). Never the opponent's hand or library order.
+- *Forge's choice goes in the same line under a separate key*, so the case and the answer can be
+  split later.
+- *Snapshots must not change games.* Write them from the existing card tracker (it already sees
+  these moments) and keep to its rule in `mtgsim/bridge/AGENTS.md`, "The tracker must not change
+  how games play": read state only, no `MyRandom`, no AI memory, no `setActivatingPlayer`, no
+  `ComputerUtilMana` payment checks (they can roll `MyRandom`); for "untapped mana" reuse the
+  tracker's own free-source count. Check with
+  `tools/compare_games.py` that a run with snapshots is game-for-game identical to one without
+  (same seed), and add unit tests for the new job field beside the existing job-line tests in
+  `tests/test_experiment.py` (`tests/AGENTS.md` first). Editing
+  the Java source makes the next run recompile the bridge (cached by hash).
+
+**B. A logged run.** Planning decks (Azorius Control, Four-Color Control, Izzet Spellementals,
+Dimir Midrange, Jund Sacrifice, Dimir Uldaros, Dimir Excruciator) against the creature decks
+(Boros Dwarves, Boros Dragons, Mono-Green Landfall, Mono-Black Aggro, Orzhov Lifegain, Rakdos
+Lizards), about 10 games per pairing, seed 1, with snapshots. That is 420 games, about 5 minutes.
+
+**C. About 200 cases, answered blind.** Sample them stratified by decision kind and deck, and
+favour close spots (more than one sensible option; skip forced plays). Write each case as plain
+text with the legal options listed. Keep Forge's choice in a separate key file. Give batches of
+about 10 cases to fresh subagents with only the case text and an instruction to answer with a
+choice and a one-line reason; they must not read the repository or know the hypothesis, or which
+player is Forge. Save the answers to a file. It costs plan usage, not API money.
+
+**D. Grading sheet.** For each case, the state and the two choices labelled A and B in random
+order (Forge's and the model's, unnamed), and the user marks A better, B better or equal. A
+page the user fills in is the natural form (an artifact with saved state). Report how often the
+two agree, which is preferred by kind and by deck, with intervals. **Gate:** only if the model is
+preferred clearly (interval excluding 50%) on the planning decks' decisions is the in-game step
+worth discussing with the user (it needs an API key; costs in `docs/stronger-ai.md`, section 4).
+If not, the remaining choice is option 1 of the 17 Nov checkpoint, repositioning mtgsim, whose
+wording the user wants to review before it is committed.
+
+## CHECKPOINT 17 Nov 2026: options discussed with the user; decision pending
 
 **Read this first.** No code or runs changed in this session; it was a discussion with the user
 about where to take the AI pilot after `--mc deep` failed (next section). The facts it rests on are

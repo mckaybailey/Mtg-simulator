@@ -52,7 +52,7 @@ class Calib:
 
     def __init__(self, run, gauntlet="decks/standard/meta/gauntlet.json", game1=False, only=None):
         run = Path(run)
-        summary = json.loads((run / "summary.json").read_text())
+        summary = json.loads((run if run.is_file() else run / "summary.json").read_text())
         field = "pairings_game1" if game1 else "pairings"
         if field not in summary:
             raise SystemExit(f"{run}: summary.json has no {field!r} (--game1 needs a best-of-three matrix run)")
