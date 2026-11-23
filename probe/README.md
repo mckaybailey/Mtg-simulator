@@ -104,6 +104,102 @@ card names that contain commas, names inside notes, and bottom lists joined with
 In 11 `main` cases both cast the same spells. In 7 of them Forge casts after combat and the
 answerer before.
 
-**Agreement says nothing about which choice is better.** That is step D's job, and some answers
-are plainly wrong. For example, C051 and C053 build long lines on abilities they misread. A
-disagreement is a case to grade, not a mistake by either side.
+**Agreement says nothing about which choice is better.** That is step D's job. A disagreement is
+a case to grade, not a mistake by either side. A correction: the first write-up called C051 and
+C053 answers that misread card abilities. They do not. Icetill Explorer lets its controller play
+lands from the graveyard, and Superior Spider-Man copying it gets that too, so both lines are
+legal. What misled was the case's own option text (gap 4 below). No answer has been checked and
+found wrong.
+
+## Fix before step D
+
+These were found after the answers came in. Fixing items 1–5 changes the case text, so the cases
+must be rebuilt and answered again (about 20 subagent runs). They are cheap next to a grading
+pass that would otherwise judge some answers on wrong or missing information.
+
+**Gaps in what the cases show**
+
+1. **Tokens without text.** Eleven token names are shown with power and toughness but no
+   abilities, because Forge has several token scripts under each name:
+   | Token | Cases |
+   |---|---|
+   | Illusion | 11 |
+   | Pest | 11 |
+   | Monk | 8 |
+   | Robot | 6 |
+   | Treefolk | 6 |
+   | Dwarf | 5 |
+   | Bat | 4 |
+   | Spirit | 4 |
+   | Dragon | 3 |
+   | Skeleton Pirate | 3 |
+   | Cadet | 1 |
+
+   C191, for one, turns on the Spirit token's evasion. *Fix:* have the tracker record each
+   token's Oracle text (it is on the card object) in the snapshot's permanent, or failing that
+   pick the token script by name, power/toughness and colour.
+
+2. **The Cavern of Souls type.** The creature type named for Cavern of Souls is not recorded.
+   Cavern is on a battlefield in 53 cases; C040's answerer had to assume Dragon. *Fix:* record a
+   permanent's chosen type (and, while at it, chosen colour, name or player) in the snapshot,
+   and show it in the case.
+
+3. **The castable lists are wrong in both directions.** The `castable` lists behind upkeep,
+   draw, second-main and end-step cases come from the tracker's check (`castableNow`).
+   - It ignores spree mode costs: C177 offers Three Steps Ahead with 1 mana open, though no mode
+     can be paid.
+   - It ignores cost reductions, such as Momo's discount on Dragons or the graveyard reduction
+     on Eddymurk Crab and Hearth Elemental. A reduced spell can be missing from the list.
+
+   *Fix:*
+   - For spree cards, require the base cost plus the cheapest mode.
+   - Add a case line: "Spells may cost less than shown because of cost reductions; the list may
+     omit them."
+   - Or drop the "Castable now" list and let the answerer judge from the hand and the open mana,
+     as `main` already does.
+
+4. **The main-phase option text says "any land from your hand".** In C051 and C053 lands can be
+   played from the graveyard (Icetill Explorer), and the answerers worked that out despite the
+   text. *Fix:* say "any land you may play (one per turn unless an effect allows more)".
+
+5. **No history.** A case shows the board, the graveyards and face-up exile. It does not show
+   what happened earlier: spells the opponent has revealed or cast this turn, cards they hold
+   from a known source, or whether a "crime" or other turn condition has happened. Several
+   answers reason about "the crime trigger" without knowing. *Fix (optional):* add the last few
+   game-log lines, or this turn's spells by both players, from the tracker. If not fixed, note
+   it in the case's header.
+
+6. **Restricted mana.** Opposing "untapped mana available" counts restricted mana (Cavern of
+   Souls, Treasures under Clarion Conqueror) as free. *Fix:* note in the case text that the
+   count includes mana usable only for some spells, or list the untapped sources (they are
+   already listed, so the note is enough).
+
+**The comparison with Forge (`collect.py`)**
+
+7. **Three name misreads, fixed.** The first comparison misread answers in three ways, and the
+   fixed comparison is the one in this README. The misreads were:
+   - card names with commas ("Kaito, Bane of Nightmares") split when the hand was read from the
+     case text (the hand now comes from the key);
+   - names inside notes ("Bitter Triumph (… discarding Restless Reef)") counted as casts (notes
+     in brackets are now ignored);
+   - bottom cards joined with "and" not counted.
+
+   Agreement went from 48% to 51%. *Still to do:* the 102 agreements were not read by hand, only
+   the 98 disagreements. Read them before step D, or have step D show all 200.
+
+8. **Targets are not compared, and cannot be.** Forge's choices in the snapshots list what was
+   cast but not at what (`cast` has `name` and `phase`). 22 agreeing spell cases that cast
+   something may hide a different target. *Fix:* record targets in the snapshot's `cast` entries
+   (the tracker sees the spell ability at cast time). Until then, step D should grade those 22
+   instead of counting them as equal.
+
+9. **Timing is compared loosely.** Forge's `main` choice gives each cast's phase. The answers
+   give it in words, which are parsed for "before" and "after". 7 of 11 same-spell `main` cases
+   differ only in timing. Step D should show both as written and let the grader decide whether
+   timing matters.
+
+The fixes to items 1, 2, 3 and 8 are changes to the driver's tracker
+(`mtgsim/bridge/`). They follow its read-only rule and need the same check as step A: a seeded
+replay that is game-for-game identical to a run without them (`tools/compare_games.py`). After
+that, re-run step B, rebuild the cases, re-answer and re-collect. The step B run here stays as
+the record of this round.

@@ -5,10 +5,11 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 23 Nov 2026, night (latest): probe steps B and C done; next is step D. START HERE
+## CHECKPOINT 23 Nov 2026, night (latest): probe steps B and C done; fix the case gaps, then step D. START HERE
 
-**State of the repository.** Steps B and C are on branch `claude/relaxed-franklin-4vtvog`, in a
-pull request to `main` that the user asked for. The step A work (#10) and everything before it
+**State of the repository.** Steps B and C and the fix list below are in pull request #11, from
+branch `claude/relaxed-franklin-4vtvog` (open, not merged, as of this note). Everything before
+them is on `main`. The step A work (#10) and everything before it
 is merged.
 
 **What the user asked (23 Nov).** Run step B, answer all 200 step C cases with subagents, write
@@ -49,10 +50,28 @@ checkpoint and `VALIDATION.md`, "Decision probe".
 
 Where they differ on spells, the answer casts more than Forge 33 times and fewer 15 times.
 When both cast the same spells, Forge often casts after combat and the answer before (7 of 11).
-Some answers are plainly wrong (C051 and C053 misread abilities), so a disagreement is not a
-Forge mistake until it is graded.
+A disagreement is not a Forge mistake until it is graded. (An earlier version of this note said
+C051 and C053 misread card abilities. They do not: Icetill Explorer allows lands from the
+graveyard, and the case text was what misled.)
 
-**Next: step D, the grading sheet** (plan below):
+**Fix before step D (the user asked, 23 Nov).** `probe/README.md`, "Fix before step D", has the
+detail and a suggested fix for each:
+
+1. Eleven token names shown without abilities (Illusion, Pest, Monk, Robot, Treefolk and others).
+2. The type named for Cavern of Souls not recorded (53 cases).
+3. "Castable now" lists that ignore spree mode costs (C177) and cost reductions.
+4. Main-phase option text that says lands come only from the hand.
+5. No game history in a case.
+6. Restricted mana counted as free.
+7. The three name misreads in the comparison: fixed, but the 102 agreements are not yet read by
+   hand.
+8. Forge's targets not recorded, so 22 agreeing spell cases cannot be checked.
+9. Timing compared loosely.
+
+Items 1, 2, 3 and 8 need the tracker (`mtgsim/bridge/`), checked game for game as in step A.
+Then re-run B, rebuild and re-answer C, and re-collect. Then step D.
+
+**Next, after the fixes above: step D, the grading sheet** (plan below):
 
 - Build a page from `probe/merged.jsonl` that shows each of the 98 disagreeing cases with the
   two choices as A and B in random order, unnamed. The answer's one-line reason must not show:

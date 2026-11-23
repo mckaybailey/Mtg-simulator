@@ -913,7 +913,9 @@ decisions agree on 59–71%.
 
 These figures measure difference, not quality: about half of the planning decks' decisions would
 go another way under a model. Whether the other way is better is step D, where the user grades
-the 98 disagreements blind. The gate is set in `docs/ai-pilot-status.md`.
+the 98 disagreements blind. The gate is set in `docs/ai-pilot-status.md`. Gaps found in the cases and the
+comparison (token text, Cavern of Souls types, castable lists, Forge's targets not recorded) are
+listed in `probe/README.md`, "Fix before step D", to be fixed and the cases re-answered first.
 
 ## The goldfish model
 
