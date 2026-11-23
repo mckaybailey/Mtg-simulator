@@ -46,8 +46,10 @@ Swiss check and the probe (21 Nov), the probe answered by Claude subagents inste
 The Swiss check is done (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"): simulated
 Swiss events of the real events' structure take the SD from 14.0 to 11.4 and leave the ranking unchanged. On 23 Nov the
 Swiss comparison became part of mtgsim (`calibrate`, and every meta `matrix` run) and the metric
-for future iterations (above). The probe's next step is a driver snapshot of the deciding player's
-visible state: start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
+for future iterations (above). Probe step A, the driver's decision snapshots (`--snapshots`:
+the deciding player's visible state and Forge's choice at nine kinds of decision), is done and
+merged (23 Nov); the next step is B, a logged run of the planning decks against the creature decks:
+start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 
@@ -159,7 +161,7 @@ Always pass on the limits with the numbers:
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (314 tests, ~4.5 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (318 tests, ~5 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match

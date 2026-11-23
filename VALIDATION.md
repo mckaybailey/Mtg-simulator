@@ -22,6 +22,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
+| Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), three times (as the kinds were added), 40 of 40 with and without snapshots; see "Decision snapshots" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -223,6 +224,40 @@ the 4-core machine.
 card scripts and the marker file. The unit tests in `tests/test_forge_patches.py` cover the same
 cases on a miniature git repository (plus interrupted applies, a damaged marker, patches that
 create or delete files, and moving to another Forge commit).
+
+## Decision snapshots
+
+`--snapshots` (23 Nov 2026) makes the driver's tracker write one line per decision point with the
+deciding player's visible state and Forge's choice (`mtgsim/bridge/AGENTS.md`). It runs in the
+game thread like the misplay tracking, so it was checked the same way: seed 1, every game compared
+on status, winner, turns, who went first, seats, seed and every player field (misplay fields
+included).
+
+| Pairing (seed 1) | Against the old driver (`runs/rr18-cal`, 30 games) | Snapshot lines (all kinds) |
+|---|---|---|
+| Azorius Control vs Boros Dwarves | 30 of 30 identical; 40 of 40 also identical to a run without snapshots, record for record | 1,225 in 40 games: 739 main, 218 attack, 146 counter, 88 mulligan, 34 block |
+| Jund Sacrifice vs Mono-Green Landfall | 30 of 30 identical | 829: 383 main, 263 attack, 112 block, 71 mulligan |
+| Dimir Uldaros vs Orzhov Lifegain | 30 of 30 identical | 998: 559 main, 257 attack, 91 block, 82 mulligan, 9 counter |
+
+After the second main phase (`main2`) and the opponent's end step (`endstep`) were added, the same
+three pairings, 30 games each, were replayed: 90 of 90 identical to the old driver again, no tracker
+errors, nothing unresolved. New lines in those 90 games: Azorius Control vs Boros Dwarves 355
+`main2` and 70 `endstep` (47 in which something was cast), Jund Sacrifice vs Mono-Green Landfall
+282 and 9, Dimir Uldaros vs Orzhov Lifegain 346 and 12; files grew to 67–87 KB a game.
+
+The player's own upkeep (`upkeep`) and draw step (`draw`), when an instant-speed card in hand is
+castable, came next; again 90 of 90 identical, no errors, nothing unresolved. Upkeep / draw lines:
+Azorius Control vs Boros Dwarves 135 / 113 (cast in 22 / 9), Jund Sacrifice vs Mono-Green Landfall
+21 / 16 (4 / 1), Dimir Uldaros vs Orzhov Lifegain 49 / 20 (29 / 8). The draw line is taken when the
+drawn card reaches the hand: in all 147 turns with both lines and nothing cast in upkeep, the draw
+line's hand is one card larger. Files are 69–100 KB a game.
+
+Same Forge patch set as the calibration run; no tracker errors in the worker logs; no decision
+left unresolved. The snapshots agree with the game records: one `main` line per turn a player
+took (739 of 739), each seat's `mulligan` lines match its recorded mulligans, the kept hand has
+seven cards and as many cards put on the bottom as mulligans taken. Azorius Control's counter
+windows: 61 countered, 85 let resolve, in line with its `counter` fields. About 60 KB of
+snapshots a game before `main2` and `endstep`. The integration test checks the same properties on four games.
 
 ## Misplay tracking
 

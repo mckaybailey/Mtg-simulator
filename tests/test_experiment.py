@@ -69,6 +69,33 @@ class SeedAndPlanTest(unittest.TestCase):
         self.assertTrue(all(Path(j.log_path).is_absolute() for j in jobs))
         self.assertTrue(jobs[1].log_path.endswith("runs/x/logs/games/red__green__0001.log".replace("/", os.sep)))
 
+    def test_snapshots_get_absolute_per_game_paths_and_a_job_field(self):
+        a, b = _entrants()
+        a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
+        jobs = experiment.plan_pairing(a, b, RunOptions(games=2, snapshots=True), Path("runs/x"))
+        self.assertTrue(all(Path(j.snap_path).is_absolute() for j in jobs))
+        self.assertTrue(jobs[1].snap_path.endswith("runs/x/snapshots/red__green__0001.jsonl".replace("/", os.sep)))
+        fields = jobs[1].line().split("\t")
+        self.assertIn(f"snap={jobs[1].snap_path}", fields)
+        self.assertEqual("log=", fields[5])  # snapshots do not need --save-logs
+        self.assertTrue(fields[7].startswith("deck="))
+
+    def test_no_snapshots_leaves_the_job_line_as_it_was(self):
+        a, b = _entrants()
+        job = experiment.plan_pairing(a, b, RunOptions(games=1), Path("/tmp/run"))[0]
+        self.assertEqual("", job.snap_path)
+        self.assertNotIn("snap=", job.line())
+
+    def test_later_match_games_get_their_own_snapshot_file(self):
+        a, b = _entrants()
+        a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
+        previous = {"seats": ["red", "green"], "status": "ok", "winner_seat": 0}
+        options = RunOptions(games=1, match_format="bo3", snapshots=True)
+        job = experiment.plan_match_game(a, b, 0, 2, previous, options, Path("/tmp/run"))
+        self.assertTrue(job.snap_path.endswith("snapshots/red__green__0000_g2.jsonl".replace("/", os.sep)))
+        self.assertEqual("", experiment.plan_match_game(a, b, 0, 2, previous, RunOptions(games=1, match_format="bo3"),
+                                                        Path("/tmp/run")).snap_path)
+
     def test_per_deck_ai_settings_follow_the_deck_to_its_seat(self):
         a, b = _entrants()
         a.dck_path, b.dck_path = "/tmp/a.dck", "/tmp/b.dck"
@@ -158,6 +185,8 @@ class SeedAndPlanTest(unittest.TestCase):
             Job(id="bad\tid", seed=1, decks=["a", "b"]).line()
         with self.assertRaises(ValueError):
             Job(id="x", seed=1, decks=["a\nb", "c"]).line()
+        with self.assertRaises(ValueError):
+            Job(id="x", seed=1, decks=["a", "b"], snap_path="/x/s\tnap.jsonl").line()
 
 
 class ExecuteTest(unittest.TestCase):
