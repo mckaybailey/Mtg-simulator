@@ -39,7 +39,8 @@ mtgsim, a Swiss-pairing check and an LLM probe, or more single-error hunting. Th
 Swiss check and the probe (21 Nov), the probe answered by Claude subagents instead of an API key.
 The Swiss check is done (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"): simulated
 Swiss events of the real events' structure take the SD from 14.0 to 11.4 and leave the ranking unchanged. The probe's next step
-is a driver snapshot of the deciding player's visible state (the 21 Nov checkpoint).
+is a driver snapshot of the deciding player's visible state: start from the 23 Nov checkpoint
+("START HERE"), which also says which branch holds this work.
 
 ## The AI pilot: what is settled, so it is not repeated
 
