@@ -117,6 +117,19 @@ import forge.game.spellability.SpellAbilityRestriction;
 import forge.game.spellability.SpellAbilityStackInstance;
 import forge.game.spellability.TargetRestrictions;
 
+// Used only by the Tracker's decision snapshots (job field snap=PATH).
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import forge.game.GameEntity;
+import forge.game.GameEntityView;
+import forge.game.card.CounterType;
+import forge.game.combat.Combat;
+import forge.game.event.GameEventAttackersDeclared;
+import forge.game.event.GameEventBlockersDeclared;
+import forge.game.event.GameEventMulligan;
+
 public final class ForgeBridge {
     /** Exit code telling the Python runner that the JVM is no longer trustworthy and must be restarted. */
     private static final int EXIT_RESTART = 3;
@@ -230,6 +243,8 @@ public final class ForgeBridge {
         String format = "Constructed";
         String monteCarlo = "off";
         String logPath = "";
+        /** Where to write the decision snapshots (one JSON line each); empty: none are taken. */
+        String snapPath = "";
         final List<String> decks = new ArrayList<>();
         final List<String> profiles = new ArrayList<>();
         final List<String> seatMonteCarlo = new ArrayList<>();
@@ -256,6 +271,7 @@ public final class ForgeBridge {
                     case "format": job.format = value; break;
                     case "mc": job.monteCarlo = value; break;
                     case "log": job.logPath = value; break;
+                    case "snap": job.snapPath = value; break;
                     case "deck": job.decks.add(value); break;
                     case "profile": job.profiles.add(value); break;
                     case "seatmc": job.seatMonteCarlo.add(value); break;
@@ -372,6 +388,13 @@ public final class ForgeBridge {
         }
 
         final Tracker tracker = new Tracker(game, seats);
+        if (!job.snapPath.isEmpty()) {
+            final List<String> names = new ArrayList<>();
+            for (final Deck deck : decks) {
+                names.add(deck.getName());
+            }
+            tracker.enableSnapshots(job.id, names);
+        }
         game.subscribeToEvents(tracker);
 
         final Throwable[] failure = new Throwable[1];
@@ -480,6 +503,22 @@ public final class ForgeBridge {
 
         if (!job.logPath.isEmpty() && !tainted) {
             writeGameLog(game, job.logPath);
+        }
+        if (!job.snapPath.isEmpty() && !tainted) {
+            final StringBuilder head = new StringBuilder("{\"type\":\"game\",\"game\":").append(quote(job.id));
+            head.append(",\"seed\":").append(job.seed).append(",\"status\":").append(quote(status));
+            head.append(",\"winner\":").append(winner).append(",\"first\":").append(tracker.firstSeat);
+            head.append(",\"turns\":").append(tracker.lastTurn).append(",\"seats\":[");
+            for (int i = 0; i < decks.size(); i++) {
+                final Map<String, Integer> main = new TreeMap<>();
+                for (final Map.Entry<PaperCard, Integer> e : decks.get(i).getMain()) {
+                    main.merge(e.getKey().getName(), e.getValue(), Integer::sum);
+                }
+                head.append(i > 0 ? "," : "").append("{\"deck\":").append(quote(decks.get(i).getName()))
+                        .append(",\"main\":").append(countsJson(main)).append('}');
+            }
+            head.append("]}");
+            writeSnapshots(job.snapPath, head.toString(), tracker.snapshotLines());
         }
         return new Result(sb.toString(), tainted);
     }
@@ -677,6 +716,24 @@ public final class ForgeBridge {
         }
     }
 
+    /** The snapshot file of one game: its header line, then one line per decision. A failure is logged, never fatal. */
+    private static void writeSnapshots(final String path, final String head, final List<String> lines) {
+        final File file = new File(path);
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+            w.write(head);
+            w.write('\n');
+            for (final String line : lines) {
+                w.write(line);
+                w.write('\n');
+            }
+        } catch (final Exception e) {
+            System.err.println("mtgsim: could not write snapshots to " + path + ": " + e);
+        }
+    }
+
     private static void writeGameLog(final Game game, final String path) {
         try {
             final List<GameLogEntry> entries = new ArrayList<>(game.getGameLog().getLogEntries(null));
@@ -821,10 +878,19 @@ public final class ForgeBridge {
                 } else if (event instanceof GameEventLandPlayed) {
                     final GameEventLandPlayed lp = (GameEventLandPlayed) event;
                     count(played, seatOf(lp.player()), lp.land());
+                    if (snaps != null) {
+                        guarded(() -> snapLand(seatOf(lp.player()), lp.land()));
+                    }
                 } else if (event instanceof GameEventTurnPhase) {
                     onPhase((GameEventTurnPhase) event);
                 } else if (event instanceof GameEventSpellResolved) {
                     onResolved((GameEventSpellResolved) event);
+                } else if (snaps != null && event instanceof GameEventMulligan) {
+                    onMulligan((GameEventMulligan) event);
+                } else if (snaps != null && event instanceof GameEventAttackersDeclared) {
+                    onAttackersDeclared((GameEventAttackersDeclared) event);
+                } else if (snaps != null && event instanceof GameEventBlockersDeclared) {
+                    onBlockersDeclared((GameEventBlockersDeclared) event);
                 }
             } catch (final Throwable t) {
                 ignored(t);
@@ -849,6 +915,9 @@ public final class ForgeBridge {
 
         private void onTurnBegan(final GameEventTurnBegan event) {
             lastTurn = Math.max(lastTurn, event.turnNumber());
+            if (snaps != null) {
+                guarded(() -> snapTurnBegan(event));
+            }
             // The stack is empty between turns, so a spell still waiting here was countered or removed.
             windows.clear();
             if (started) {
@@ -870,6 +939,9 @@ public final class ForgeBridge {
         }
 
         private void onZoneChange(final GameEventCardChangeZone event) {
+            if (snaps != null && !started) {
+                guarded(() -> snapPregameMove(event));
+            }
             if (!started || event.from() == null || event.to() == null) {
                 return;
             }
@@ -904,10 +976,16 @@ public final class ForgeBridge {
             guarded(() -> recordCounterCast(seat, name, sa));
             guarded(() -> recordRemovalTargets(seat, name, sa, caster));
             guarded(() -> openCounterWindows(sa, caster));
+            if (snaps != null) {
+                guarded(() -> snapCast(seat, name, sa));
+            }
         }
 
         /** Once per turn, when the cleanup step begins: which cards could still have been cast. */
         private void onPhase(final GameEventTurnPhase event) {
+            if (snaps != null) {
+                guarded(() -> snapPhase(event));
+            }
             if (!started || event.phase() != PhaseType.CLEANUP) {
                 return;
             }
@@ -926,6 +1004,9 @@ public final class ForgeBridge {
         }
 
         private void onResolved(final GameEventSpellResolved event) {
+            if (snaps != null && event.spell() != null) {
+                guarded(() -> snapResolved(event.spell().getId(), event.hasFizzled()));
+            }
             if (event.spell() == null || windows.isEmpty()) {
                 return;
             }
@@ -972,6 +1053,9 @@ public final class ForgeBridge {
                 }
             } catch (final Throwable t) {
                 ignored(t);
+            }
+            if (snaps != null) {
+                guarded(this::snapFinish);
             }
             if (errors > 0 || unknownActivator > 0) {
                 System.err.println("mtgsim: tracker: " + errors + " ignored errors, " + unknownActivator
@@ -1151,6 +1235,10 @@ public final class ForgeBridge {
                     } catch (final Throwable t) {
                         ignored(t);
                     }
+                }
+                if (snaps != null && !done.isEmpty()) {
+                    final Set<String> counters = done;
+                    guarded(() -> snapCounterWindow(p, seat, spell, counters));
                 }
             }
         }
@@ -1725,6 +1813,514 @@ public final class ForgeBridge {
         private static String nameOf(final Card card) {
             final IPaperCard paper = card.getPaperCard();
             return paper != null ? paper.getName() : card.getName();
+        }
+
+        // ------------------------------------------------- decision snapshots
+
+        // Optional (job field snap=PATH, enableSnapshots): one JSON line per decision point with what the deciding
+        // player may know at that moment, and Forge's choice under a separate key ("forge"). Kinds: "counter" (an
+        // opposing spell was cast while the player held a castable counter), "main" (the start of the player's first
+        // main phase; the choice is what they cast and played that turn and the mana left at cleanup), "attack",
+        // "block" (the state just before the declaration; only when the player had a creature that could) and
+        // "mulligan" (each hand decided on, keep or mulligan). Like the rest of the tracker it only reads state.
+
+        /** One decision point. The choice stays null until Forge's answer is seen; unresolved ones are closed at the end. */
+        private static final class Snap {
+            final String kind;
+            final int seat;
+            final int spellId; // "counter": the spell on the stack; otherwise -1
+            String body; // the line's fields before "forge", without the braces
+            String choice;
+
+            Snap(final String kind, final int seat, final int spellId) {
+                this.kind = kind;
+                this.seat = seat;
+                this.spellId = spellId;
+            }
+        }
+
+        /** A hand before the first turn: the state when it was complete, how many mulligans came before it. */
+        private static final class HandSnap {
+            final int seat;
+            final String state;
+            final int mulligans;
+            final String choice;
+
+            HandSnap(final int seat, final String state, final int mulligans, final String choice) {
+                this.seat = seat;
+                this.state = state;
+                this.mulligans = mulligans;
+                this.choice = choice;
+            }
+        }
+
+        private List<Snap> snaps = null; // null: snapshots are off
+        private String snapGame = "";
+        private List<String> snapDecks = Collections.emptyList();
+        private final List<Snap> openCounters = new ArrayList<>();
+        private final List<Snap> openCombat = new ArrayList<>();
+        private Snap mainSnap = null;
+        private int mainTurn = -1;
+        private final List<String> mainCasts = new ArrayList<>();
+        private final List<String> mainLands = new ArrayList<>();
+        // Before the first turn: the state each time a card reaches a hand (the last one is the whole hand), frozen
+        // when cards start going back to the library (a mulligan, or London's bottoming after a keep).
+        private String[] handState;
+        private String[] leavingState;
+        private String[] mulliganedState; // a hand that went back and was replaced by a new draw: a mulligan
+        private List<List<String>> leaving;
+        private int[] mulligansSoFar;
+        private final List<HandSnap> handSnaps = new ArrayList<>();
+
+        void enableSnapshots(final String gameId, final List<String> deckNames) {
+            final int n = deckNames.size();
+            snaps = new ArrayList<>();
+            snapGame = gameId;
+            snapDecks = new ArrayList<>(deckNames);
+            handState = new String[n];
+            leavingState = new String[n];
+            mulliganedState = new String[n];
+            leaving = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                leaving.add(new ArrayList<>());
+            }
+            mulligansSoFar = new int[n];
+        }
+
+        /** The snapshot lines, in the order the decisions came up; call after finish(). */
+        List<String> snapshotLines() {
+            final List<String> out = new ArrayList<>();
+            if (snaps == null) {
+                return out;
+            }
+            for (final Snap s : snaps) {
+                if (s.body != null) {
+                    out.add("{" + s.body + ",\"forge\":" + (s.choice == null ? "{\"unresolved\":true}" : s.choice) + "}");
+                }
+            }
+            return out;
+        }
+
+        private Snap addSnap(final String kind, final Player p, final int seat, final int spellId, final String state,
+                             final String context) {
+            final Snap s = new Snap(kind, seat, spellId);
+            final String opponentDeck = seat == 0 && snapDecks.size() > 1 ? snapDecks.get(1)
+                    : seat > 0 ? snapDecks.get(0) : null;
+            s.body = "\"type\":\"decision\",\"game\":" + quote(snapGame) + ",\"n\":" + snaps.size()
+                    + ",\"kind\":" + quote(kind) + ",\"seat\":" + seat
+                    + ",\"deck\":" + quote(seat < snapDecks.size() ? snapDecks.get(seat) : null)
+                    + ",\"opponentDeck\":" + quote(opponentDeck)
+                    + ",\"state\":" + (state != null ? state : stateJson(p)) + ",\"context\":" + context;
+            snaps.add(s);
+            return s;
+        }
+
+        private void snapTurnBegan(final GameEventTurnBegan event) {
+            for (final Snap s : openCounters) {
+                if (s.choice == null) {
+                    s.choice = "{\"action\":\"pass\",\"result\":\"left the stack\"}";
+                }
+            }
+            openCounters.clear();
+            if (!started) {
+                flushHands(seatOf(event.turnOwner()));
+            }
+        }
+
+        /** The hands decided on before the first turn, in order, now that it is known who plays first. */
+        private void flushHands(final int first) {
+            for (int seat = 0; seat < handState.length; seat++) {
+                final boolean bottoming = leavingState[seat] != null;
+                final String state = bottoming ? leavingState[seat] : handState[seat];
+                if (state != null) {
+                    handSnaps.add(new HandSnap(seat, state, mulligansSoFar[seat],
+                            "{\"action\":\"keep\",\"bottom\":" + namesJson(bottoming ? leaving.get(seat) : new ArrayList<>()) + "}"));
+                }
+            }
+            for (final HandSnap h : handSnaps) {
+                final String context = "{\"mulligansSoFar\":" + h.mulligans + ",\"onThePlay\":"
+                        + (first < 0 ? "null" : String.valueOf(first == h.seat)) + "}";
+                addSnap("mulligan", null, h.seat, -1, h.state, context).choice = h.choice;
+            }
+            handSnaps.clear();
+        }
+
+        private void snapPregameMove(final GameEventCardChangeZone event) {
+            if (event.from() == null || event.to() == null) {
+                return;
+            }
+            final ZoneType from = event.from().zoneType();
+            final ZoneType to = event.to().zoneType();
+            if (from == ZoneType.Library && to == ZoneType.Hand) {
+                final int seat = seatOf(event.to().player());
+                final Player p = playerOfSeat(seat);
+                if (p != null) {
+                    if (leavingState[seat] != null) {
+                        mulliganedState[seat] = leavingState[seat];
+                    }
+                    leavingState[seat] = null;
+                    leaving.get(seat).clear();
+                    handState[seat] = stateJson(p);
+                }
+            } else if (from == ZoneType.Hand && to == ZoneType.Library) {
+                final int seat = seatOf(event.from().player());
+                if (seat < 0) {
+                    return;
+                }
+                if (leavingState[seat] == null) {
+                    leavingState[seat] = handState[seat];
+                }
+                final Card c = event.card() == null ? null : game.findById(event.card().getId());
+                leaving.get(seat).add(c != null ? nameOf(c) : event.card() == null ? "?" : event.card().getName());
+            }
+        }
+
+        private void onMulligan(final GameEventMulligan event) {
+            final int seat = seatOf(event.player());
+            if (seat < 0 || started) {
+                return;
+            }
+            // The new hand is already drawn; the decision was on the one frozen when it went back.
+            if (mulliganedState[seat] != null) {
+                handSnaps.add(new HandSnap(seat, mulliganedState[seat], mulligansSoFar[seat], "{\"action\":\"mulligan\"}"));
+            }
+            mulliganedState[seat] = null;
+            mulligansSoFar[seat]++;
+        }
+
+        private void snapCounterWindow(final Player p, final int seat, final SpellAbility spell, final Set<String> counters) {
+            final Card host = spell.getHostCard();
+            final String spellName = host.isFaceDown() ? "face-down spell" : nameOf(host);
+            final String context = "{\"spell\":{\"id\":" + host.getId() + ",\"name\":" + quote(spellName)
+                    + ",\"manaValue\":" + host.getCMC() + ",\"caster\":\"opponent\"},\"castableCounters\":"
+                    + namesJson(new ArrayList<>(counters)) + "}";
+            openCounters.add(addSnap("counter", p, seat, spell.getId(), null, context));
+        }
+
+        private void snapCast(final int seat, final String name, final SpellAbility sa) {
+            if (mainSnap != null && mainSnap.choice == null && seat == mainSnap.seat
+                    && game.getPhaseHandler().getTurn() == mainTurn) {
+                final PhaseType ph = game.getPhaseHandler().getPhase();
+                mainCasts.add("{\"name\":" + quote(name) + ",\"phase\":" + quote(ph == null ? null : ph.name()) + "}");
+            }
+            if (openCounters.isEmpty()) {
+                return;
+            }
+            for (final SpellAbility s : chainOf(sa)) {
+                if (s.getApi() != ApiType.Counter || s.getTargets() == null) {
+                    continue;
+                }
+                for (final SpellAbility t : s.getTargets().getTargetSpells()) {
+                    for (int i = openCounters.size() - 1; i >= 0; i--) {
+                        final Snap w = openCounters.get(i);
+                        if (w.seat == seat && w.spellId == t.getId()) {
+                            w.choice = "{\"action\":\"counter\",\"with\":" + quote(name) + "}";
+                            openCounters.remove(i);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void snapLand(final int seat, final CardView land) {
+            if (mainSnap != null && mainSnap.choice == null && seat == mainSnap.seat && land != null
+                    && game.getPhaseHandler().getTurn() == mainTurn) {
+                final Card c = game.findById(land.getId());
+                mainLands.add(c != null ? nameOf(c) : land.getName());
+            }
+        }
+
+        private void snapResolved(final int spellId, final boolean fizzled) {
+            for (int i = openCounters.size() - 1; i >= 0; i--) {
+                final Snap w = openCounters.get(i);
+                if (w.spellId == spellId) {
+                    w.choice = "{\"action\":\"pass\",\"result\":" + quote(fizzled ? "fizzled" : "resolved") + "}";
+                    openCounters.remove(i);
+                }
+            }
+        }
+
+        private void closeMain() {
+            if (mainSnap == null || mainSnap.choice != null) {
+                return;
+            }
+            final Player p = playerOfSeat(mainSnap.seat);
+            mainSnap.choice = "{\"cast\":[" + String.join(",", mainCasts) + "],\"lands\":" + namesJson(mainLands)
+                    + ",\"manaOpenAtCleanup\":" + (p == null ? "null" : String.valueOf(manaUnits(p).size())) + "}";
+        }
+
+        private void snapPhase(final GameEventTurnPhase event) {
+            // A declaration that produced no event (nobody attacked or blocked) has passed by the next step.
+            for (final Snap s : openCombat) {
+                if (s.choice == null) {
+                    s.choice = "attack".equals(s.kind) ? "{\"attackers\":[]}" : "{\"blocks\":[]}";
+                }
+            }
+            openCombat.clear();
+            if (!started) {
+                return;
+            }
+            final PhaseType ph = event.phase();
+            final Player active = game.getPhaseHandler().getPlayerTurn();
+            final int seat = seatOfPlayer(active);
+            final int turn = game.getPhaseHandler().getTurn();
+            if (seat < 0 || ph == null) {
+                return;
+            }
+            if (ph == PhaseType.MAIN1 && turn != mainTurn) {
+                closeMain();
+                mainTurn = turn;
+                mainCasts.clear();
+                mainLands.clear();
+                mainSnap = addSnap("main", active, seat, -1, null, "{}");
+            } else if (ph == PhaseType.CLEANUP && turn == mainTurn) {
+                closeMain();
+            } else if (ph == PhaseType.COMBAT_DECLARE_ATTACKERS) {
+                final List<String> ids = new ArrayList<>();
+                for (final Card c : active.getCardsIn(ZoneType.Battlefield)) {
+                    if (c.isCreature() && !c.isPhasedOut() && !c.isTapped() && !c.isSick() && !c.hasKeyword(Keyword.DEFENDER)) {
+                        ids.add(String.valueOf(c.getId()));
+                    }
+                }
+                if (!ids.isEmpty()) {
+                    openCombat.add(addSnap("attack", active, seat, -1, null, "{\"canAttack\":[" + String.join(",", ids) + "]}"));
+                }
+            } else if (ph == PhaseType.COMBAT_DECLARE_BLOCKERS) {
+                final Combat combat = game.getPhaseHandler().getCombat();
+                if (combat == null) {
+                    return;
+                }
+                for (final Player p : game.getRegisteredPlayers()) {
+                    final int ps = seatOfPlayer(p);
+                    if (ps < 0 || p == active || !p.isInGame() || !hasUntappedCreature(p)) {
+                        continue;
+                    }
+                    final List<String> attackers = new ArrayList<>();
+                    for (final Card a : combat.getAttackers()) {
+                        final GameEntity d = combat.getDefenderByAttacker(a);
+                        final String at = d == p ? "you" : d instanceof Card && ((Card) d).getController() == p
+                                ? nameOf((Card) d) : null;
+                        if (at != null) {
+                            attackers.add("{\"id\":" + a.getId() + ",\"name\":" + quote(nameOf(a)) + ",\"attacking\":" + quote(at) + "}");
+                        }
+                    }
+                    if (!attackers.isEmpty()) {
+                        openCombat.add(addSnap("block", p, ps, -1, null, "{\"attackers\":[" + String.join(",", attackers) + "]}"));
+                    }
+                }
+            }
+        }
+
+        private static boolean hasUntappedCreature(final Player p) {
+            for (final Card c : p.getCardsIn(ZoneType.Battlefield)) {
+                if (c.isCreature() && !c.isPhasedOut() && !c.isTapped()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Snap openCombatSnap(final String kind, final int seat) {
+            for (final Snap s : openCombat) {
+                if (s.kind.equals(kind) && s.seat == seat && s.choice == null) {
+                    return s;
+                }
+            }
+            return null;
+        }
+
+        private void onAttackersDeclared(final GameEventAttackersDeclared event) {
+            final Snap s = openCombatSnap("attack", seatOf(event.player()));
+            if (s == null || event.attackersMap() == null) {
+                return;
+            }
+            final Map<Integer, String> out = new TreeMap<>();
+            for (final Map.Entry<GameEntityView, CardView> e : event.attackersMap().entries()) {
+                final GameEntityView d = e.getKey();
+                String target = "opponent";
+                if (d instanceof CardView) {
+                    final Card c = game.findById(d.getId());
+                    target = c != null ? nameOf(c) : ((CardView) d).getName();
+                }
+                final Card a = game.findById(e.getValue().getId());
+                out.put(e.getValue().getId(), "{\"id\":" + e.getValue().getId() + ",\"name\":"
+                        + quote(a != null ? nameOf(a) : e.getValue().getName()) + ",\"attacking\":" + quote(target) + "}");
+            }
+            s.choice = "{\"attackers\":[" + String.join(",", out.values()) + "]}";
+        }
+
+        private void onBlockersDeclared(final GameEventBlockersDeclared event) {
+            final Snap s = openCombatSnap("block", seatOf(event.defendingPlayer()));
+            if (s == null || event.blockers() == null) {
+                return;
+            }
+            final Map<String, String> out = new TreeMap<>();
+            for (final Multimap<CardView, CardView> byAttacker : event.blockers().values()) {
+                for (final Map.Entry<CardView, CardView> e : byAttacker.entries()) {
+                    final int attacker = e.getKey().getId();
+                    final int blocker = e.getValue().getId();
+                    if (attacker == blocker) {
+                        continue; // Forge lists an unblocked attacker as blocking itself
+                    }
+                    final Card b = game.findById(blocker);
+                    out.put(String.format("%09d-%09d", blocker, attacker), "{\"blocker\":" + blocker + ",\"name\":"
+                            + quote(b != null ? nameOf(b) : e.getValue().getName()) + ",\"attacker\":" + attacker + "}");
+                }
+            }
+            s.choice = "{\"blocks\":[" + String.join(",", out.values()) + "]}";
+        }
+
+        /** At the end of the game (driver thread): hands never followed by a first turn, and the open main phase. */
+        private void snapFinish() {
+            if (!started) {
+                flushHands(-1);
+            }
+            closeMain();
+            for (final Snap s : snaps) {
+                if (s.choice == null) {
+                    s.choice = "{\"unresolved\":\"game ended\"}";
+                }
+            }
+        }
+
+        private Player playerOfSeat(final int seat) {
+            if (seat < 0) {
+                return null;
+            }
+            for (final Player p : game.getRegisteredPlayers()) {
+                if (seatOfPlayer(p) == seat) {
+                    return p;
+                }
+            }
+            return null;
+        }
+
+        /** What player p may know: own hand, both battlefields, graveyards, face-up exile, the stack, counts. */
+        private String stateJson(final Player me) {
+            Player opp = null;
+            for (final Player p : game.getRegisteredPlayers()) {
+                if (p != me && seatOfPlayer(p) >= 0) {
+                    opp = p;
+                    break;
+                }
+            }
+            final PhaseType ph = game.getPhaseHandler().getPhase();
+            final Player active = game.getPhaseHandler().getPlayerTurn();
+            final StringBuilder sb = new StringBuilder(1024);
+            sb.append("{\"turn\":").append(game.getPhaseHandler().getTurn());
+            sb.append(",\"phase\":").append(quote(ph == null ? null : ph.name()));
+            sb.append(",\"activePlayer\":").append(active == null ? "null" : quote(active == me ? "you" : "opponent"));
+            sb.append(",\"you\":").append(playerJson(me, me, true));
+            sb.append(",\"opponent\":").append(opp == null ? "null" : playerJson(opp, me, false));
+            sb.append(",\"stack\":[");
+            boolean first = true;
+            for (final SpellAbilityStackInstance si : game.getStack()) {
+                final SpellAbility sa = si.getSpellAbility();
+                final Card src = si.getSourceCard();
+                final boolean mine = si.getActivatingPlayer() == me;
+                sb.append(first ? "" : ",").append("{\"name\":")
+                        .append(quote(src == null ? null : src.isFaceDown() && !mine ? "face-down spell" : nameOf(src)));
+                sb.append(",\"controller\":").append(quote(mine ? "you" : "opponent"));
+                sb.append(",\"kind\":").append(quote(sa == null ? null : sa.isSpell() ? "spell" : sa.isTrigger() ? "trigger" : "ability"));
+                final List<String> targets = new ArrayList<>();
+                if (sa != null && sa.getTargets() != null) {
+                    for (final Card t : sa.getTargets().getTargetCards()) {
+                        targets.add(t.isFaceDown() && t.getController() != me ? "face-down card" : nameOf(t) + " (" + t.getId() + ")");
+                    }
+                    for (final SpellAbility t : sa.getTargets().getTargetSpells()) {
+                        targets.add(t.getHostCard() == null ? "a spell" : "spell " + nameOf(t.getHostCard()));
+                    }
+                    for (final Player t : sa.getTargets().getTargetPlayers()) {
+                        targets.add(t == me ? "you" : "opponent");
+                    }
+                }
+                sb.append(",\"targets\":").append(namesJson(targets)).append('}');
+                first = false;
+            }
+            return sb.append("]}").toString();
+        }
+
+        private String playerJson(final Player p, final Player viewer, final boolean own) {
+            final StringBuilder sb = new StringBuilder(512);
+            sb.append("{\"life\":").append(p.getLife());
+            if (p.getPoisonCounters() > 0) {
+                sb.append(",\"poison\":").append(p.getPoisonCounters());
+            }
+            if (own) {
+                final List<String> hand = new ArrayList<>();
+                for (final Card c : p.getCardsIn(ZoneType.Hand)) {
+                    hand.add(nameOf(c));
+                }
+                Collections.sort(hand);
+                sb.append(",\"hand\":").append(namesJson(hand));
+            }
+            sb.append(",\"handCount\":").append(p.getCardsIn(ZoneType.Hand).size());
+            sb.append(",\"library\":").append(p.getCardsIn(ZoneType.Library).size());
+            sb.append(",\"landsPlayedThisTurn\":").append(p.getLandsPlayedThisTurn());
+            sb.append(",\"manaOpen\":").append(manaUnits(p).size());
+            sb.append(",\"battlefield\":[");
+            boolean first = true;
+            for (final Card c : p.getCardsIn(ZoneType.Battlefield)) {
+                if (c.isPhasedOut()) {
+                    continue;
+                }
+                sb.append(first ? "" : ",").append(permanentJson(c, viewer));
+                first = false;
+            }
+            final List<String> graveyard = new ArrayList<>();
+            for (final Card c : p.getCardsIn(ZoneType.Graveyard)) {
+                graveyard.add(nameOf(c));
+            }
+            final List<String> exile = new ArrayList<>();
+            for (final Card c : p.getCardsIn(ZoneType.Exile)) {
+                if (!c.isFaceDown()) {
+                    exile.add(nameOf(c));
+                }
+            }
+            sb.append("],\"graveyard\":").append(namesJson(graveyard));
+            sb.append(",\"exile\":").append(namesJson(exile));
+            return sb.append('}').toString();
+        }
+
+        private static String permanentJson(final Card c, final Player viewer) {
+            final boolean hidden = c.isFaceDown() && c.getController() != viewer;
+            final StringBuilder sb = new StringBuilder(128);
+            sb.append("{\"id\":").append(c.getId());
+            sb.append(",\"name\":").append(quote(hidden ? "face-down permanent" : nameOf(c)));
+            sb.append(",\"types\":").append(quote(String.valueOf(c.getType())));
+            sb.append(",\"tapped\":").append(c.isTapped());
+            if (c.isCreature()) {
+                sb.append(",\"power\":").append(c.getNetPower()).append(",\"toughness\":").append(c.getNetToughness());
+                if (c.getDamage() > 0) {
+                    sb.append(",\"damage\":").append(c.getDamage());
+                }
+                if (c.isSick()) {
+                    sb.append(",\"sick\":true");
+                }
+            }
+            final Multiset<CounterType> counters = c.getCounters();
+            if (counters != null && !counters.isEmpty()) {
+                final Map<String, Integer> named = new TreeMap<>();
+                for (final Multiset.Entry<CounterType> e : counters.entrySet()) {
+                    named.merge(String.valueOf(e.getElement()), e.getCount(), Integer::sum);
+                }
+                sb.append(",\"counters\":").append(countsJson(named));
+            }
+            if (c.getAttachedTo() != null) {
+                sb.append(",\"attachedTo\":").append(c.getAttachedTo().getId());
+            }
+            if (c.isToken()) {
+                sb.append(",\"token\":true");
+            }
+            return sb.append('}').toString();
+        }
+
+        private static String namesJson(final List<String> names) {
+            final StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < names.size(); i++) {
+                sb.append(i > 0 ? "," : "").append(quote(names.get(i)));
+            }
+            return sb.append(']').toString();
         }
 
         // ------------------------------------------------------------- JSON

@@ -22,6 +22,8 @@ recompile on the next run. Forge is GPL-3.0 and this driver links against it.
   sideboard before the game, see below; needs exactly two decks), `planonly=1` (with
   `sideboard=1`: report the swaps and play nothing, status `plan`; used by
   `tools/sideboard_plans.py`).
+  `snap=PATH` (optional, only sent with `--snapshots`) writes the game's decision snapshots to
+  PATH, see below; without it no snapshot code runs.
   Values may not contain tabs or newlines (`runner.Job.line` enforces it).
 - One result line per job: `status` (`ok|timeout|error`), `winner` and `first` (seat index or
   -1), `turns`, `endReason`, `ms`, `restart`, and per player `mainCount`, `mulligans`, `turns`,
@@ -64,6 +66,39 @@ damage, destroy against indestructible, numbers only; other effects count every 
 capped at 1. Creatures are valued with `ComputerUtilCard.evaluateCreature`, other permanents by
 mana value + 1. A cast's quality is the mean over its harmful effects; an effect that hit only
 the caster's own permanents counts as 0. `POOR_TARGET` (2/3) must match `misplay.POOR_TARGET`.
+
+### Decision snapshots (`snap=PATH`; read by the decision probe, `docs/ai-pilot-status.md`)
+
+One JSON-lines file per game, written by the driver thread after the game (not for a game whose
+thread would not stop). Line 1 is `{"type":"game"}` with `game` (job id), `seed`, `status`,
+`winner`, `first`, `turns` and `seats` (`deck` name and `main` decklist per seat): the result is
+there for analysis and must not reach whoever answers a case. Every other line is one decision:
+`type` `decision`, `game`, `n` (order), `kind`, `seat`, `deck`, `opponentDeck`, `state`, `context`
+and Forge's choice under `forge`.
+
+| `kind` | Taken when | `context` | `forge` |
+|---|---|---|---|
+| `counter` | an opponent casts a spell while the player holds a counter that is castable (as in `counter.passed`) and could target it | `spell` (`id`, `name`, `manaValue`), `castableCounters` | `{"action":"counter","with":NAME}` if the player cast a counter at that spell, else `{"action":"pass","result":"resolved"\|"fizzled"\|"left the stack"}` |
+| `main` | the active player's first main phase begins (once a turn) | `{}` | `cast` (spells the player cast from then to cleanup, `name` and `phase`), `lands` played, `manaOpenAtCleanup` (free mana units, as below) |
+| `attack` | the declare-attackers step begins and the active player has an untapped creature without summoning sickness or defender | `canAttack` (ids) | `attackers` (`id`, `name`, `attacking`: `opponent` or a planeswalker's name), sorted by id; `[]` when no one attacked |
+| `block` | the declare-blockers step begins and the player is attacked (or their planeswalker is) and has an untapped creature | `attackers` (`id`, `name`, `attacking`: `you` or the planeswalker) | `blocks` (`blocker`, `name`, `attacker`); `[]` for no blocks |
+| `mulligan` | each hand decided on before the first turn | `mulligansSoFar`, `onThePlay` | `{"action":"mulligan"}`, or `{"action":"keep","bottom":[names]}` (London: the cards put on the bottom) |
+
+`state` holds only what the deciding player may know: `turn`, `phase`, `activePlayer` (`you` /
+`opponent`), `you` and `opponent` (`life`, `poison` when above 0, `hand` for `you` only (sorted
+names), `handCount`, `library` count, `landsPlayedThisTurn`, `manaOpen` = the tracker's free mana
+units (`manaUnits`, see "Castable"), `battlefield`, `graveyard`, face-up `exile`), and `stack`
+(`name`, `controller`, `kind` spell / ability / trigger, `targets`). A permanent: `id`, `name`,
+`types`, `tapped`, for creatures `power`, `toughness`, `damage` and `sick` (when present),
+`counters`, `attachedTo` (an id), `token`. Opposing face-down cards are shown as face-down, never
+named; the opponent's hand and library order never appear. A mulligan's state is the one taken
+when the last card of that hand was drawn (the mulligan event fires only after the new hand is
+drawn). A decision still open when the game ends gets `{"unresolved":"game ended"}`.
+
+Snapshots are taken from the tracker's handlers and obey its rules below (read only). Checked
+23 Nov 2026: 90 seed-1 games of three pairings with snapshots are identical to the same games
+played by the driver before snapshots existed, and 40 games with and without them agree record for
+record (`VALIDATION.md`, "Decision snapshots").
 
 ## Behaviour that matters
 

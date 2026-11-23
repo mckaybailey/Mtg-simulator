@@ -46,6 +46,9 @@ class Job:
     game_format: str = "Constructed"
     monte_carlo: str = "off"  # one of MONTE_CARLO_MODES, for every seat
     log_path: str = ""
+    # Decision snapshots (ForgeBridge "snap="): one JSON line per decision point with what the deciding player may
+    # know and Forge's choice. Empty: none, and the job line is what it always was.
+    snap_path: str = ""
     profiles: List[str] = field(default_factory=list)
     seat_monte_carlo: List[str] = field(default_factory=list)  # per seat; "" follows ``monte_carlo``
     # Games after the first of a best-of-three match (experiment.plan_match_game): seat 0 starts, and both seats
@@ -69,6 +72,8 @@ class Job:
             f"id={self.id}", f"seed={self.seed}", f"timeout={self.timeout}",
             f"format={self.game_format}", f"mc={self.monte_carlo}", f"log={self.log_path}",
         ]
+        if self.snap_path:
+            parts.append(f"snap={self.snap_path}")
         parts += [f"deck={d}" for d in self.decks]
         parts += [f"profile={p}" for p in self.profiles]
         if any(self.seat_monte_carlo):

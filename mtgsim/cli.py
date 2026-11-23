@@ -271,6 +271,7 @@ def _options(args: argparse.Namespace) -> RunOptions:
         # without --timeout, games with a "fixed" Monte Carlo seat get the longer limit (see runner.FIXED_TIMEOUT)
         timeout=args.timeout or DEFAULT_TIMEOUT, fixed_timeout=args.timeout or FIXED_TIMEOUT, workers=args.workers,
         heap=args.heap, monte_carlo=args.mc or "off", ai_profile=args.ai_profile or "", save_logs=args.save_logs,
+        snapshots=getattr(args, "snapshots", False),
         force_profile=bool(args.ai_profile), force_monte_carlo=args.mc is not None,
     )
 
@@ -955,6 +956,9 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
                         "rollouts and does; deep is fixed with a larger budget (several times slower again)")
     p.add_argument("--heap", default="2g", help="Java heap per worker (default 2g)")
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")
+    p.add_argument("--snapshots", action="store_true",
+                   help="record each player's visible state at decision points (counter windows, first main phase, "
+                        "attacks, blocks, mulligans) with Forge's choice, in RUN_DIR/snapshots/; games are unchanged")
 
 
 def _add_match_format(p: argparse.ArgumentParser) -> None:

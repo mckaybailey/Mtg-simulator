@@ -7,6 +7,7 @@ A run lives in its own directory::
     decks/        the exact .dck files handed to Forge
     ai/           the AI profiles Forge loads for this run (see ai_profiles.py)
     logs/         worker output, and per-game logs when --save-logs is used
+    snapshots/    one JSON-lines file per game of decision snapshots when --snapshots is used
     summary.json  the analysed results (written by the commands, see analysis.py)
     report.html   the human-readable report
 """
@@ -82,6 +83,7 @@ class RunOptions:
     force_profile: bool = False
     force_monte_carlo: bool = False
     save_logs: bool = False
+    snapshots: bool = False  # --snapshots: decision snapshots of every game (runner.Job.snap_path)
     # "bo1": every game is its own match. "bo3": ``games`` matches per pairing, each played to two game wins
     # (see execute_matches); ``sideboard`` lets both decks sideboard before games 2 and 3.
     match_format: str = "bo1"
@@ -144,6 +146,8 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
         if options.save_logs:
             # absolute: the Forge JVMs run in Forge's own folder, where a relative path would land
             log_path = str(Path(run_dir).resolve() / "logs" / "games" / f"{a.key}__{b.key}__{i:04d}.log")
+        snap_path = str(Path(run_dir).resolve() / "snapshots" / f"{a.key}__{b.key}__{i:04d}.jsonl") \
+            if options.snapshots else ""
         job = Job(
             id=job_id,
             seed=game_seed(options.seed, a.deck, b.deck, i),
@@ -151,6 +155,7 @@ def plan_pairing(a: Entrant, b: Entrant, options: RunOptions, run_dir: Path) -> 
             timeout=options.timeout,
             monte_carlo=options.monte_carlo,
             log_path=log_path,
+            snap_path=snap_path,
             profiles=_seat_profiles(seats, options),
             seat_monte_carlo=[] if options.force_monte_carlo else [s.ai_mc for s in seats],
             meta={"a": a.key, "b": b.key, "game": i, "seats": [s.key for s in seats]},
@@ -199,6 +204,8 @@ def plan_match_game(a: Entrant, b: Entrant, match: int, number: int, previous: d
     log_path = ""
     if options.save_logs:
         log_path = str(Path(run_dir).resolve() / "logs" / "games" / f"{a.key}__{b.key}__{match:04d}_g{number}.log")
+    snap_path = str(Path(run_dir).resolve() / "snapshots" / f"{a.key}__{b.key}__{match:04d}_g{number}.jsonl") \
+        if options.snapshots else ""
     job = Job(
         id=f"{a.key}|{b.key}|{match}|g{number}",
         seed=match_game_seed(options.seed, a.deck, b.deck, match, number),
@@ -206,6 +213,7 @@ def plan_match_game(a: Entrant, b: Entrant, match: int, number: int, previous: d
         timeout=options.timeout,
         monte_carlo=options.monte_carlo,
         log_path=log_path,
+        snap_path=snap_path,
         profiles=_seat_profiles(seats, options),
         seat_monte_carlo=[] if options.force_monte_carlo else [s.ai_mc for s in seats],
         first_seat=0,

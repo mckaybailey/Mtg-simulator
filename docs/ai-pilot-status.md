@@ -5,7 +5,35 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 23 Nov 2026, later (latest): Swiss comparison built in; next is probe step A. START HERE
+## CHECKPOINT 23 Nov 2026, evening (latest): probe step A done; next is step B. START HERE
+
+**State of the repository.** Step A is on branch `claude/relaxed-franklin-4vtvog`, not yet in a
+pull request (open one only when the user asks); everything before it is on `main` (#2–#9).
+
+**Step A, driver snapshots: done.** `--snapshots` (any simulating command) writes
+`RUN_DIR/snapshots/<a>__<b>__<game>.jsonl`: a header line with the decklists and the result, then
+one line per decision with the deciding player's visible state and Forge's choice under `forge`.
+Five kinds, as planned below: `counter`, `main`, `attack`, `block`, `mulligan`. The format is in
+`mtgsim/bridge/AGENTS.md` ("Decision snapshots"). Checked (`VALIDATION.md`, "Decision snapshots"):
+90 of 90 seed-1 games identical to the old driver's in three pairings, 40 of 40 with and without
+snapshots, the lines agree with the game records, no tracker errors; unit tests for the job field
+and paths (`tests/test_experiment.py`) and an integration test on real games. About 60 KB a game.
+
+What the planned format changed in the doing: a mulligan is seen only after the new hand is drawn,
+so each hand is captured as it is drawn and frozen when it goes back; the kept hand's line also
+lists the cards London put on the bottom. Attack and block lines are taken at the start of the
+declare steps (before the declaration) and only when the player had a creature that could act;
+an attack or block step with no declaration gets an empty choice. The `main` line is taken once a
+turn at the first main phase; its choice is everything the player cast from then to cleanup. The
+counter line's choice covers a counter aimed at that spell only; a spell that left the stack some
+other way (countered by the other seat, say) is `"left the stack"`.
+
+**Next: step B**, the logged run below (420 games, about 5 minutes; add `--snapshots`, and
+`--out runs/probe-b`). For step C note: the header line carries the winner, which the case text
+must not; ids in `state` are Forge card ids, stable within a game; the `main` choice can include
+spells cast in response on the player's own turn.
+
+## CHECKPOINT 23 Nov 2026, later: Swiss comparison built in; next is probe step A
 
 **State of the repository.** Everything, including the work below, is on `main` (#2–#9; #9 merged
 the Swiss comparison). No other branch holds unmerged work.

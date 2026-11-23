@@ -94,6 +94,38 @@ class ForgeIntegrationTest(unittest.TestCase):
             [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"]) for r in second],
         )
 
+    def test_snapshots_do_not_change_games_and_follow_the_records(self):
+        plain = self._play("snap-off", games=4, seed=9, workers=2)
+        snapped = self._play("snap-on", games=4, seed=9, workers=2, snapshots=True)
+        self.assertEqual(
+            [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"]) for r in plain],
+            [(r["id"], r["winner_seat"], r["first_seat"], r["turns"], r["players"]) for r in snapped],
+        )
+        import json
+
+        folder = self.tmp / "snap-on" / "snapshots"
+        self.assertEqual(4, len(list(folder.glob("*.jsonl"))))
+        self.assertFalse((self.tmp / "snap-off" / "snapshots").exists())
+        for record in snapped:
+            lines = [json.loads(l) for l in (folder / f"bears__giants__{record['game']:04d}.jsonl").read_text().splitlines()]
+            head, decisions = lines[0], lines[1:]
+            self.assertEqual(("game", record["id"], record["winner_seat"]), (head["type"], head["game"], head["winner"]))
+            self.assertEqual(2, len(head["seats"]))
+            for seat, player in enumerate(record["players"]):
+                mine = [d for d in decisions if d["seat"] == seat]
+                hands = [d for d in mine if d["kind"] == "mulligan"]
+                self.assertEqual(player["mulligans"], sum(d["forge"]["action"] == "mulligan" for d in hands))
+                keep = [d for d in hands if d["forge"]["action"] == "keep"]
+                self.assertEqual(1, len(keep))
+                self.assertEqual(7, len(keep[0]["state"]["you"]["hand"]))
+                self.assertEqual(player["mulligans"], len(keep[0]["forge"]["bottom"]))
+                self.assertEqual(player["turns"], sum(d["kind"] == "main" for d in mine))
+            for d in decisions:
+                self.assertNotIn("hand", d["state"]["opponent"] or {})  # never the opponent's hand
+                self.assertNotIn("unresolved", d["forge"])
+                self.assertNotEqual("counter", d["kind"])  # these decks hold no counterspells
+            self.assertTrue(any(d["kind"] == "attack" and d["forge"]["attackers"] for d in decisions))
+
     def test_fixed_monte_carlo_replays_the_same_games(self):
         # Monte Carlo "fixed" counts rollouts instead of reading the clock, so unlike "on" and "max"
         # it must replay from the seed whatever the number of workers.

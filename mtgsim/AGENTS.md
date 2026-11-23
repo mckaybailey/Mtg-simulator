@@ -11,7 +11,7 @@
 | `legality.py` | deck size, copy limits and format legality from Forge's `res/formats` files |
 | `ai_profiles.py` | AI profiles: Forge's `res/ai`, shipped `profiles/*.ai|*.json`, the user's `MTGSIM_HOME/profiles`; builds a run's own profile folder |
 | `runner.py` | pool of long-lived Forge JVMs (one game at a time each), fed jobs over stdin |
-| `experiment.py` | plan pairings (and games 2/3 of best-of-three matches), per-game seeds, write `games.jsonl`, resume |
+| `experiment.py` | plan pairings (and games 2/3 of best-of-three matches), per-game seeds, write `games.jsonl`, resume; per-game log and `--snapshots` paths (the driver writes those files) |
 | `tune.py` | `tune`: search AI profile settings against real win rates; game cache, successive halving, hold-out, CV, noise |
 | `analysis.py`, `stats.py` | win rates, Wilson intervals, A/B tests, matrix, card stats, clock |
 | `calibration.py` | a `matrix` run's meta win rates against the gauntlet's `real_win_rate`: round robin of games (equal and share-weighted), of best-of-three matches, and simulated Swiss events of the gauntlet's `real_events` structure; SD, mean gap, Spearman, sign errors, bootstrap noise ranges. `cli._add_calibration` adds it to matrix summaries; `tools/swiss_check.py` uses the same code |

@@ -20,7 +20,9 @@ not installed and must not be required.
   games seat the loser first with `first=0` / `sideboard=1` and store the driver's swaps, no game 3
   after 2-0, re-planning on resume, refusal to resume under another format, the job-line fields.
   Its fake picks the winner per job; note that `"|g"` also matches deck keys such as `green`, so
-  find later games by the `|g2` / `|g3` suffix. `test_analysis.py` `MatchTest` covers
+  find later games by the `|g2` / `|g3` suffix. The `--snapshots` tests check the absolute per-game
+  paths (`snapshots/<a>__<b>__<game>.jsonl`, `_g2` for later match games) and that the `snap=` field
+  appears only when asked for. `test_analysis.py` `MatchTest` covers
   `summarize_matches` (wins, draws, unfinished matches, game-1 and later-game splits).
 - `test_tune.py` covers `ai_profiles.py` (Forge's file-reading rules, overrides, the run's
   profile folder) and `tune.py` with a fake `runner.run_jobs` whose outcomes depend on the seed
@@ -49,6 +51,9 @@ not installed and must not be required.
   `test_fixed_monte_carlo_replays_the_same_games` plays four `--mc fixed` games with two workers
   and with one and compares them, rollout counts included; it skips itself on a Forge build
   without patch 0020. It is the slowest test (about a minute).
+  `test_snapshots_do_not_change_games_and_follow_the_records` plays four games with and without
+  `--snapshots`, compares them, and checks the files against the records (header, mulligans and
+  the kept hand, one `main` line per turn, no opponent hand, nothing unresolved).
 - **`test_integration_profiles.py`** (a few seconds of real games, skipped without Forge) checks
   that a run-generated AI profile reaches the engine: 60 Forests mulligan under Default but never
   with MULLIGAN_THRESHOLD=8, and an unknown profile name is an error, not a silent fallback.
