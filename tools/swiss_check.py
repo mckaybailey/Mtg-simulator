@@ -44,37 +44,17 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from calibration import Calib, spearman  # noqa: E402
-
-OTHER = "other"
-
-
-def bo3(p):
-    return p * p * (3 - 2 * p)
-
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from calibration import Calib  # noqa: E402
+from mtgsim.calibration import FRACTURE_2026_EVENTS, Field, parse_event, swiss  # noqa: E402
+from mtgsim.calibration import metrics as _metrics  # noqa: E402
 
 # The three events of the Magic.gg article (checked 23 Nov 2026): Arena Championship 13, 176
 # players, nine rounds of modified Swiss in which a player stops at 7 wins or 3 losses (magic.gg
 # viewer's guide); Magic Spotlight: Fracture in Hartford (775 players) and Beijing (865), nine
 # rounds, 18+ match points (at most 3 losses without draws) to day two, six more rounds
 # (melee.gg tournaments 440878 and 457663). Top 16 / top 8 playoffs are left out.
-REAL_EVENTS = "176:9:w7:l3,775:15:c9/3,865:15:c9/3"
-
-
-def parse_event(spec):
-    parts = spec.split(":")
-    e = {"n": int(parts[0]), "rounds": int(parts[1]), "cut": None, "win_cap": None, "loss_cap": None}
-    for p in parts[2:]:
-        if p[0] == "c":
-            r, l = p[1:].split("/")
-            e["cut"] = (int(r), int(l))
-        elif p[0] == "w":
-            e["win_cap"] = int(p[1:])
-        elif p[0] == "l":
-            e["loss_cap"] = int(p[1:])
-        else:
-            raise SystemExit(f"bad event part {p!r} in {spec!r}")
-    return e
+REAL_EVENTS = FRACTURE_2026_EVENTS
 
 
 def parse_args(argv):
@@ -115,145 +95,19 @@ def parse_args(argv):
     return pos, o
 
 
-class Field:
-    """Archetypes (the meta decks, plus "other" unless --no-other), shares and match win rates."""
-
-    def __init__(self, c, cells, o):
-        self.keys = list(c.keys)
-        shares = [c.share[k] for k in self.keys]
-        if not o["no_other"]:
-            self.keys.append(OTHER)
-            shares.append(max(0.0, 100.0 - sum(shares)))
-        tot = sum(shares)
-        self.share = [s / tot for s in shares]
-        n = len(self.keys)
-        idx = {k: i for i, k in enumerate(self.keys)}
-        conv = (lambda p: p) if o["games"] else bo3
-        self.m = [[0.5] * n for _ in range(n)]
-        self.game = [[0.5] * n for _ in range(n)]
-        for (a, b), (w, d) in cells.items():
-            if not d:
-                continue
-            p = w / d
-            ia, ib = idx[a], idx[b]
-            self.game[ia][ib], self.game[ib][ia] = p, 1 - p
-            self.m[ia][ib], self.m[ib][ia] = conv(p), conv(1 - p)
-        if OTHER in idx:
-            j = idx[OTHER]
-            for i in range(n):
-                if i != j:
-                    self.m[i][j], self.m[j][i] = o["other_rate"], 1 - o["other_rate"]
-        self.cum = []
-        acc = 0.0
-        for s in self.share:
-            acc += s
-            self.cum.append(acc)
-
-    def draw(self, rng):
-        x = rng.random()
-        for i, c in enumerate(self.cum):
-            if x < c:
-                return i
-        return len(self.cum) - 1
-
-    def rr(self, matrix, k):
-        """Share-weighted rate of deck k against the other archetypes (mirrors left out)."""
-        num = den = 0.0
-        for j, s in enumerate(self.share):
-            if j != k:
-                num += s * matrix[k][j]
-                den += s
-        return num / den
-
-
-def pair(players, rng, played):
-    """Swiss pairing: sort by points (random order within a score group), pair down greedily
-    avoiding rematches; an odd player out gets a bye. Returns (pairs, bye or None)."""
-    order = sorted(players, key=lambda p: (-p[1], rng.random()))
-    pairs, bye = [], None
-    unpaired = order
-    while unpaired:
-        a = unpaired[0]
-        rest = unpaired[1:]
-        if not rest:
-            bye = a
-            break
-        pick = 0
-        for j, b in enumerate(rest):
-            if (a[0], b[0]) not in played:
-                pick = j
-                break
-        b = rest[pick]
-        pairs.append((a, b))
-        unpaired = rest[:pick] + rest[pick + 1:]
-    return pairs, bye
-
-
-def play_event(field, e, rng, wins, games):
-    # player: [id, points, losses, deck]
-    players = [[i, 0, 0, field.draw(rng)] for i in range(e["n"])]
-    played = set()
-    for r in range(1, e["rounds"] + 1):
-        active = [p for p in players
-                  if (e["loss_cap"] is None or p[2] < e["loss_cap"])
-                  and (e["win_cap"] is None or p[1] < e["win_cap"])]
-        if e["cut"] and r > e["cut"][0]:
-            active = [p for p in active if p[2] <= e["cut"][1]]
-        if len(active) < 2:
-            break
-        pairs, bye = pair(active, rng, played)
-        if bye is not None:
-            bye[1] += 1
-        for a, b in pairs:
-            played.add((a[0], b[0]))
-            played.add((b[0], a[0]))
-            da, db = a[3], b[3]
-            a_wins = rng.random() < field.m[da][db]
-            w, l = (a, b) if a_wins else (b, a)
-            w[1] += 1
-            l[2] += 1
-            if da != db:
-                games[da] += 1
-                games[db] += 1
-                wins[w[3]] += 1
-
-
-def swiss(field, o, seasons, rng):
-    n = len(field.keys)
-    wins, games = [0] * n, [0] * n
-    for _ in range(seasons):
-        for e in o["event_list"]:
-            play_event(field, e, rng, wins, games)
-    return [wins[i] / games[i] if games[i] else float("nan") for i in range(n)]
-
-
 def metrics(sim, real):
-    gaps = [abs(s - r) for s, r in zip(sim, real)]
-    signs = sum(1 for s, r in zip(sim, real) if (s - 50) * (r - 50) < 0)
-    return {"sd": st.pstdev(sim), "mae": sum(gaps) / len(gaps), "spearman": spearman(sim, real),
-            "sign_errors": signs}
+    m = _metrics(sim, real)
+    return {"sd": m["sd"], "mae": m["mean_gap"], "spearman": m["spearman"], "sign_errors": m["sign_errors"]}
 
 
 def evaluate(c, cells, o, seasons, rng):
-    f = Field(c, cells, o)
+    """The tool's three rows; the field and the events are mtgsim.calibration's."""
     nm = len(c.keys)
-    rows = {
-        "rr-games": [100 * f.rr(f.game, k) if o["no_other"] else 100 * rr_meta(f, k, nm) for k in range(nm)],
-        "rr-matches": [100 * f.rr(f.m, k) for k in range(nm)],
-    }
-    sw = swiss(f, o, seasons, rng)
-    rows["swiss"] = [100 * x for x in sw[:nm]]
+    f = Field(c.keys, c.share, cells, cells if o["games"] else None, o["other_rate"], not o["no_other"])
+    rows = {"rr-games": [100 * f.rr(f.game, k, nm) for k in range(nm)],
+            "rr-matches": [100 * f.rr(f.m, k) for k in range(nm)]}
+    rows["swiss"] = [100 * x for x in swiss(f, o["event_list"], seasons, rng)[:nm]]
     return rows
-
-
-def rr_meta(f, k, nm):
-    """Share-weighted game win rate against the meta decks only, as calibration.py's "wtd"."""
-    num = den = 0.0
-    for j in range(nm):
-        if j != k:
-            num += f.share[j] * f.game[k][j]
-            den += f.share[j]
-    return num / den
 
 
 def q(xs):

@@ -14,6 +14,7 @@
 | `experiment.py` | plan pairings (and games 2/3 of best-of-three matches), per-game seeds, write `games.jsonl`, resume |
 | `tune.py` | `tune`: search AI profile settings against real win rates; game cache, successive halving, hold-out, CV, noise |
 | `analysis.py`, `stats.py` | win rates, Wilson intervals, A/B tests, matrix, card stats, clock |
+| `calibration.py` | a `matrix` run's meta win rates against the gauntlet's `real_win_rate`: round robin of games (equal and share-weighted), of best-of-three matches, and simulated Swiss events of the gauntlet's `real_events` structure; SD, mean gap, Spearman, sign errors, bootstrap noise ranges. `cli._add_calibration` adds it to matrix summaries; `tools/swiss_check.py` uses the same code |
 | `misplay.py` | likely AI misplays per card (cards left in hand, castable but never cast, poor removal targets, unused counterspell windows, rarely cast) from the driver's misplay fields; its docstring defines every signal and the ranking score; old runs fall back to "seen but never cast" |
 | `goldfish.py` | engine-free mana/curve Monte Carlo; its docstring defines the result schema exactly |
 | `report.py`, `goldfish_report.py` | render `summary.json` as one self-contained HTML page |
@@ -103,10 +104,22 @@
   carrying the shipped set or a resumed run changes set. `patch_status` reads only the marker
   (cheap, no git); `verify=True` (doctor, setup) also hashes the patched files with git.
 
+## Comparing with real win rates
+
+The Swiss line of `calibration.compare` is the reference metric for how closely simulations
+match real results (root `AGENTS.md`). Keep it reproducible: it draws only from its own
+`random.Random(seed)` (default 1), in a fixed order (decks sorted by key, pairings in summary
+order, the point estimate before the bootstrap), so the same run gives the same numbers, and
+`tools/swiss_check.py` must keep printing what it printed before any change here. Only decks with
+both `real_win_rate` and `meta_share` (the entrant's `weight`) take part; `real_win_rate` is
+carried on `Entrant` and in `run.json` / `summary.json`. For a `--bo3` run, game rates come from
+`pairings_game1` and match rates from `pairings`; never convert match results again.
+
 ## Reports
 
 `report.py` reads only `summary.json`, so `python3 -m mtgsim report RUN_DIR` can re-render old
-runs. `match`, `gauntlet` and `matrix` summaries carry a `misplays` key (`misplay.analyze` over
+runs. A `matrix` summary with a `calibration` key gets the "Against real win rates" section.
+`match`, `gauntlet` and `matrix` summaries carry a `misplays` key (`misplay.analyze` over
 every entrant), rendered as the "Likely AI misplays" section; `python3 -m mtgsim misplays RUN_DIR`
 recomputes it from `run.json` and `games.jsonl`. The page loads nothing external. Escape every name with `esc()`; the tooltip script builds
 its DOM with `textContent` from a `data-tip` JSON attribute, never `innerHTML`. Colours are CSS

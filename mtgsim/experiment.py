@@ -45,6 +45,7 @@ class Entrant:
     pilot: str = ""  # how well the AI plays this deck compared with people: "weak", "fair", "strong" or unknown
     ai_profile: str = ""  # Forge AI profile for this deck's seat ("" = the run's default)
     ai_mc: str = ""  # Monte Carlo search for this deck's seat: "off", "on", "max", "fixed", "deep" ("" = the run's default)
+    real_win_rate: Optional[float] = None  # real tournament match win rate (percent), from gauntlet.json
     dck_path: str = ""
 
     def describe(self) -> dict:
@@ -57,6 +58,7 @@ class Entrant:
             "ai_pilot": self.pilot,
             "ai_profile": self.ai_profile or None,
             "ai_mc": self.ai_mc or None,
+            "real_win_rate": self.real_win_rate,
             "source": str(self.deck.path) if self.deck.path else None,
             "fingerprint": self.deck.fingerprint(),
             "main_count": self.deck.main_count,

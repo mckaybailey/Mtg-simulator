@@ -22,6 +22,9 @@ What you can do with it:
 - **`check`** – validate a list: card names, deck size, copy limits, format legality.
 - **Card-level stats** in every report: how the deck does when each card is seen, in the
   opening hand, and how often it actually gets played.
+- **`calibrate`** – how closely a `matrix` run's meta win rates match the real ones, as a
+  round robin and as simulated Swiss events of the real events' structure. Every `matrix` run
+  whose decks have real win rates gets it automatically.
 - **`misplays`** – which cards Forge's AI seems to mishandle: cards it could have cast but kept
   in hand, counterspells it never used, removal aimed at the wrong target. Also a section of
   every `match`, `gauntlet` and `matrix` report.
@@ -37,7 +40,8 @@ What you can do with it:
   round robin of the eighteen included meta decks, simulated win rates barely tracked the
   decks' real tournament win rates (rank correlation 0.14, average gap 11 points, spread 14
   points against a real 6, even after mtgsim's fourteen Forge patches for cards the AI could not
-  cast or misused): creature decks came out on top and the real field's best deck, Jund
+  cast or misused; played out as simulated Swiss events like the real ones, still 0.11, 9 points
+  and 11 points, with 8 of 18 decks on the wrong side of 50%): creature decks came out on top and the real field's best deck, Jund
   Sacrifice, near the bottom. Each gauntlet deck
   therefore carries an "AI pilot" rating, and reports tell you which opponents to discount.
   Details are in `decks/standard/meta/README.md` and `VALIDATION.md`.
@@ -177,6 +181,41 @@ each of the eighteen meta decks takes roughly 20 minutes.
   role rather than reading the numbers as each card's worth. They are also noisy: in a
   400-game test of two identical decks, the same card came out 20 points apart. Reports
   mark the differences whose 95% interval excludes zero; ignore the rest.
+
+## Comparing with real win rates (`calibrate`)
+
+When at least three decks in a `matrix` run have `real_win_rate` and `meta_share` in their
+`gauntlet.json` (the included meta gauntlet does), the run ends with a comparison against the
+real figures, also in the report under "Against real win rates". The real figures are match win
+rates from Swiss events, mirrors and byes left out, so the round robin is compared four ways:
+
+| Line | Simulated rate |
+|---|---|
+| `games` | average game win rate, every opponent equal (the ranking's number) |
+| `weighted` | game win rate, opponents weighted by `meta_share` |
+| `matches` | each pairing's rate turned into a best-of-three match rate (a `--bo3` run's own matches), share-weighted, the rest of the field as "other" beaten 50% of the time |
+| `swiss` | those match rates played out in simulated Swiss events of the structure in the gauntlet's `real_events` (decks drawn by `meta_share`, paired by record, no rematches) |
+
+Each line has the spread (SD of the decks' rates, against the real SD), the mean gap to the real
+rates, the rank correlation and the sign errors (decks on the wrong side of 50%), with 95% noise
+ranges from redrawing the run's games. **`swiss` is the line to compare with the real figures,
+and the one to compare runs on**: it removes the part of the spread that only comes from pairing
+(winning decks meet winning decks), about 3 points of SD on the meta. Recompute it, or add it to
+an older run:
+
+```
+python -m mtgsim calibrate RUN_DIR                       # adds it to summary.json and report.html
+python -m mtgsim calibrate decks/standard/meta/sim-matchups.json --reps 0   # the committed calibration table
+python -m mtgsim calibrate RUN_DIR --events 600:12 --json cal.json
+```
+
+Compare runs of the same decks only: in a run of a few meta decks most of the field is "other",
+which pulls the `matches` and `swiss` lines towards 50%. The reference numbers are for all
+eighteen meta decks (`VALIDATION.md`, "Swiss pairing").
+
+`--events` takes `N:R[:cR/L][:wW][:lL]` per event, comma-separated: N players, R rounds, a cut to
+L losses after round R, a stop at W wins or L losses. It costs about 10 seconds plus 3 per 10
+noise replicates (`--reps`, default 100) for eighteen decks.
 
 ## Finding AI misplays
 

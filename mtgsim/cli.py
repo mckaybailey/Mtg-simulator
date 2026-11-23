@@ -170,12 +170,83 @@ def _entrants(ctx: Context, groups: Sequence[Tuple[Sequence[str], str]]) -> Tupl
             pilot=str(info.get("ai_pilot") or ""),
             ai_profile=str(info.get("ai_profile") or ""),
             ai_mc=_mc_setting(info.get("ai_mc"), deck.name),
+            real_win_rate=_real_rate(info.get("real_win_rate"), deck.name),
         ))
         if deck.name in notes_by_name:
             notes[key] = notes_by_name[deck.name]
     for entrant in entrants:
         _check_profile_name(ctx, entrant.ai_profile, f" (set for {entrant.deck.name})")
     return entrants, notes
+
+
+def _real_rate(value, deck_name: str) -> Optional[float]:
+    if value is None:
+        return None
+    if not isinstance(value, (int, float)) or isinstance(value, bool) or not 0 <= value <= 100:
+        raise UserError(f"real_win_rate of {deck_name} must be a percentage, not {value!r}")
+    return float(value)
+
+
+def _read_manifest_header(folder: Path) -> dict:
+    """The top-level fields of a folder's gauntlet.json (everything but "decks"), or {}."""
+    for name in MANIFEST_NAMES:
+        path = folder / name
+        if path.is_file():
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except ValueError as exc:
+                raise UserError(f"{path} is not valid JSON: {exc}")
+            return {k: v for k, v in data.items() if k != "decks"} if isinstance(data, dict) else {}
+    return {}
+
+
+def _calibration_events(sources: Sequence[Optional[str]]) -> str:
+    """The real events' structure from the gauntlet.json of the first deck folder that gives one."""
+    from . import calibration
+
+    seen = set()
+    for source in sources:
+        if not source:
+            continue
+        folder = Path(source).parent
+        if folder in seen:
+            continue
+        seen.add(folder)
+        events = _read_manifest_header(folder).get("real_events")
+        if isinstance(events, dict):
+            events = events.get("structure")
+        if isinstance(events, str) and events.strip():
+            return events
+    return calibration.DEFAULT_EVENTS
+
+
+def _add_calibration(summary: dict, events: Optional[str] = None, reps: int = 100, seasons: int = 200,
+                     quiet: bool = False) -> None:
+    """Compare a matrix summary's meta win rates with the real ones, round robin and Swiss (calibration.py).
+
+    Does nothing unless at least three decks have both real_win_rate and meta_share.
+    """
+    from . import calibration
+
+    entrants = summary.get("entrants") or {}
+    if sum(1 for e in entrants.values() if e.get("real_win_rate") is not None and e.get("weight")) < 3:
+        return
+    if events is None:
+        events = _calibration_events([e.get("source") for e in entrants.values()])
+    try:
+        calibration.parse_events(events)
+    except ValueError as exc:
+        raise UserError(str(exc))
+    bo3 = (summary.get("options") or {}).get("match_format") == "bo3" and "pairings_game1" in summary
+    if not quiet:
+        print("\nSimulating Swiss events to compare with the real win rates (under a minute)...")
+    cal = calibration.compare(entrants, summary["pairings"], summary["pairings_game1"] if bo3 else None,
+                              events=events, reps=reps, seasons=seasons)
+    if cal is None:
+        return
+    summary["calibration"] = cal
+    if not quiet:
+        print(calibration.format_text(cal))
 
 
 def _mc_setting(value, deck_name: str) -> str:
@@ -618,6 +689,7 @@ def cmd_matrix(args: argparse.Namespace) -> int:
         game1 = [analysis.summarize_pairing(analysis.first_games(records), a.key, b.key) for a, b in pairs]
         summary["matrix_game1"] = analysis.summarize_matrix([e.key for e in entrants], game1)
         summary["pairings_game1"] = game1
+    _add_calibration(summary)
     _add_misplays(summary, ctx, entrants, records, run_dir)
     _finish(ctx, run_dir, summary)
     return 0
@@ -732,6 +804,73 @@ def _print_misplays(deck: dict, name: str, top: int) -> None:
                           _pct(r["cast_rate"], 0), compare(r["compare"])])
         print(_table(["Card", "Never cast/100", "Seen", "Cast when seen", "Never-cast minus cast pts"],
                      table, right=range(1, 5)))
+
+
+def cmd_calibrate(args: argparse.Namespace) -> int:
+    """Compare an existing matrix run's meta win rates with the real ones, round robin and Swiss."""
+    from . import calibration, report
+
+    target = Path(args.run).expanduser()
+    path = target / "summary.json" if target.is_dir() else target
+    if not path.is_file():
+        raise UserError(f"{target}: no summary.json (give a matrix run directory or a pairing table)")
+    try:
+        summary = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise UserError(f"{path} is not valid JSON: {exc}")
+    if not isinstance(summary, dict) or "pairings" not in summary or "entrants" not in summary:
+        raise UserError(f"{path} has no \"entrants\" and \"pairings\" (is it a matrix run?)")
+    entrants = {k: dict(e) for k, e in summary["entrants"].items()}
+    # real win rates and shares from the summary, else from a gauntlet.json, matched by deck name
+    if args.gauntlet:
+        gpath = Path(args.gauntlet).expanduser()
+        manifests = [gpath] if gpath.is_file() else [gpath / n for n in MANIFEST_NAMES]
+    else:
+        folders = {Path(e["source"]).parent for e in entrants.values() if e.get("source")}
+        manifests = [f / n for f in sorted(folders) for n in MANIFEST_NAMES] + [DEFAULT_GAUNTLET / "gauntlet.json"]
+    by_name, events = {}, None
+    for m in manifests:
+        if not m.is_file():
+            continue
+        try:
+            data = json.loads(m.read_text(encoding="utf-8"))
+        except ValueError as exc:
+            raise UserError(f"{m} is not valid JSON: {exc}")
+        if not isinstance(data, dict):
+            continue
+        for d in data.get("decks", []):
+            if isinstance(d, dict) and d.get("name"):
+                by_name.setdefault(str(d["name"]), d)
+        found = data.get("real_events")
+        found = found.get("structure") if isinstance(found, dict) else found
+        if events is None and isinstance(found, str) and found.strip():
+            events = found
+    for key, e in entrants.items():
+        info = by_name.get(str(e.get("name", key)), {})
+        if args.gauntlet or e.get("real_win_rate") is None:
+            e["real_win_rate"] = _real_rate(info.get("real_win_rate"), str(e.get("name", key)))
+        if args.gauntlet or not e.get("weight"):
+            share = info.get("meta_share")
+            e["weight"] = float(share) if isinstance(share, (int, float)) and share > 0 else None
+    if args.events and args.events != "real":
+        events = args.events
+    if args.reps < 0 or args.seasons < 1:
+        raise UserError("--reps must be at least 0 and --seasons at least 1")
+    usable = sum(1 for e in entrants.values() if e.get("real_win_rate") is not None and e.get("weight"))
+    if usable < 3:
+        raise UserError(f"only {usable} deck(s) have both real_win_rate and meta_share; at least three are needed")
+    work = dict(summary, entrants=entrants)
+    _add_calibration(work, events or calibration.DEFAULT_EVENTS, reps=args.reps, seasons=args.seasons)
+    if "calibration" not in work:
+        raise UserError("fewer than three decks with real win rates played each other in this run")
+    if args.json:
+        Path(args.json).write_text(json.dumps(work["calibration"], indent=1), encoding="utf-8")
+        print(f"\nSaved to {args.json}")
+    if target.is_dir() and not args.no_save:
+        summary["calibration"] = work["calibration"]
+        path.write_text(json.dumps(summary, indent=1), encoding="utf-8")
+        print(f"\nAdded to {path}; report:  {report.write_report(target, summary)}")
+    return 0
 
 
 def cmd_misplays(args: argparse.Namespace) -> int:
@@ -931,6 +1070,19 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("report", help="rebuild report.html for an existing run directory")
     p.add_argument("run_dir")
     p.set_defaults(func=cmd_report)
+
+    p = sub.add_parser("calibrate", help="compare a matrix run's meta win rates with the real ones, "
+                                         "round robin and as simulated Swiss events")
+    p.add_argument("run", help="matrix run directory, or a pairing table such as decks/standard/meta/sim-matchups.json")
+    p.add_argument("--gauntlet", metavar="FILE", help="gauntlet.json (or its folder) with real_win_rate, meta_share and "
+                   "real_events; default: the decks' own folders, then decks/standard/meta")
+    p.add_argument("--events", metavar="SPEC", help="Swiss event structure N:R[:cR/L][:wW][:lL],... (default: the "
+                   "gauntlet's real_events, else 600:12)")
+    p.add_argument("--reps", type=int, default=100, help="bootstrap replicates for the noise ranges (default 100; 0 skips)")
+    p.add_argument("--seasons", type=int, default=200, help="repetitions of the events (default 200)")
+    p.add_argument("--json", metavar="FILE", help="also save the comparison as JSON")
+    p.add_argument("--no-save", action="store_true", help="do not add it to the run's summary.json and report")
+    p.set_defaults(func=cmd_calibrate)
 
     p = sub.add_parser("misplays", help="rank each deck's cards by likely AI misplays in an existing run")
     p.add_argument("run_dir")

@@ -29,6 +29,11 @@ not installed and must not be required.
   `MTGSIM_HOME` so no real profile folder is read.
 - `test_report.py` renders every report kind and checks that names containing `<script>` and
   quotes come out escaped.
+- `test_calibration.py` covers `calibration.py` (best-of-three conversion, event parsing, Swiss
+  pairing without rematches, mirrors left out, an even field staying even, the four views and
+  their order on a field with a known ranking, best-of-three runs using their own matches,
+  reproducibility from the seed), the `calibrate` command on a pairing table and a run folder
+  (temporary files only) and the report section's escaping.
 - `test_goldfish.py` checks the solo model against exact hypergeometric probabilities.
 - `test_forge_patches.py` builds a tiny git repository laid out like a Forge checkout and runs
   `forge.build_from_source` on it with `forge._maven_build` replaced by a fake that writes a jar
