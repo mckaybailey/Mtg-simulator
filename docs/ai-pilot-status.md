@@ -58,7 +58,9 @@ graveyard, and the case text was what misled.)
 detail and a suggested fix for each:
 
 1. Eleven token names shown without abilities (Illusion, Pest, Monk, Robot, Treefolk and others).
-2. The type named for Cavern of Souls not recorded (53 cases).
+2. Choices made for a card not recorded: the type named for Cavern of Souls (53 cases) and
+   every other chosen type, colour, player, number, card name or mode. Record them all from
+   the card's `getChosen*` fields, not Cavern alone.
 3. "Castable now" lists that ignore spree mode costs (C177) and cost reductions.
 4. Main-phase option text that says lands come only from the hand.
 5. No game history in a case.

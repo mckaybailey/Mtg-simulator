@@ -139,10 +139,25 @@ pass that would otherwise judge some answers on wrong or missing information.
    token's Oracle text (it is on the card object) in the snapshot's permanent, or failing that
    pick the token script by name, power/toughness and colour.
 
-2. **The Cavern of Souls type.** The creature type named for Cavern of Souls is not recorded.
-   Cavern is on a battlefield in 53 cases; C040's answerer had to assume Dragon. *Fix:* record a
-   permanent's chosen type (and, while at it, chosen colour, name or player) in the snapshot,
-   and show it in the case.
+2. **Choices made for a card are not recorded.** Cavern of Souls is the case found: the type
+   named for it is missing, though Cavern is on a battlefield in 53 cases, and C040's answerer
+   had to assume Dragon. The same gap holds for every card that has you choose something as it
+   enters or resolves: a colour, a player, a number, a card or card name, a mode or a direction.
+   *Fix:* do not handle Cavern by itself. Forge keeps every such choice on the card object:
+   - `getChosenType`, `getChosenColors`, `getChosenPlayer` and `getChosenNumber`;
+   - `getChosenCards` and `getNamedCards`;
+   - `getChosenMode`, `getChosenDirection`, `getChosenEvenOdd` and `getChosenSector`
+     (`forge-game/.../card/Card.java`).
+
+   The tracker should write whichever of these are set into each permanent's snapshot as a
+   `chosen` object, for example `"chosen": {"type": "Dragon"}`. The case should then show it
+   after the permanent ("chose Dragon"). The getters only read, so the tracker's rule holds.
+   - **Visibility:** most such choices are announced, but a few are secret until revealed ("secretly
+     choose"). Show those only on the deciding player's own permanents.
+   - **A choice involving a player:** write "you" or "opponent" for a player, as elsewhere in
+     the snapshot.
+   - **A choice that is a card:** write the card's name if it is a public card, and an id if it
+     is a permanent.
 
 3. **The castable lists are wrong in both directions.** The `castable` lists behind upkeep,
    draw, second-main and end-step cases come from the tracker's check (`castableNow`).

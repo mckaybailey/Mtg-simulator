@@ -52,7 +52,7 @@ merged (23 Nov). Step B, a logged run of the planning decks against the creature
 with snapshots, committed packed in `probe/run/`), and step C, 200 cases answered blind by Claude
 subagents (`probe/`, `tools/probe/`; they agree with Forge on 51%, 44–58%), are done. Before step D
 (the user's blind grading of the disagreements), fix the gaps listed in `probe/README.md`, "Fix
-before step D" (token text, Cavern types, castable lists, Forge's targets and more): start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
+before step D" (token text, cards' chosen types, colours and names, castable lists, Forge's targets and more): start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 
