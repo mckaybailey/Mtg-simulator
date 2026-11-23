@@ -5,7 +5,7 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 23 Nov 2026, evening (latest): probe step A done; next is step B. START HERE
+## CHECKPOINT 23 Nov 2026, evening (latest): probe steps A and B done; next is step C. START HERE
 
 **State of the repository.** Everything is on `main`: step A (below) was merged by pull request
 #10, the Swiss comparison by #9, the earlier work by #2–#8. No other branch holds unmerged work.
@@ -61,7 +61,15 @@ How the format differs from the plan below, and why:
   restrictions, targets; cost reductions are ignored, so a reduced spell can be missed, never
   wrongly listed.
 
-**Next: step B**, the logged run (as planned below): the seven planning decks against the six
+**Step B, the logged run: done (23 Nov).** `runs/probe-b.sh` (not committed; `runs/` is ignored):
+one `gauntlet` per planning deck against the six creature decks, `-n 10 --seed 1 --snapshots`,
+into `runs/probe-b/<planning-deck>/`. 420 games, all finished; 420 snapshot files, 19,629
+decision lines (main 6,629, main2 3,888, attack 2,931, upkeep 1,609, draw 1,276, mulligan 1,074,
+block 895, endstep 527, counter 380; both players' decisions). Planning decks' records, 60 games
+each: Azorius Control 26.7%, Four-Color Control 31.7%, Izzet Spellementals 31.7%, Dimir Midrange
+26.7%, Jund Sacrifice 26.7%, Dimir Uldaros 18.3%, Dimir Excruciator 10.0%. If the run is gone in a
+new container, rerun the script (seeded, about 20 minutes on 4 cores). **Next: step C**, sampling
+cases from it (below). The run as planned: the seven planning decks against the six
 creature decks, about 10 games per pairing, seed 1, with `--snapshots --out runs/probe-b` (420
 games, about 5 minutes). Probably a `match` per pairing or a `gauntlet` per planning deck; a
 `matrix` of all 13 would add the pairings within each group. Notes for step C:
