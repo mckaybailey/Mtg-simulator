@@ -7,9 +7,8 @@ what was learned and what to do next.
 
 ## CHECKPOINT 23 Nov 2026, later (latest): Swiss comparison built in; next is probe step A. START HERE
 
-**State of the repository.** The work below is on branch `claude/relaxed-franklin-4vtvog`, in a pull
-request to `main` opened at the user's request (merged only when they say so). Everything before it
-is on `main` (#2–#8).
+**State of the repository.** Everything, including the work below, is on `main` (#2–#9; #9 merged
+the Swiss comparison). No other branch holds unmerged work.
 
 **What the user asked (23 Nov).** Make the Swiss comparison part of mtgsim and use it as *the*
 metric to compare future iterations against. Done:
