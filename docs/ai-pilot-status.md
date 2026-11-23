@@ -7,31 +7,65 @@ what was learned and what to do next.
 
 ## CHECKPOINT 23 Nov 2026, evening (latest): probe step A done; next is step B. START HERE
 
-**State of the repository.** Step A is on branch `claude/relaxed-franklin-4vtvog`, not yet in a
-pull request (open one only when the user asks); everything before it is on `main` (#2–#9).
+**State of the repository.** Everything is on `main`: step A (below) was merged by pull request
+#PRNUM, the Swiss comparison by #9, the earlier work by #2–#8. No other branch holds unmerged work.
+`runs/` is not committed; the check runs named below (`runs/snap2-*`, `runs/snapcheck-*`) may be
+gone in a new container and are not needed.
+
+**What the user asked (23 Nov).** Start the decision probe with step A, the driver snapshots; then
+add two more decision kinds (the second main phase and the opponent's end step) before step B,
+because B's run is what step C samples from. Not every step of the turn: untap and draw hold no
+decision, empty lines would dilute the cases, and `--save-logs` already has the play-by-play.
 
 **Step A, driver snapshots: done.** `--snapshots` (any simulating command) writes
-`RUN_DIR/snapshots/<a>__<b>__<game>.jsonl`: a header line with the decklists and the result, then
-one line per decision with the deciding player's visible state and Forge's choice under `forge`.
-Five kinds, as planned below: `counter`, `main`, `attack`, `block`, `mulligan`. The format is in
-`mtgsim/bridge/AGENTS.md` ("Decision snapshots"). Checked (`VALIDATION.md`, "Decision snapshots"):
-90 of 90 seed-1 games identical to the old driver's in three pairings, 40 of 40 with and without
-snapshots, the lines agree with the game records, no tracker errors; unit tests for the job field
-and paths (`tests/test_experiment.py`) and an integration test on real games. About 60 KB a game.
+`RUN_DIR/snapshots/<a>__<b>__<game>.jsonl` (`_g2` / `_g3` for later best-of-three games): a header
+line (`type` `game`: decklists and the result), then one line per decision with the deciding
+player's visible state and Forge's choice under `forge`. Seven kinds; the full format is in
+`mtgsim/bridge/AGENTS.md`, "Decision snapshots":
 
-What the planned format changed in the doing: a mulligan is seen only after the new hand is drawn,
-so each hand is captured as it is drawn and frozen when it goes back; the kept hand's line also
-lists the cards London put on the bottom. Attack and block lines are taken at the start of the
-declare steps (before the declaration) and only when the player had a creature that could act;
-an attack or block step with no declaration gets an empty choice. The `main` line is taken once a
-turn at the first main phase; its choice is everything the player cast from then to cleanup. The
-counter line's choice covers a counter aimed at that spell only; a spell that left the stack some
-other way (countered by the other seat, say) is `"left the stack"`.
+| Kind | When | Forge's choice |
+|---|---|---|
+| `mulligan` | each hand decided on | mulligan, or keep and the cards put on the bottom |
+| `main` | first main phase, every turn | everything cast from then to cleanup (with the phase), lands, mana left at cleanup |
+| `main2` | second main phase, if a card in hand is castable | what was cast and played in that phase |
+| `attack` | declare attackers, if a creature could attack | the attackers and what they attacked |
+| `block` | declare blockers, if attacked and a creature could block | the blocks |
+| `counter` | an opposing spell cast while a castable counter that could target it was in hand | countered with which card, or passed (resolved / fizzled / left the stack) |
+| `endstep` | the opponent's end step, if an instant-speed card in hand is castable | what was cast in that step (empty: held) |
 
-**Next: step B**, the logged run below (420 games, about 5 minutes; add `--snapshots`, and
-`--out runs/probe-b`). For step C note: the header line carries the winner, which the case text
-must not; ids in `state` are Forge card ids, stable within a game; the `main` choice can include
-spells cast in response on the player's own turn.
+Checked (`VALIDATION.md`, "Decision snapshots"): 90 of 90 seed-1 games of three pairings (Azorius
+Control vs Boros Dwarves, Jund Sacrifice vs Mono-Green Landfall, Dimir Uldaros vs Orzhov Lifegain)
+identical to the old driver's games in `runs/rr18-cal`, both before and after `main2` and
+`endstep` were added; 40 of 40 with and without snapshots, record for record; the lines agree with
+the records (one `main` per turn taken, mulligans, kept hands of seven with as many bottomed as
+mulligans); no tracker errors, nothing unresolved. 67–87 KB a game. Tests: 3 unit tests in
+`tests/test_experiment.py` (paths, the `snap=` field only when asked), an integration test on real
+games; the suite is 318 tests.
+
+How the format differs from the plan below, and why:
+- A mulligan event fires only after the new hand is drawn, so each hand's state is captured as its
+  cards are drawn and frozen when they go back to the library.
+- Attack and block lines are taken when the declare step begins, before the declaration, and only
+  when the player had a creature that could act; a step with no declaration gets an empty choice.
+- `main` is taken once a turn; its choice covers the whole turn (including spells cast in response
+  on the player's own turn). `main2` repeats the post-combat part as a decision of its own.
+- A `counter` line counts as countered only when the player aimed a counter at that very spell; a
+  spell that left the stack another way is `"left the stack"`.
+- `main2` and `endstep` use the tracker's castability check (`castableNow`): free mana sources,
+  restrictions, targets; cost reductions are ignored, so a reduced spell can be missed, never
+  wrongly listed.
+
+**Next: step B**, the logged run (as planned below): the seven planning decks against the six
+creature decks, about 10 games per pairing, seed 1, with `--snapshots --out runs/probe-b` (420
+games, about 5 minutes). Probably a `match` per pairing or a `gauntlet` per planning deck; a
+`matrix` of all 13 would add the pairings within each group. Notes for step C:
+- The header line carries the winner and the turn count; the case text must not.
+- Ids in `state` are Forge card ids, stable within one game; use them to name attackers and
+  blockers in a case, and give the options in words.
+- `main` and `main2` choices are lists of what was cast, not single picks; a case should offer the
+  realistic alternatives (cast X, cast Y, hold) and map Forge's list onto one of them.
+- Close spots: `counter` and `endstep` lines are choices by construction; for `main`, `attack` and
+  `block` prefer lines with more than one castable card or more than one possible attacker.
 
 ## CHECKPOINT 23 Nov 2026, later: Swiss comparison built in; next is probe step A
 

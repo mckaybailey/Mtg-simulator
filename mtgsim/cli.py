@@ -958,7 +958,7 @@ def _add_common(p: argparse.ArgumentParser, sim: bool = True) -> None:
     p.add_argument("--save-logs", action="store_true", help="keep Forge's full text log of every game")
     p.add_argument("--snapshots", action="store_true",
                    help="record each player's visible state at decision points (counter windows, first main phase, "
-                        "attacks, blocks, mulligans) with Forge's choice, in RUN_DIR/snapshots/; games are unchanged")
+                        "second main phase, attacks, blocks, the opponent's end step, mulligans) with Forge's choice, in RUN_DIR/snapshots/; games are unchanged")
 
 
 def _add_match_format(p: argparse.ArgumentParser) -> None:

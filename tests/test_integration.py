@@ -123,7 +123,10 @@ class ForgeIntegrationTest(unittest.TestCase):
             for d in decisions:
                 self.assertNotIn("hand", d["state"]["opponent"] or {})  # never the opponent's hand
                 self.assertNotIn("unresolved", d["forge"])
-                self.assertNotEqual("counter", d["kind"])  # these decks hold no counterspells
+                self.assertNotIn(d["kind"], ("counter", "endstep"))  # these decks hold no counterspells or instants
+                if d["kind"] == "main2":
+                    self.assertTrue(d["context"]["castable"])
+                    self.assertLessEqual(set(d["forge"]["cast"]), {"Grizzly Bears", "Raging Goblin"})
             self.assertTrue(any(d["kind"] == "attack" and d["forge"]["attackers"] for d in decisions))
 
     def test_fixed_monte_carlo_replays_the_same_games(self):

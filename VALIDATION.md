@@ -22,7 +22,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
-| Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), 40 of 40 with and without snapshots; see "Decision snapshots" |
+| Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), twice (before and after the `main2` and `endstep` kinds), 40 of 40 with and without snapshots; see "Decision snapshots" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -239,12 +239,18 @@ included).
 | Jund Sacrifice vs Mono-Green Landfall | 30 of 30 identical | 829: 383 main, 263 attack, 112 block, 71 mulligan |
 | Dimir Uldaros vs Orzhov Lifegain | 30 of 30 identical | 998: 559 main, 257 attack, 91 block, 82 mulligan, 9 counter |
 
+After the second main phase (`main2`) and the opponent's end step (`endstep`) were added, the same
+three pairings, 30 games each, were replayed: 90 of 90 identical to the old driver again, no tracker
+errors, nothing unresolved. New lines in those 90 games: Azorius Control vs Boros Dwarves 355
+`main2` and 70 `endstep` (47 in which something was cast), Jund Sacrifice vs Mono-Green Landfall
+282 and 9, Dimir Uldaros vs Orzhov Lifegain 346 and 12; files grew to 67–87 KB a game.
+
 Same Forge patch set as the calibration run; no tracker errors in the worker logs; no decision
 left unresolved. The snapshots agree with the game records: one `main` line per turn a player
 took (739 of 739), each seat's `mulligan` lines match its recorded mulligans, the kept hand has
 seven cards and as many cards put on the bottom as mulligans taken. Azorius Control's counter
 windows: 61 countered, 85 let resolve, in line with its `counter` fields. About 60 KB of
-snapshots a game. The integration test checks the same properties on four games.
+snapshots a game before `main2` and `endstep`. The integration test checks the same properties on four games.
 
 ## Misplay tracking
 

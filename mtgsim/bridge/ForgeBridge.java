@@ -1829,6 +1829,9 @@ public final class ForgeBridge {
             final String kind;
             final int seat;
             final int spellId; // "counter": the spell on the stack; otherwise -1
+            PhaseType phase; // "main2", "endstep": the step whose casts are its choice
+            final List<String> casts = new ArrayList<>();
+            final List<String> lands = new ArrayList<>();
             String body; // the line's fields before "forge", without the braces
             String choice;
 
@@ -1859,6 +1862,7 @@ public final class ForgeBridge {
         private List<String> snapDecks = Collections.emptyList();
         private final List<Snap> openCounters = new ArrayList<>();
         private final List<Snap> openCombat = new ArrayList<>();
+        private final List<Snap> openSteps = new ArrayList<>(); // "main2" and "endstep" until their step ends
         private Snap mainSnap = null;
         private int mainTurn = -1;
         private final List<String> mainCasts = new ArrayList<>();
@@ -1922,6 +1926,7 @@ public final class ForgeBridge {
                 }
             }
             openCounters.clear();
+            closeSteps(null);
             if (!started) {
                 flushHands(seatOf(event.turnOwner()));
             }
@@ -2003,6 +2008,11 @@ public final class ForgeBridge {
                 final PhaseType ph = game.getPhaseHandler().getPhase();
                 mainCasts.add("{\"name\":" + quote(name) + ",\"phase\":" + quote(ph == null ? null : ph.name()) + "}");
             }
+            for (final Snap st : openSteps) {
+                if (st.seat == seat) {
+                    st.casts.add(name);
+                }
+            }
             if (openCounters.isEmpty()) {
                 return;
             }
@@ -2023,6 +2033,12 @@ public final class ForgeBridge {
         }
 
         private void snapLand(final int seat, final CardView land) {
+            for (final Snap st : openSteps) {
+                if (st.seat == seat && land != null) {
+                    final Card c = game.findById(land.getId());
+                    st.lands.add(c != null ? nameOf(c) : land.getName());
+                }
+            }
             if (mainSnap != null && mainSnap.choice == null && seat == mainSnap.seat && land != null
                     && game.getPhaseHandler().getTurn() == mainTurn) {
                 final Card c = game.findById(land.getId());
@@ -2057,6 +2073,7 @@ public final class ForgeBridge {
                 }
             }
             openCombat.clear();
+            closeSteps(event.phase());
             if (!started) {
                 return;
             }
@@ -2075,6 +2092,24 @@ public final class ForgeBridge {
                 mainSnap = addSnap("main", active, seat, -1, null, "{}");
             } else if (ph == PhaseType.CLEANUP && turn == mainTurn) {
                 closeMain();
+            } else if (ph == PhaseType.MAIN2) {
+                // After combat: only when something in hand could be cast now (sorcery timing).
+                final List<String> castable = castableNames(active, seat, false);
+                if (!castable.isEmpty()) {
+                    openStep("main2", active, seat, ph, castable);
+                }
+            } else if (ph == PhaseType.END_OF_TURN) {
+                // The opponent's end step: the last chance to use an instant or flash card before the turn passes.
+                for (final Player p : game.getRegisteredPlayers()) {
+                    final int ps = seatOfPlayer(p);
+                    if (ps < 0 || p == active || !p.isInGame()) {
+                        continue;
+                    }
+                    final List<String> castable = castableNames(p, ps, true);
+                    if (!castable.isEmpty()) {
+                        openStep("endstep", p, ps, ph, castable);
+                    }
+                }
             } else if (ph == PhaseType.COMBAT_DECLARE_ATTACKERS) {
                 final List<String> ids = new ArrayList<>();
                 for (final Card c : active.getCardsIn(ZoneType.Battlefield)) {
@@ -2108,6 +2143,40 @@ public final class ForgeBridge {
                         openCombat.add(addSnap("block", p, ps, -1, null, "{\"attackers\":[" + String.join(",", attackers) + "]}"));
                     }
                 }
+            }
+        }
+
+        /** Non-land cards in hand castable now (the tracker's own check); instant speed only if asked. Sorted, distinct. */
+        private List<String> castableNames(final Player p, final int seat, final boolean instantSpeed) {
+            final List<Unit> units = manaUnits(p);
+            final Set<String> out = new TreeSet<>();
+            for (final Card c : p.getCardsIn(ZoneType.Hand)) {
+                try {
+                    if (!c.isLand() && !out.contains(nameOf(c)) && castableNow(p, c, units, instantSpeed)) {
+                        out.add(nameOf(c));
+                    }
+                } catch (final Throwable t) {
+                    ignored(t);
+                }
+            }
+            return new ArrayList<>(out);
+        }
+
+        private void openStep(final String kind, final Player p, final int seat, final PhaseType ph, final List<String> castable) {
+            final Snap s = addSnap(kind, p, seat, -1, null, "{\"castable\":" + namesJson(castable) + "}");
+            s.phase = ph;
+            openSteps.add(s);
+        }
+
+        /** Ends the open "main2" / "endstep" decisions whose step is over (all of them when phase is null). */
+        private void closeSteps(final PhaseType phase) {
+            for (int i = openSteps.size() - 1; i >= 0; i--) {
+                final Snap s = openSteps.get(i);
+                if (phase != null && phase == s.phase) {
+                    continue; // a repeated step
+                }
+                s.choice = "{\"cast\":" + namesJson(s.casts) + ",\"lands\":" + namesJson(s.lands) + "}";
+                openSteps.remove(i);
             }
         }
 
@@ -2176,6 +2245,7 @@ public final class ForgeBridge {
                 flushHands(-1);
             }
             closeMain();
+            closeSteps(null);
             for (final Snap s : snaps) {
                 if (s.choice == null) {
                     s.choice = "{\"unresolved\":\"game ended\"}";

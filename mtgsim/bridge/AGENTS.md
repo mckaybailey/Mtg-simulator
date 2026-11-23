@@ -81,6 +81,8 @@ and Forge's choice under `forge`.
 | `counter` | an opponent casts a spell while the player holds a counter that is castable (as in `counter.passed`) and could target it | `spell` (`id`, `name`, `manaValue`), `castableCounters` | `{"action":"counter","with":NAME}` if the player cast a counter at that spell, else `{"action":"pass","result":"resolved"\|"fizzled"\|"left the stack"}` |
 | `main` | the active player's first main phase begins (once a turn) | `{}` | `cast` (spells the player cast from then to cleanup, `name` and `phase`), `lands` played, `manaOpenAtCleanup` (free mana units, as below) |
 | `attack` | the declare-attackers step begins and the active player has an untapped creature without summoning sickness or defender | `canAttack` (ids) | `attackers` (`id`, `name`, `attacking`: `opponent` or a planeswalker's name), sorted by id; `[]` when no one attacked |
+| `main2` | the active player's second main phase begins and a non-land card in hand is castable (the tracker's check, sorcery timing) | `castable` (names) | `cast` (spells cast in that phase), `lands` played in it |
+| `endstep` | the opponent's end step begins and the player holds a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step), `lands`; `[]` when the card was held |
 | `block` | the declare-blockers step begins and the player is attacked (or their planeswalker is) and has an untapped creature | `attackers` (`id`, `name`, `attacking`: `you` or the planeswalker) | `blocks` (`blocker`, `name`, `attacker`); `[]` for no blocks |
 | `mulligan` | each hand decided on before the first turn | `mulligansSoFar`, `onThePlay` | `{"action":"mulligan"}`, or `{"action":"keep","bottom":[names]}` (London: the cards put on the bottom) |
 
@@ -98,7 +100,8 @@ drawn). A decision still open when the game ends gets `{"unresolved":"game ended
 Snapshots are taken from the tracker's handlers and obey its rules below (read only). Checked
 23 Nov 2026: 90 seed-1 games of three pairings with snapshots are identical to the same games
 played by the driver before snapshots existed, and 40 games with and without them agree record for
-record (`VALIDATION.md`, "Decision snapshots").
+record (`VALIDATION.md`, "Decision snapshots"); the same 90 again after `main2` and `endstep` were
+added.
 
 ## Behaviour that matters
 
