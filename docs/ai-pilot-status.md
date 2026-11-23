@@ -7,10 +7,9 @@ what was learned and what to do next.
 
 ## CHECKPOINT 23 Nov 2026 (latest): Swiss check done; next is the decision probe. START HERE
 
-**State of the repository.** The work since 21 Nov is on branch `claude/relaxed-franklin-4vtvog`
-(three commits after `main`'s `c854a18`: the Swiss tool, its results, the real event structure),
-not yet merged into `main`. Merge it or open a pull request only when the user asks. The session
-could push only that branch. `runs/rr18-cal` (the replayed calibration) is not committed. Nothing
+**State of the repository.** Everything is on `main`: the Swiss tool, its results, the real event
+structure and this checkpoint were merged by pull request #7 (`14c2fd9`); the AI-pilot work of
+15–17 Nov by #2–#3. No other branch holds unmerged work. `runs/rr18-cal` (the replayed calibration) is not committed. Nothing
 below needs it except re-deriving the audit numbers, and its pairing table is committed.
 
 **What the user decided (21 Nov).** Option 2 of the 17 Nov checkpoint: the Swiss check, then the
@@ -510,10 +509,8 @@ advisor would be a Forge patch, measured like any other.
 
 ## Branch state
 
-- As of 17 Nov 2026 all AI-pilot work is on `claude/ai-decision-engine`, pushed, including step 4
-  (done on `claude/gifted-mendel-ia018w`, which points at the same commit) and the 100-list sample
-  of the other session. It contains `main` as of 56151e6. **It has not been merged into `main` and
-  no pull request exists.** Ask the user before merging or opening a PR.
+- All AI-pilot work, step 4 and the 100-list sample included, is on `main` (pull requests #2–#7;
+  checked 23 Nov 2026). `claude/ai-decision-engine` no longer exists on the remote.
 - `runs/` is git-ignored and does not survive a new container; every run can be replayed from its
   command and seed.
 - The cloud environment "Mtg-simulator" allows `magic.gg`, `mtgdecks.net` and melee.gg. magic.gg
