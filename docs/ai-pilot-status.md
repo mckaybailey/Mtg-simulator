@@ -8,7 +8,7 @@ what was learned and what to do next.
 ## CHECKPOINT 23 Nov 2026, evening (latest): probe step A done; next is step B. START HERE
 
 **State of the repository.** Everything is on `main`: step A (below) was merged by pull request
-#PRNUM, the Swiss comparison by #9, the earlier work by #2–#8. No other branch holds unmerged work.
+#10, the Swiss comparison by #9, the earlier work by #2–#8. No other branch holds unmerged work.
 `runs/` is not committed; the check runs named below (`runs/snap2-*`, `runs/snapcheck-*`) may be
 gone in a new container and are not needed.
 
