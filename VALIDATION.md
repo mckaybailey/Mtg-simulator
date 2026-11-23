@@ -17,6 +17,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Lopsided match (meta deck vs 40 lands + 20 Llanowar Elves) | 93.3%, CI 84–97% |
 | A/B with a deliberately worse variant | detected: +12.5 points, CI +6.8 to +18.2, p < 0.001 |
 | Simulated vs real meta win rates | weak agreement: rank correlation 0.14 over eighteen decks with all fourteen Forge patches (noise 0.04–0.19), mean gap 11.4 points, SD 14.0 against a real 6.0 ("Calibration" below); 0.23 and 11.4 over twelve decks with eleven patches; 0.24 and 13.0 on unpatched Forge with eleven decks |
+| Simulated vs real meta win rates, as simulated Swiss events (the reference metric since 23 Nov) | `calibrate` on the same run: SD 11.4 (10.6–12.2) against a real 6.0, mean gap 9.4 (8.5–10.1), Spearman 0.11 (0.01–0.18), 8 sign errors of 18 ("Swiss pairing" below) |
 | Engine failures | 0 crashes in about 4,100 recorded games; 1 time-out (a board stall in the mirror match), plus 1 in an early integration-test run |
 | Fresh install (`setup --build` in an empty home, then `doctor`) | passes in about 2 minutes |
 | Forge patches (fresh build with patches, then changed patch sets) | applied, recorded and rebuilt exactly as designed; see below |
@@ -818,6 +819,30 @@ Pairing explains part of the spread, not the ranking: the simulated matchups the
 wrong. Meta win rates should be reported as a simulated Swiss event of the real structure when
 they are compared with real ones, which narrows the gap by about 2–3 points without any change in
 play.
+
+### Built into mtgsim: the reference metric (23 November 2026)
+
+The comparison is now part of mtgsim (`mtgsim/calibration.py`): every `matrix` run whose decks have
+`real_win_rate` and `meta_share` ends with it, and `python3 -m mtgsim calibrate RUN_DIR|TABLE.json`
+recomputes it. The event structure is read from the gauntlet's `real_events` (the three events
+above for `decks/standard/meta`), the rest of the field is beaten 50% of the time (the reading above:
+that rate changes no metric), and a `--bo3` run's own match results are used instead of the
+p²(3 − 2p) conversion. `tools/swiss_check.py` now runs on the same code and prints the same
+numbers as before (checked on `sim-matchups.json` with `--events real` and two other option sets).
+On the committed calibration table, `calibrate` gives:
+
+| Line | SD (real 6.0) | Mean gap | Spearman | Sign errors |
+|---|---|---|---|---|
+| games, equal weights | 14.0 (13.2–15.0) | 11.5 (10.7–12.3) | 0.14 (0.04–0.18) | 9 |
+| games, share-weighted | 14.0 (12.9–15.3) | 11.6 (10.4–12.9) | 0.14 (0.01–0.19) | 8 |
+| best-of-three matches, share-weighted | 14.7 (13.4–15.4) | 12.2 (10.7–13.0) | 0.14 (0.01–0.19) | 8 |
+| **Swiss, the three real events** | **11.4 (10.6–12.2)** | **9.4 (8.5–10.1)** | **0.11 (0.01–0.18)** | **8** |
+
+(100 bootstrap replicates of 10 seasons; Swiss minus round-robin matches SD −3.3, −3.7 to −2.5.)
+**From now on runs are compared on the Swiss line**; these are its baseline numbers for the
+18-deck meta with fourteen patches. A change that does not move the Swiss SD or gap beyond these
+noise ranges has not brought the simulation closer to the real results. The older figures in this
+file are round-robin game rates and stay as they were measured.
 
 ## The goldfish model
 

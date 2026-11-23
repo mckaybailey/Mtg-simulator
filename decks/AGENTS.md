@@ -23,7 +23,11 @@ Any folder of `.txt` / `.dck` lists works as a gauntlet. Check every list with
 
 ## gauntlet.json (optional, one per folder)
 
-`{"format", "snapshot", "description", "calibration", "decks": [...]}`; each deck entry:
+`{"format", "snapshot", "description", "calibration", "real_events", "decks": [...]}`.
+`real_events` is `{"structure", "description"}`: the structure of the events behind the real win
+rates as `N:R[:cR/L][:wW][:lL]` per event, comma-separated (N players, R Swiss rounds, a cut to L
+losses after round R, a stop at W wins or L losses), used by `calibrate` and every `matrix` run to
+play the round robin's results out as Swiss events; without it, `600:12`. Each deck entry:
 
 | Field | Meaning |
 |---|---|
@@ -40,4 +44,5 @@ Any folder of `.txt` / `.dck` lists works as a gauntlet. Check every list with
 1. Replace the lists and update `meta_share`, provenance fields and the README table.
 2. `python3 -m mtgsim check decks/standard/meta` must pass with no errors.
 3. Re-calibrate: `python3 -m mtgsim matrix decks/standard/meta -n 30` (about 30 minutes), then
-   update `sim_win_rate` and `ai_pilot` for every deck and the README's calibration table.
+   update `sim_win_rate` and `ai_pilot` for every deck and the README's calibration table. Update
+   `real_events` to the events the new real win rates come from.

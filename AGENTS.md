@@ -22,7 +22,13 @@ parses the game logs of a `--save-logs` run. `mtgsim/forge_patches/README.md` li
 patch with its cause and measurement.
 
 **The goal of the current work is simulations whose win rates look like the real ones.** Judge every
-change by the spread (SD) and the mean gap of the 18 meta decks against their real win rates. The
+change by the spread (SD) and the mean gap of the 18 meta decks against their real win rates,
+**on the Swiss line** of `python3 -m mtgsim calibrate` (since 23 Nov; every `matrix` run of the
+meta prints it): the real rates come from Swiss events, so the round robin's pairing results are
+played out as simulated events of the real structure (`mtgsim/calibration.py`). Baseline (17 Nov
+calibration, fourteen patches): Swiss SD 11.4 (10.6–12.2) against a real 6.0, mean gap 9.4
+(8.5–10.1), Spearman 0.11, 8 sign errors of 18. Round-robin figures quoted below (SD 14.0, gap
+11.4) are the older measure of the same run; compare old and new results like with like. The
 plan, revised 16 Nov 2026, in order: check best-of-three with sideboards (`--bo3`; done 16 Nov);
 run the 18-deck round robin in best-of-three (done 16 Nov: the format widens the spread and Forge's
 sideboards do not pull it back beyond noise, so best-of-one is not the explanation); a field of
@@ -38,9 +44,10 @@ discussion with the user (the "latest" checkpoint there) laid out what remains: 
 mtgsim, a Swiss-pairing check and an LLM probe, or more single-error hunting. The user chose the
 Swiss check and the probe (21 Nov), the probe answered by Claude subagents instead of an API key.
 The Swiss check is done (`tools/swiss_check.py`, `VALIDATION.md` "Swiss pairing"): simulated
-Swiss events of the real events' structure take the SD from 14.0 to 11.4 and leave the ranking unchanged. The probe's next step
-is a driver snapshot of the deciding player's visible state: start from the 23 Nov checkpoint
-("START HERE"). All of this work, the AI pilot included, is on `main` (pull requests #2–#7).
+Swiss events of the real events' structure take the SD from 14.0 to 11.4 and leave the ranking unchanged. On 23 Nov the
+Swiss comparison became part of mtgsim (`calibrate`, and every meta `matrix` run) and the metric
+for future iterations (above). The probe's next step is a driver snapshot of the deciding player's
+visible state: start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 
@@ -93,8 +100,10 @@ How the findings were made, for the next card or deck:
   interval and how often the card was cast), plus a 200-game mirror. Card-script patches can be
   measured on the shared Forge one at a time; Java patches in a private `MTGSIM_HOME`.
 - After patches change, replay `matrix decks/standard/meta -n 30 --seed 1` and update the
-  calibration (`tools/calibration.py`, `tools/calibration_diff.py`, `tools/update_calibration.py`,
-  the meta README table, the numbers in this file and `README.md`).
+  calibration: the run's own "Against real win rates" block (the Swiss line is the headline;
+  `calibrate RUN_DIR` recomputes it), `tools/calibration.py`, `tools/calibration_diff.py`,
+  `tools/update_calibration.py`, the meta README table, `decks/standard/meta/sim-matchups.json`,
+  the numbers in this file and `README.md`.
 
 ## Running simulations for the user
 
@@ -123,7 +132,9 @@ Always pass on the limits with the numbers:
 
 - The pilot is Forge's AI. Simulated meta win rates barely track real ones (calibration run of
   17 Nov, 18 decks, 14 Forge patches, best-of-one, 4,590 games: rank correlation 0.14, noise
-  0.04–0.19; mean gap 11.4 points; SD 14.0 against a real 6.0): creature decks (Boros Dwarves,
+  0.04–0.19; mean gap 11.4 points; SD 14.0 against a real 6.0; as simulated Swiss events like the
+  real ones, which is how to compare with real figures: SD 11.4, gap 9.4, Spearman 0.11, 8 of 18
+  decks on the wrong side of 50%): creature decks (Boros Dwarves,
   Boros Dragons, Mono-Black Aggro, Mono-Green Landfall, Rakdos Lizards, Orzhov Lifegain) are
   overrated, Jund Sacrifice, Dimir Uldaros, Dimir Excruciator, Azorius Artifacts and Izzet
   Spellementals underrated.
@@ -148,7 +159,7 @@ Always pass on the limits with the numbers:
 ## Working on the code
 
 - Python 3.9+, standard library only; no third-party imports, no pytest.
-- Tests: `python3 -m unittest discover -s tests` (298 tests, ~4.5 minutes because the integration
+- Tests: `python3 -m unittest discover -s tests` (314 tests, ~4.5 minutes because the integration
   test plays real games; the unit tests alone take ~3 seconds).
 - Forge is pinned by `FORGE_PINNED_REF` in `mtgsim/forge.py`. The Java driver uses Forge
   internals, so bump the pin deliberately and re-run the integration test plus a mirror match

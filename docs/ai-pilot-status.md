@@ -5,7 +5,38 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 23 Nov 2026 (latest): Swiss check done; next is the decision probe. START HERE
+## CHECKPOINT 23 Nov 2026, later (latest): Swiss comparison built in; next is probe step A. START HERE
+
+**State of the repository.** The work below is on branch `claude/relaxed-franklin-4vtvog`, in a pull
+request to `main` opened at the user's request (merged only when they say so). Everything before it
+is on `main` (#2–#8).
+
+**What the user asked (23 Nov).** Make the Swiss comparison part of mtgsim and use it as *the*
+metric to compare future iterations against. Done:
+
+- `mtgsim/calibration.py` plays a `matrix` run's pairing results out as simulated Swiss events of
+  the real structure and compares four lines with the real win rates (round-robin games equal and
+  share-weighted, round-robin best-of-three matches, Swiss): SD, mean gap, Spearman, sign errors,
+  bootstrap noise ranges. Every `matrix` run whose decks have `real_win_rate` and `meta_share` prints
+  it and puts it in the report ("Against real win rates"); `python3 -m mtgsim calibrate RUN_DIR|TABLE`
+  recomputes it or adds it to old runs. The real events' structure is `real_events` in
+  `decks/standard/meta/gauntlet.json`. `tools/swiss_check.py` now uses the same code (same output).
+- **The reference numbers to beat** (Swiss line, `calibrate decks/standard/meta/sim-matchups.json`,
+  18 decks, fourteen patches): **SD 11.4 (10.6–12.2) against a real 6.0, mean gap 9.4 (8.5–10.1),
+  Spearman 0.11 (0.01–0.18), 8 sign errors of 18.** A change counts only if it moves the Swiss SD
+  or gap outside those ranges (better: `tools/calibration_diff.py`-style paired comparison on the
+  same seeds; there is no Swiss version of that script yet, see below).
+- Docs updated: root `AGENTS.md` (the goal now names the Swiss line), `README.md` (new section and
+  command), `VALIDATION.md` ("Built into mtgsim: the reference metric"), `mtgsim/AGENTS.md`,
+  `tests/AGENTS.md`, `decks/AGENTS.md`, `tools/README.md`, `decks/standard/meta/README.md`.
+
+**Next.** Unchanged: the decision probe, starting with step A (driver snapshots) as laid out in
+the checkpoint below. Two small optional follow-ups, not asked for: a paired Swiss difference
+between two runs (`calibrate` on each gives independent noise ranges, which overstate the noise of
+a difference on shared seeds); and `tools/update_calibration.py` writing the Swiss rate per deck
+into `gauntlet.json` next to `sim_win_rate` (the `ai_pilot` ratings still use the round-robin rate).
+
+## CHECKPOINT 23 Nov 2026: Swiss check done; next is the decision probe
 
 **State of the repository.** Everything is on `main`: the Swiss tool, its results, the real event
 structure and this checkpoint were merged by pull request #7 (`14c2fd9`); the AI-pilot work of

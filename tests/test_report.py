@@ -113,6 +113,7 @@ class CliHelpersTest(unittest.TestCase):
             ["match", "a.txt", "b.txt", "-n", "50", "-j", "2", "--seed", "9"],
             ["gauntlet", "a.txt", "--vs", "d1", "d2", "--strict"], ["ab", "a.txt", "b.txt", "--head-to-head"],
             ["matrix", "folder", "--mc", "max"], ["goldfish", "a.txt", "--clock"], ["report", "runs/x"],
+            ["calibrate", "runs/x", "--events", "600:12", "--reps", "0"],
         ]
         for argv in cases:
             args = parser.parse_args(argv)

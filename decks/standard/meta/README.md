@@ -75,7 +75,11 @@ The patches fix cards the AI could not cast or used wrongly, and each moved its 
 Landfall spent its mana on Ba Sing Se every turn and gained 20 points once that was fixed;
 Four-Color Control gained 12 points from patch 0014), but the two columns still barely agree on
 the order: rank correlation 0.14 (game noise alone moves it between 0.04 and 0.19), mean gap 11.4
-points, and a spread (SD) of 14.0 points against the real 6.0. The AI wins with decks that turn
+points, and a spread (SD) of 14.0 points against the real 6.0. Played out as simulated Swiss
+events of the real events' structure (`real_events` in `gauntlet.json`; `python3 -m mtgsim
+calibrate`), which is how the real figures were produced and the comparison to use from now on,
+the spread is 11.4, the mean gap 9.4, the rank correlation 0.11, and 8 of 18 decks are still on
+the wrong side of 50%. The AI wins with decks that turn
 creatures sideways and loses with decks that need planning: Jund Sacrifice, the best deck in the
 real field, comes out fifth from the bottom. Best-of-three with Forge's sideboarding, a wider
 field and a Monte Carlo search pilot were all tried and leave this where it is; `VALIDATION.md`

@@ -2,6 +2,10 @@
  "format": "Standard",
  "snapshot": "2026-11-05",
  "description": "Most-played Standard archetypes from the Magic.gg Metagame Mentor table of 2026-11-05 (Arena Championship 13 and Magic Spotlight: Fracture events, about 1,810 decklists). meta_share is the percentage of that field. See README.md in this folder for how the lists were gathered and their limits.",
+ "real_events": {
+  "structure": "176:9:w7:l3,775:15:c9/3,865:15:c9/3",
+  "description": "The events behind real_win_rate, for the Swiss comparison (python3 -m mtgsim calibrate; mtgsim/calibration.py): Arena Championship 13, 176 players, nine rounds of modified Swiss in which a player stops at 7 wins or 3 losses (magic.gg viewer's guide); Magic Spotlight: Fracture in Hartford (775 players) and Beijing (865), nine rounds, at most 3 losses to day two, fifteen rounds in all (melee.gg tournaments 440878 and 457663). Top 16 / top 8 playoffs left out. Checked 2026-11-23."
+ },
  "decks": [
   {
    "file": "mono-green-landfall.txt",

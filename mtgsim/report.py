@@ -463,6 +463,77 @@ def _section_matrix(summary: dict, names: Dict[str, str]) -> str:
     )
 
 
+_CAL_VIEWS = (
+    ("swiss", "Simulated Swiss events", "the like-for-like comparison: the real rates are match results from Swiss events"),
+    ("matches", "Round robin, best-of-three matches", "share-weighted, the rest of the field as \u201cother\u201d"),
+    ("weighted", "Round robin, games, share-weighted", ""),
+    ("games", "Round robin, games", "every opponent counted equally, as in the ranking above"),
+)
+
+
+def _range(r: Optional[Sequence[Optional[float]]], digits: int, signed: bool = False) -> str:
+    if not r or r[0] is None:
+        return ""
+    f = (lambda v: _signed(v, digits)) if signed else (lambda v: f"{v:.{digits}f}")
+    return f"{f(r[0])} to {f(r[1])}"
+
+
+def _signed(value: float, digits: int = 1) -> str:
+    """A difference already in points, with its sign (− for minus)."""
+    return f"{value:+.{digits}f}".replace("-", "\u2212")
+
+
+def _section_calibration(summary: dict, names: Dict[str, str]) -> str:
+    cal = summary.get("calibration")
+    if not cal or not cal.get("decks"):
+        return ""
+    m, noise = cal["metrics"], cal.get("noise") or {}
+    sw = m["swiss"]
+    tiles = (_tile("Spread (SD), Swiss", num(sw["sd"]), f"real {num(cal['real_sd'])}")
+             + _tile("Mean gap to real", f"{num(sw['mean_gap'])} pts", f"all at 50%: {num(cal['flat']['mean_gap'])}")
+             + _tile("Rank correlation", num(sw["spearman"], 2) if sw["spearman"] is not None else "–", "Spearman")
+             + _tile("Sign errors", str(sw["sign_errors"]), f"of {len(cal['decks'])} decks"))
+    rows = []
+    for view, label, hint in _CAL_VIEWS:
+        mv, nv = m[view], noise.get(view, {})
+        sp = num(mv["spearman"], 2) if mv["spearman"] is not None else "–"
+        rows.append(
+            f'<tr><td class="name">{"<b>" if view == "swiss" else ""}{esc(label)}{"</b>" if view == "swiss" else ""}'
+            + (f'<div class="note">{esc(hint)}</div>' if hint else "") + "</td>"
+            f'<td class="n">{num(mv["sd"])}</td><td class="n">{esc(_range(nv.get("sd"), 1))}</td>'
+            f'<td class="n">{num(mv["mean_gap"])}</td><td class="n">{esc(_range(nv.get("mean_gap"), 1))}</td>'
+            f'<td class="n">{sp}</td><td class="n">{esc(_range(nv.get("spearman"), 2))}</td>'
+            f'<td class="n">{mv["sign_errors"]}</td></tr>')
+    pe, pn = cal.get("pairing_effect") or {}, cal.get("pairing_effect_noise") or {}
+    effect = ""
+    if "sd" in pe:
+        rng = _range(pn.get("sd"), 1, signed=True)
+        effect = (f" Swiss pairing alone changes the spread by {_signed(pe['sd'])} points"
+                  + (f" ({rng})" if rng else "") + f" and the mean gap by {_signed(pe['mean_gap'])}.")
+    decks = "".join(
+        f'<tr><td class="name">{esc(names.get(d["key"], d["name"]))}</td><td class="n">{num(d["real"])}</td>'
+        f'<td class="n">{num(d["games"])}</td><td class="n">{num(d["matches"])}</td>'
+        f'<td class="n"><b>{num(d["swiss"])}</b></td><td class="n">{_signed(d["swiss"] - d["real"])}</td></tr>'
+        for d in sorted(cal["decks"], key=lambda d: -(d["swiss"] - d["real"])))
+    return (
+        '<section class="card"><h2>Against real win rates</h2>'
+        f'<p class="note">The decks with a real win rate and a meta share in their gauntlet.json, {len(cal["decks"])} here. '
+        "Real win rates are match results from Swiss events, so this run's pairing results are also played out as "
+        f"simulated events of that structure ({esc(cal['events'])}, {cal['seasons']} repetitions; decks drawn by meta "
+        f"share, the rest of the field, {num(cal['other_share'])}%, won against {pct(cal['other_rate'], 0)} of the time; "
+        "mirrors and byes left out). Compare future runs on the Swiss line." + esc(effect) + "</p>"
+        f'<div class="tiles">{tiles}</div>'
+        '<h3>Four ways to compare</h3><div class="scroll"><table><thead><tr><th>Simulated rate</th><th>SD</th>'
+        '<th>95% noise</th><th>Mean gap</th><th>95% noise</th><th>Spearman</th><th>95% noise</th><th>Sign errors</th>'
+        f'</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
+        '<p class="note">Noise ranges come from redrawing every pairing\u2019s games from its observed win rate. '
+        "Sign errors count decks on the other side of 50% from their real rate.</p>"
+        '<h3>By deck</h3><div class="scroll"><table><thead><tr><th>Deck</th><th>Real</th><th>Round robin</th>'
+        '<th>RR matches</th><th>Swiss</th><th>Swiss − real (pts)</th></tr></thead>'
+        f"<tbody>{decks}</tbody></table></div></section>"
+    )
+
+
 def _section_cards(summary: dict, names: Dict[str, str]) -> str:
     out = []
     for key, data in (summary.get("cards") or {}).items():
@@ -704,6 +775,7 @@ def render(summary: dict) -> str:
         "matrix": _section_matrix, "clock": _section_clock,
     }
     body = sections[kind](summary, names) if kind in sections else ""
+    body += _section_calibration(summary, names)
     if kind != "clock":
         body += _section_cards(summary, names)
     body += _section_misplays(summary, names)
