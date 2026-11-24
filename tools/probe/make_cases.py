@@ -265,6 +265,32 @@ def mana_text(side):
     return "%d%s" % (side["manaOpen"], (" (" + "; ".join(notes) + ")") if notes else "")
 
 
+def ability_text(text):
+    """Forge's stack text without its bracketed annotations ("[Number Attackers: [...]]", nested, or cut off at
+    the end), and targets written "(targeting X, Y)"."""
+    out, i = [], 0
+    while i < len(text):
+        m = re.match(r"\s*\[(?!\[)[A-Z][A-Za-z ]*: ", text[i:])
+        if m:
+            depth, j = 0, i
+            while j < len(text):
+                if text[j] == "[":
+                    depth += 1
+                elif text[j] == "]":
+                    depth -= 1
+                    if depth == 0:
+                        j += 1
+                        break
+                j += 1
+            i = j
+            continue
+        out.append(text[i])
+        i += 1
+    t = "".join(out).strip()
+    t = re.sub(r"\(Targeting: \[\[(.*?)\]\]\)", lambda m: "(targeting " + m.group(1) + ")", t)
+    return t.rstrip(".").rstrip() + "."
+
+
 def history_text(st):
     """What both players saw happen this turn and last (spells, abilities, turn conditions, cards known in hand)."""
     lines = []
@@ -282,7 +308,7 @@ def history_text(st):
         parts = []
         for who in ("you", "opponent"):
             items = ab[who]["items"]
-            txt = "; ".join("%s %s%s" % (a["source"], a["kind"], (": " + a["text"]) if a.get("text") else "")
+            txt = "; ".join("%s %s%s" % (a["source"], a["kind"], (": " + ability_text(a["text"])) if a.get("text") else "")
                             for a in items) or "none"
             if ab[who]["more"]:
                 txt += "; and %d more" % ab[who]["more"]
