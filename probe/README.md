@@ -115,9 +115,14 @@ found wrong.
 
 ## Fix before step D
 
-**Status, 24 Nov 2026: done, see "Round 2" at the end.** Items 1–6 and 8 are fixed in the tracker
-or the case text; 7 is done (the spell and counter agreements were read by hand, and a misread
-was fixed); 9 is left to step D.
+**Status, 24 Nov 2026 (round 2, see the end):**
+- **Done:** items 1, 2, 4 and 8.
+- **Partly done:** 3 (spree fixed; cost reductions only noted in the case text), 5 (spells this
+  turn and last; no abilities, reveals or crimes) and 6 (a note, no split count). They are to be
+  finished in round 3 (`docs/ai-pilot-status.md`, latest checkpoint).
+- **Item 7:** done for the spell and counter agreements, which were read by hand; a misread was
+  fixed.
+- **Item 9:** left to step D.
 
 These were found after the answers came in. Fixing items 1–5 changes the case text, so the cases
 must be rebuilt and answered again (about 20 subagent runs). They are cheap next to a grading

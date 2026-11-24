@@ -5,7 +5,127 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 24 Nov 2026 (latest): case gaps fixed, round 2 answered; next is step D. START HERE
+## CHECKPOINT 24 Nov 2026, later (latest): finish case gaps 3, 5 and 6 fully, then step D. START HERE
+
+**What the user asked (24 Nov).** Round 2 (the checkpoint below) fixed gaps 3, 5 and 6 of
+`probe/README.md`, "Fix before step D", only partly. The user wants them done fully before step D.
+Then re-run step B, rebuild and re-answer the cases as round 3, re-collect, and update the docs.
+All earlier work is committed and pushed on `claude/relaxed-franklin-4vtvog`; no pull request is
+open for the 24 Nov commits.
+
+**Where each gap stands, and what "fully" means:**
+
+3. **Cost reductions in the castable lists.** Spree and tiered costs are already fixed
+   (`modeCostPayable` in `payableNow`). Cost reductions are not computed: Momo's discount on
+   Dragons, Eddymurk Crab and Hearth Elemental's graveyard discount, Cavern-style restrictions
+   aside. For now the case text only warns that the list may miss them. *To do:* reduce the
+   printed mana cost by the reductions that apply before `canPayMana`. The tracker check is
+   `castableNow` → `payableNow` → `canPayMana` (`mtgsim/bridge/ForgeBridge.java`, `Tracker`).
+   - **Forge's function, and its risk.** Forge applies reductions in
+     `CostAdjustment.adjust(ManaCostBeingPaid, sa, payer, cardsToDelveOut, test, effect)`
+     (`forge-game/.../cost/CostAdjustment.java`, line ~173).
+   - **It is not plainly read-only.** For a face-down cast it flips the host face down and back
+     (`turnFaceDownNoUpdate`). Convoke, improvise, delve, emerge, offering and assist branches may
+     ask the player controller to choose (look for `test` guards). `applyReduceCostAbility` evaluates
+     `AbilityUtils.calculateAmount`.
+   - **The tracker's rule** (`mtgsim/bridge/AGENTS.md`): no `MyRandom`, no AI memory, no controller
+     calls, no state changes.
+   - **Two ways to do it:**
+     - (a) Call `adjust` with `test=true` only after reading every branch it can reach for these
+       decks' cards.
+     - (b) Safer: walk the `ReduceCost` static abilities yourself, the way `adjust` collects them
+       (statics on the battlefield, stack and command zones with `Mode$ ReduceCost`), and apply only
+       `Amount$` values that are numbers or that `calculateAmount` reads without side effects. Leave
+       out convoke, delve, improvise and the like, and say so in the case note.
+   - Either way, keep the case note for whatever is not covered.
+   - **Cards to test against:**
+     - Momo, Friendly Flier (Azorius Momo / Boros Dragons);
+     - Eddymurk Crab and Hearth Elemental (Izzet Spellementals);
+     - Superior Spider-Man;
+     - anything `misplays` flags with a discount.
+
+5. **History.** Cases now show `spellsThisTurn` / `spellsLastTurn`. They do not show:
+   - activated abilities (a Map, Jace's -2, a land animated);
+   - cards revealed or known to the player (a Duress look, a card the opponent returned to hand);
+   - turn conditions such as a crime this turn, or a creature that died this turn.
+
+   *To do:* record what the deciding player saw happen, this turn and last, in `state`.
+   - **Option (a), the game log.** The driver already reads `game.getGameLog()` for `--save-logs`
+     (`writeGameLog`, ~line 737), and `GameEventAddLog` fires per entry. Check that log entries never
+     carry hidden information (draws, the opponent's hand, face-down cards, library order) before
+     putting any in a case. Filter by `GameLogEntryType`, and drop anything about a hidden zone.
+   - **Option (b), tracker events.** Record specific events in the tracker: `GameEventSpellAbilityCast`
+     for abilities and triggers (`item.isAbility()` / `isTrigger()`, already filtered out in `onCast`),
+     zone changes to hand from public zones, creatures dying. Then read the "crime" condition from
+     the player object if Forge keeps it (search `forge-game` for `Crime` / `committedCrime`).
+   - Keep the case header's note for whatever is still not shown.
+
+6. **Restricted mana.** `manaOpen` counts every free mana unit, restricted ones included. The case
+   text only notes this. *To do:* split the count.
+   - **Data:** `manaUnits` already builds `Unit` objects whose `restrictedParts` / `restrictedMasks`
+     hold mana usable only for some spells (`AbilityManaPart.getManaRestrictions()`, the
+     `RestrictValid$` of Cavern of Souls, Treasures under Clarion Conqueror and the like).
+   - **Snapshot:** write `manaOpenFree` (units whose `freeMask` is non-zero) and `manaOpenRestricted`
+     plus a short description of the restriction, for example the card's name and "creature spells
+     of the chosen type". Put them in `playerJson`, for both players.
+   - **Case text:** in `tools/probe/make_cases.py` `side_text`, show the split, for example "4 (1 of
+     them only for Dwarf spells)", and drop the generic note.
+
+**How to do the round** (the same steps as round 2; commands are in `probe/README.md`, "Round 2"):
+
+1. **Change the tracker** (read-only rule). Recompile happens automatically on the next run.
+   Smoke test: `python3 -m mtgsim match decks/standard/meta/azorius-control.txt
+   decks/standard/meta/boros-dwarves.txt -n 4 --seed 1 --snapshots --out runs/fixcheck-smoke`.
+   Inspect the new fields, then `grep tracker: runs/.../logs/worker-*.log` for ignored errors.
+2. **Check games are unchanged:**
+   - Unpack the original step B: `tar -C runs -xJf probe/run/probe-b.tar.xz`. Also unpack
+     `probe-b2.tar.xz` if wanted.
+   - Re-run step B: copy `probe/run/probe-b2.sh` to `probe-b3.sh`, change the output to
+     `runs/probe-b3/`, and run it detached (`setsid nohup … &`). It takes about 30 minutes, most of
+     it Four-Color Control.
+   - Compare: `python3 tools/compare_games.py runs/probe-b/<deck> runs/probe-b3/<deck> …` for all
+     seven decks. It must say 420 of 420.
+   - Diff the snapshots against probe-b2's: only the new fields should differ, and castable lists
+     only where a reduction applies. A reduction can add castable spells, and so new
+     `main2` / `upkeep` / `draw` / `endstep` / `counter` lines; that is expected.
+   - Gap 3 changes `idleOwn` / `idleOpp` / `counter` misplay counts for discounted cards. Say so in
+     `mtgsim/bridge/AGENTS.md`.
+3. **Rebuild the cases:** `python3 tools/probe/make_cases.py runs/probe-b3 --out probe/round3
+   --same-as probe/round2/key.jsonl --old-run runs/probe-b2`. This needs `runs/probe-b2`; unpack it.
+   Decisions that no longer exist are listed. New decisions that only now exist are not added; note
+   how many, if any matter.
+4. **Answer:** copy `probe/round3/batches/*.txt` to a scratchpad folder outside the repository.
+   Start 20 fresh general-purpose subagents in the background, one batch each, with
+   `tools/probe/answer_prompt.txt` (fill in `{PATH}`).
+   - **Use this round's transcripts only.** The session's tasks folder can also hold an earlier
+     session's transcripts; the prior round's were found there.
+   - Copy this round's agent transcripts (`<tasks dir>/<agentId>.output`) to a scratchpad folder.
+     Run `python3 tools/probe/extract_answers.py --out probe/round3 <those files>`. It must report
+     no PROBLEM lines. Do not commit the transcripts (about 8 MB).
+5. **Collect:** `python3 tools/probe/collect.py --out probe/round3`.
+   - Compare with round 2 case by case: verdict flips, and which flips the new text explains.
+     Expect about one case in thirteen to flip from the answerer's own variation.
+   - Read the spell and counter agreements for false matches.
+6. **Docs, commit, push:**
+   - Add a "Round 3" section to `probe/README.md` and mark gaps 3, 5 and 6 done in its list.
+   - Add a row to `VALIDATION.md`, "Decision probe".
+   - Update `mtgsim/bridge/AGENTS.md`: the snapshot fields and the castable definition, now with
+     reductions.
+   - Update this checkpoint and the probe paragraph of `AGENTS.md`.
+   - Commit after each milestone: the tracker with its replay check, the cases, then the answers.
+   - Push to `claude/relaxed-franklin-4vtvog`.
+7. **Then step D on round 3** (plan below, in the checkpoint after this one). Gap 9 (timing) is
+   left to step D by design.
+
+**Facts the next agent would otherwise rediscover:**
+- `tests/test_integration.py` checks the shape of snapshot fields. Run the integration test once
+  after changing the driver; it takes about 5 minutes. A test run started in parallel with games
+  slows both.
+- Tokens with empty text are vanilla in Forge's token scripts (Illusion, Robot, Dwarf, Skeleton
+  Pirate, most Spirits). This is not a bug.
+- Probe round 2: agreement 102 of 198, 52% (45–58%); planning decks 85 of 173.
+
+## CHECKPOINT 24 Nov 2026: case gaps fixed, round 2 answered; next is step D (superseded by the checkpoint above)
 
 **State of the repository.** Steps B and C were merged by pull request #11. This round is on
 branch `claude/relaxed-franklin-4vtvog` (pushed, no pull request yet as of this note).
