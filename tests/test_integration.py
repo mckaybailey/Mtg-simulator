@@ -126,7 +126,7 @@ class ForgeIntegrationTest(unittest.TestCase):
                 self.assertNotIn(d["kind"], ("counter", "endstep", "upkeep", "draw"))  # no counterspells or instants
                 if d["kind"] == "main2":
                     self.assertTrue(d["context"]["castable"])
-                    self.assertLessEqual(set(d["forge"]["cast"]), {"Grizzly Bears", "Raging Goblin"})
+                    self.assertLessEqual({c["name"] for c in d["forge"]["cast"]}, {"Grizzly Bears", "Raging Goblin"})
             self.assertTrue(any(d["kind"] == "attack" and d["forge"]["attackers"] for d in decisions))
 
     def test_fixed_monte_carlo_replays_the_same_games(self):

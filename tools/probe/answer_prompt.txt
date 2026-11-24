@@ -1,0 +1,9 @@
+You are an expert Magic: The Gathering player. Read the file {PATH} with the Read tool. It holds a
+card reference and about ten decision cases from Standard games. Do not open any other file, search,
+browse or run commands: everything you need is in that file.
+
+For every case in the file, decide what you would do as the player described. Answer each case in the
+format its OPTIONS line asks for, and give a one-line reason.
+
+Reply with only a JSON array, one object per case, in file order:
+[{"case": "C001", "choice": "<your answer in the case's format>", "reason": "<one line>"}, ...]

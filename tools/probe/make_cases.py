@@ -423,6 +423,37 @@ def forge_words(d):
     return json.dumps(fo)
 
 
+def same_as(decisions, key_path, old_root):
+    """The decisions of an earlier round's key, found again in a replay of the same games (round 2).
+
+    The games replay exactly, but decision numbers can shift (a decision kind's trigger changed), so
+    each old decision is matched on game, seat, kind, turn, phase, hand and stack. Old decisions
+    with no match (for instance a step recorded only because a spree card counted as castable) are
+    returned as None in their place.
+    """
+    def ident(d):
+        st = d["state"]
+        return (d["game"], d["seat"], d["kind"], st.get("turn"), st.get("phase"),
+                tuple(st["you"].get("hand", [])), tuple(x["name"] for x in st.get("stack", [])))
+    index = collections.defaultdict(list)
+    for d in decisions:
+        index[ident(d)].append(d)
+    out = []
+    for line in Path(key_path).read_text().splitlines():
+        k = json.loads(line)
+        old_file = Path(old_root) / Path(k["file"]).relative_to(Path(k["file"]).parents[2])
+        old = None
+        with open(old_file) as fh:
+            for l in fh:
+                d = json.loads(l)
+                if d.get("n") == k["n"] and d["type"] == "decision":
+                    old = d
+                    break
+        found = index.get(ident(old), []) if old else []
+        out.append((k["case"], found[0] if len(found) == 1 else None))
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("runs", nargs="+")
@@ -430,10 +461,22 @@ def main(argv=None):
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--batch", type=int, default=10)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--same-as", metavar="KEY", help="rebuild the decisions of an earlier round's key.jsonl "
+                    "(found in --old-run) from a replay of the same games, instead of sampling")
+    ap.add_argument("--old-run", default="runs/probe-b", help="the run the --same-as key was sampled from")
     args = ap.parse_args(argv)
     cards = Cards()
     games, decisions = load_decisions(args.runs)
-    chosen = sample(decisions, cards, args.n, args.seed)
+    if args.same_as:
+        pairs = same_as(decisions, args.same_as, args.old_run)
+        missing = [c for c, d in pairs if d is None]
+        if missing:
+            print("no match in the replay (left out):", ", ".join(missing))
+        chosen = [d for c, d in pairs if d is not None]
+        old_ids = [c for c, d in pairs if d is not None]
+    else:
+        chosen = sample(decisions, cards, args.n, args.seed)
+        old_ids = None
     out = Path(args.out)
     (out / "batches").mkdir(parents=True, exist_ok=True)
     with open(out / "key.jsonl", "w") as key, open(out / "cases.jsonl", "w") as cases:
@@ -441,7 +484,7 @@ def main(argv=None):
             batch = chosen[b:b + args.batch]
             texts, names = [], set()
             for j, d in enumerate(batch):
-                cid = "C%03d" % (b + j + 1)
+                cid = old_ids[b + j] if old_ids else "C%03d" % (b + j + 1)
                 game = games[d["game"]]
                 text = case_text(cid, d, game)
                 texts.append(text)
