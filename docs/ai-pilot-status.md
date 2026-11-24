@@ -5,7 +5,43 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 23 Nov 2026, night (latest): probe steps B and C done; fix the case gaps, then step D. START HERE
+## CHECKPOINT 24 Nov 2026 (latest): case gaps fixed, round 2 answered; next is step D. START HERE
+
+**State of the repository.** Steps B and C were merged by pull request #11. This round is on
+branch `claude/relaxed-franklin-4vtvog` (pushed, no pull request yet as of this note).
+
+**What the user asked (24 Nov).** Fix the gaps in the cases before step D: tracker items 1, 2, 3
+and 8 of `probe/README.md`, "Fix before step D", plus the case-text items. Then re-run step B,
+rebuild and re-answer the cases, and re-collect.
+
+**Done.**
+- **Tracker** (`mtgsim/bridge/ForgeBridge.java`): token text, `chosen` (every `getChosen*` /
+  `getNamedCards` field, public view only for the opponent), cast `targets`, `spellsThisTurn` /
+  `spellsLastTurn`, and spree / tiered mode costs in the castable check (this also changes those
+  cards' misplay counts). Step B replayed identically, 420 of 420 games
+  (`probe/run/probe-b2.tar.xz`).
+- **Cases:** `make_cases.py --same-as` rebuilt the same decisions with the fixed text, 198 of the
+  200; C128 and C177 existed only through the spree bug. They are in `probe/round2/`.
+- **Answers:** 20 fresh subagents answered under `tools/probe/answer_prompt.txt`.
+  `extract_answers.py` took the answers from the transcripts and checked that each answerer read
+  only its own file.
+- **Comparison:** `collect.py` no longer counts held spells as cast, and it reports whether the
+  answer names Forge's targets. The spell and counter agreements were read by hand.
+
+**Result.** Agreement is 102 of 198, 52% (45–58%); for the planning decks it is 49% (42–57%).
+That is the same as round 1. 183 of 198 cases keep their verdict. One flip clearly comes from the
+new text (C175, the Treefolk show reach). The rest are the model's own variation, about one case
+in thirteen. Detail is in `probe/README.md`, "Round 2", and `VALIDATION.md`.
+
+**Next: step D,** as planned below, on round 2.
+- Grade the 96 disagreements in `probe/round2/merged.jsonl` (`agree` false). Show `text`, the
+  answer's `model` and Forge's `forge` as A and B in random order. Never show the `reason`.
+- Show the 10 agreeing `main` cases that differ only in timing, or count them as equal and say
+  so.
+- A noisy answerer means a single grade per case carries that noise. If the result is near the
+  gate, a second answer per disagreement would show how stable the preference is.
+
+## CHECKPOINT 23 Nov 2026, night: probe steps B and C done; fix the case gaps, then step D (superseded by the checkpoint above)
 
 **State of the repository.** Steps B and C and the fix list below are in pull request #11, from
 branch `claude/relaxed-franklin-4vtvog` (open, not merged, as of this note). Everything before

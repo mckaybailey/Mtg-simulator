@@ -12,6 +12,8 @@ latest checkpoint. This folder holds the data. The scripts that made it are in `
 | `cases.jsonl` | the same cases, one line each (`case`, `kind`, `deck`, `text`), for the grading sheet |
 | `key.jsonl` | **not shown to the answerers**: where each case came from (`file`, `game`, `n`), its `kind`, `deck`, `group` (`planning` or `creature`), the hand, and Forge's choice, both raw (`forge`) and in the case's answer format (`forge_text`) |
 | `answers.jsonl` | the blind answers: `case`, `choice`, `reason`, `batch`, and `note` where something was done by hand (two cases, see below) |
+| `run/probe-b2.tar.xz`, `run/probe-b2.sh`, `run/probe-b2.log` | **Round 2's step B**: the same 420 games replayed by the fixed tracker (24 Nov), identical game for game; unpack with `tar -C runs -xJf probe/run/probe-b2.tar.xz` |
+| `round2/` | **Round 2** (24 Nov): the same decisions rebuilt with the gaps below fixed, and answered again. `batches/`, `cases.jsonl`, `key.jsonl`, `answers.jsonl` and `merged.jsonl` as here (198 cases; C128 and C177 dropped). Use this round for step D |
 | `merged.jsonl` | key, case text and answer side by side, with `agree` (the mechanical comparison) and `timing` (whether a `main` case that agrees on its spells also agrees on casting them before or after combat) |
 
 ## How the cases were made
@@ -112,6 +114,10 @@ legal. What misled was the case's own option text (gap 4 below). No answer has b
 found wrong.
 
 ## Fix before step D
+
+**Status, 24 Nov 2026: done, see "Round 2" at the end.** Items 1–6 and 8 are fixed in the tracker
+or the case text; 7 is done (the spell and counter agreements were read by hand, and a misread
+was fixed); 9 is left to step D.
 
 These were found after the answers came in. Fixing items 1–5 changes the case text, so the cases
 must be rebuilt and answered again (about 20 subagent runs). They are cheap next to a grading
@@ -218,3 +224,66 @@ The fixes to items 1, 2, 3 and 8 are changes to the driver's tracker
 replay that is game-for-game identical to a run without them (`tools/compare_games.py`). After
 that, re-run step B, rebuild the cases, re-answer and re-collect. The step B run here stays as
 the record of this round.
+
+## Round 2 (24 November 2026)
+
+**What changed.** The driver's tracker (`mtgsim/bridge/ForgeBridge.java`, documented in
+`mtgsim/bridge/AGENTS.md`) now records:
+- each token's rules text (`text`; empty for a vanilla token, which most of the Illusion, Robot,
+  Dwarf, Skeleton Pirate and Spirit tokens here are);
+- every choice made for a permanent (`chosen`: type, colours, player, number, cards, card names,
+  mode, direction, odd or even, sector), for example Cavern of Souls' type or the card named for
+  Petrified Hamlet; the opponent's only as publicly known;
+- the targets of the spells Forge cast;
+- the spells each player cast this turn and the last;
+- spree and tiered mode costs in the castable check.
+
+The case text (`tools/probe/make_cases.py`) shows these, says lands are "any land you may play",
+notes that castable lists can miss reduced-cost spells and that open mana includes restricted
+mana, and says which history is not shown (abilities, reveals, crimes).
+
+**Checks.** Step B replayed with the new tracker is identical to the first run in all 420 games
+(`tools/compare_games.py`). The snapshots differ only by the new fields and by the spree fix.
+`make_cases.py --same-as probe/key.jsonl --old-run runs/probe-b` found 198 of the 200 decisions
+again. C128 and C177 were recorded only because Three Steps Ahead counted as castable with one
+mana open, so they no longer exist. Twenty fresh general-purpose subagents answered under the
+prompt in `tools/probe/answer_prompt.txt`. `tools/probe/extract_answers.py` took the answers from
+their transcripts and confirmed that each read only its own batch file. Nothing was done by hand
+this round.
+
+**Comparison fixes.** `collect.py` no longer counts a spell the answer says it holds ("Erode
+(hold, cast if needed)", "hold No More Lies (opponent's turn)") as cast; that fix moved C040 in
+round 2 and C197 in round 1. It also reports, for agreeing spell cases, whether the answer names
+Forge's targets. Every spell and counter agreement was read by hand and none is false. Some still
+hide a choice the snapshot does not record: a charm's mode (C102), evoke or not (C189), what
+Superior Spider-Man copies (C026, C034). Attack, block and mulligan agreements compare ids and
+keep or mulligan exactly.
+
+**Result** (`python3 tools/probe/collect.py --out probe/round2`):
+
+| | cases | agree | agreement (95% CI) |
+|---|---|---|---|
+| all | 198 | 102 | 52% (45–58%) |
+| planning decks | 173 | 85 | 49% (42–57%) |
+| creature decks | 25 | 17 | 68% (48–83%) |
+| main | 60 | 21 | 35% (24–48%) |
+| main2 | 15 | 2 | 13% (4–38%) |
+| block | 33 | 18 | 55% (38–70%) |
+| attack | 27 | 18 | 67% (48–81%) |
+| mulligan | 24 | 16 | 67% (47–82%) |
+| endstep | 14 | 9 | 64% (39–84%) |
+| counter | 10 | 5 | 50% (24–76%) |
+| upkeep | 8 | 7 | 88% (53–98%) |
+| draw | 7 | 6 | 86% (49–97%) |
+
+Agreement is where it was. 183 of the 198 cases get the same verdict in both rounds. Of the 15
+that flip, one follows plainly from the new text: in C175 the Treefolk tokens now show reach,
+and the answer no longer attacks into them.
+
+The other flips are the model answering the same question differently a second time, mostly
+mulligans and blocks. About one case in thirteen flips, so one answer per case is a noisy
+measure.
+
+**For step D.** Grade round 2's 96 disagreements (`round2/merged.jsonl`, `agree` false). For the
+agreeing cases, show the 10 `main` cases that differ only in timing, and the ones above whose
+modes or copy choices are unrecorded, or count them as equal and say so.

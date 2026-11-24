@@ -40,7 +40,40 @@ def strip_notes(text):
     return text
 
 
-def split_fields(choice):
+HELD = re.compile(r"\bhold\b|\bif (?:needed|unused|not needed|nothing)\b|\botherwise\b|\bkeep\b.*\bup\b", re.I)
+LATER = re.compile(r"opponent's (?:turn|upkeep|draw|end step|combat)|their (?:turn|upkeep|end step)|next turn", re.I)
+
+
+def top_level_parts(text):
+    """Split on commas and semicolons outside brackets."""
+    parts, depth, cur = [], 0, ""
+    for ch in text:
+        depth += ch == "("
+        depth -= ch == ")"
+        if ch in ",;" and depth == 0:
+            parts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    return parts + [cur]
+
+
+def drop_held(cast, own_turn_only):
+    """Leave out the spells an answer only holds, or (in a decision about this turn) casts on a later turn."""
+    keep = []
+    for part in top_level_parts(cast):
+        if HELD.search(part) or (own_turn_only and LATER.search(part)):
+            continue
+        keep.append(part)
+    return ",".join(keep)
+
+
+def split_fields(choice, own_turn_only=False):
+    land, cast = "", choice
+    m = re.search(r"cast\s*:\s*(.*)$", choice, re.I | re.S)
+    if m:
+        cast = drop_held(m.group(1), own_turn_only)
+        choice = choice[:m.start()] + "Cast: " + cast
     choice = strip_notes(choice)
     land, cast = "", choice
     m = re.search(r"land\s*:\s*(.*?)(;|$)", choice, re.I)
@@ -82,7 +115,7 @@ def agree(key, case_text, choice):
     # when to cast them (before or after combat) is not compared, see timing()
     hand = set(key["hand"])
     forge_cast = {x["name"] if isinstance(x, dict) else x for x in fo.get("cast", [])}
-    land_text, cast_text = split_fields(c)
+    land_text, cast_text = split_fields(c, own_turn_only=kind in ("main", "main2"))
     model_cast = names_in(cast_text, hand | forge_cast)
     same_cast = {norm(x) for x in model_cast} == {norm(x) for x in forge_cast & (hand | forge_cast)}
     if kind in ("main", "main2"):
@@ -108,6 +141,24 @@ def timing(key, choice):
     return "differs" if differs else "same"
 
 
+def targets_named(key, choice):
+    """For a spell case that agrees: whether the answer names each of Forge's targets ("same", "differs", None)."""
+    casts = [x for x in key["forge"].get("cast", []) if isinstance(x, dict) and x.get("targets")]
+    if not casts:
+        return None
+    for c in casts:
+        for t in c["targets"]:
+            m = re.match(r"(.*) \((\d+)\)$", t)
+            if m:
+                if "#" + m.group(2) not in choice and norm(m.group(1)) not in norm(choice):
+                    return "differs"
+            elif t in ("you", "opponent"):
+                continue  # a player target is rarely written out
+            elif norm(t) not in norm(choice):
+                return "differs"
+    return "same"
+
+
 def wilson(k, n, z=1.96):
     if n == 0:
         return (float("nan"),) * 2
@@ -128,6 +179,7 @@ def main(argv=None):
     answers = {a["case"]: a for a in map(json.loads, open(out / "answers.jsonl"))}
     tally = collections.defaultdict(lambda: [0, 0, 0])  # agree, disagree, unclear
     timings = collections.Counter()
+    targets = collections.Counter()
     with open(out / "merged.jsonl", "w") as fh:
         for cid in sorted(keys):
             k = keys[cid]
@@ -137,9 +189,11 @@ def main(argv=None):
                                  "forge": k["forge_text"], "model": a["choice"] if a else None,
                                  "reason": a.get("reason") if a else None, "agree": res,
                                  "timing": timing(k, a["choice"]) if a and res else None,
+                                 "targets": targets_named(k, a["choice"]) if a and res else None,
                                  "text": texts[cid]}) + "\n")
             if a and res:
                 timings[timing(k, a["choice"])] += 1
+                targets[targets_named(k, a["choice"])] += 1
             for bucket in ("all", k["group"], k["kind"]):
                 tally[bucket][0 if res is True else 1 if res is False else 2] += 1
     print("answers: %d of %d cases" % (len(answers), len(keys)))
@@ -151,6 +205,8 @@ def main(argv=None):
                                             "%.0f%% (%.0f-%.0f%%)" % (100 * a / (a + d), 100 * lo, 100 * hi) if a + d else "-"))
     print("main cases that agree on the spells: timing the same %d, differs (before / after combat) %d"
           % (timings["same"], timings["differs"]))
+    print("spell cases that agree and where Forge targeted something: answer names the same targets %d, others %d"
+          % (targets["same"], targets["differs"]))
 
 
 if __name__ == "__main__":

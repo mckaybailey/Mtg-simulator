@@ -24,6 +24,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Misplay tracking does not change games (same seed, original vs new driver) | 60 of 60 games identical, then 1,650 of 1,650 over the whole round robin; see below |
 | Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), three times (as the kinds were added), 40 of 40 with and without snapshots; see "Decision snapshots" |
 | Decision probe, steps B and C (23 Nov): 200 blind cases | a Claude subagent's choice and Forge's agree on 51% (44–58%) of cases, 49% (41–56%) of the planning decks' 175; least on spell decisions (main phase 32%, second main 19%), where the answer usually casts more. Which is better is step D's grading; see "Decision probe" |
+| Decision probe, round 2 (24 Nov): the same decisions with the case gaps fixed | 420 of 420 step B games replay identically with the new tracker; 198 of the 200 decisions found again (two existed only through a spree-cost bug); fresh answerers agree with Forge on 102 of 198, 52% (45–58%), planning decks 49% (42–57%): no change. 183 of 198 cases get the same verdict in both rounds; see "Decision probe" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -916,6 +917,37 @@ go another way under a model. Whether the other way is better is step D, where t
 the 98 disagreements blind. The gate is set in `docs/ai-pilot-status.md`. Gaps found in the cases and the
 comparison (token text, choices made for cards such as Cavern of Souls' type, castable lists, Forge's targets not recorded) are
 listed in `probe/README.md`, "Fix before step D", to be fixed and the cases re-answered first.
+
+**Round 2 (24 Nov 2026).** The tracker gained token text, the choices made for each permanent
+(`getChosen*`: Cavern of Souls' type and the rest), the targets of Forge's casts, the spells cast
+this turn and the last, and spree / tiered mode costs in its castable check. Replaying step B with
+it (`probe/run/probe-b2.tar.xz`) gave 420 of 420 games identical to the first run; the snapshots
+differ only by the new fields and by Three Steps Ahead and Lively Dirge no longer counting as
+castable without an affordable mode. The case builder rebuilt the same decisions (`--same-as`)
+with the fixed text (tokens' abilities, "chose …" after a permanent, the recent spells, notes on
+cost reductions, restricted mana and what history is missing, lands "you may play"). C128 and
+C177 are gone: both were recorded only because Three Steps Ahead counted as castable with one
+mana open. Twenty fresh subagents answered the 198 cases under the same rules; their transcripts
+show each read only its own batch file.
+
+| | Round 1 (200 cases) | Round 2 (198 cases) |
+|---|---|---|
+| all | 103, 52% (45–58%) | 102, 52% (45–58%) |
+| planning decks | 85 of 175, 49% | 85 of 173, 49% (42–57%) |
+| creature decks | 18 of 25, 72% | 17 of 25, 68% (48–83%) |
+| main | 20 of 60 | 21 of 60, 35% (24–48%) |
+| main2 | 3 of 16 | 2 of 15, 13% |
+
+(Round 1 is re-scored here with the comparison's fix for spells an answer says it holds, which
+moved C197 to agreement; its published 102 of 200 is the same data before that fix.)
+
+The fixes do not move agreement. 183 of the 198 cases get the same verdict in both rounds. Of the
+15 that change, one follows plainly from the new text (C175: the Treefolk tokens now show reach
+and the answer no longer attacks), and the rest look like the answerer's own variation (mulligans
+and blocks that go the other way on a second asking). So about one case in thirteen flips between
+two askings of the same model: a single answer per case is a noisy measure, and step D's grades
+inherit that. Of the agreeing spell cases where Forge targeted something, all 3 name the same
+target; 10 of 15 agreeing `main` cases with casts differ in timing (Forge after combat).
 
 ## The goldfish model
 
