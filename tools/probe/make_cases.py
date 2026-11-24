@@ -243,15 +243,76 @@ def perm_text(p, controller_you):
     return "#%s %s [%s] — %s" % (p["id"], " ".join(bits), p["types"], "; ".join(flags))
 
 
+def mana_text(side):
+    """The open mana, with the units that only some spells may use (round 3 on); older snapshots keep the note."""
+    if "manaRestricted" not in side:
+        return ("%d (counting mana that can be spent only on some spells, such as Cavern of Souls' or a "
+                "restricted Treasure's)" % side["manaOpen"])
+    only = [r for r in side["manaRestricted"] if r["onlyUnderRule"]]
+    partly = [r for r in side["manaRestricted"] if not r["onlyUnderRule"]]
+    notes = []
+    groups = collections.OrderedDict()
+    for r in only:
+        groups.setdefault((r["source"], r["rule"]), 0)
+        groups[(r["source"], r["rule"])] += 1
+    for (src, rule), n in groups.items():
+        notes.append("%d of them from %s: %s" % (n, src, rule.rstrip(".")))
+    seen = set()
+    for r in partly:
+        if (r["source"], r["rule"]) not in seen:
+            seen.add((r["source"], r["rule"]))
+            notes.append("%s's other colours: %s" % (r["source"], r["rule"].rstrip(".")))
+    return "%d%s" % (side["manaOpen"], (" (" + "; ".join(notes) + ")") if notes else "")
+
+
+def history_text(st):
+    """What both players saw happen this turn and last (spells, abilities, turn conditions, cards known in hand)."""
+    lines = []
+    for key, label in (("spellsLastTurn", "Spells cast last turn"), ("spellsThisTurn", "Spells cast so far this turn")):
+        sp = st[key]
+        lines.append("%s: you %s; opponent %s." % (label, ", ".join(sp["you"]) or "none",
+                                                  ", ".join(sp["opponent"]) or "none"))
+    if "abilitiesThisTurn" not in st:
+        lines.append("(No other history is shown: abilities activated, cards revealed, or whether a condition "
+                     "such as a crime has been met this turn.)")
+        return lines
+    for key, label in (("abilitiesLastTurn", "Abilities and triggers put on the stack last turn"),
+                       ("abilitiesThisTurn", "Abilities and triggers put on the stack so far this turn")):
+        ab = st[key]
+        parts = []
+        for who in ("you", "opponent"):
+            items = ab[who]["items"]
+            txt = "; ".join("%s %s%s" % (a["source"], a["kind"], (": " + a["text"]) if a.get("text") else "")
+                            for a in items) or "none"
+            if ab[who]["more"]:
+                txt += "; and %d more" % ab[who]["more"]
+            parts.append("%s: %s" % ("you" if who == "you" else "opponent", txt))
+        lines.append("%s — %s." % (label, " | ".join(parts)))
+    for who, label in (("you", "you"), ("opponent", "opponent")):
+        t = st[who]["thisTurn"]
+        bits = ["crimes committed %d" % t["crimes"], "life gained %d" % t["lifeGained"],
+                "life lost %d" % t["lifeLost"], "cards drawn %d" % t["cardsDrawn"],
+                "tokens created %d" % t["tokensCreated"]]
+        for k, name in (("creaturesDied", "creatures died"), ("sacrificed", "sacrificed"), ("discarded", "discarded")):
+            if t[k]:
+                bits.append("%s: %s" % (name, ", ".join(t[k])))
+        lines.append("This turn so far, %s: %s." % (label, "; ".join(bits)))
+    known = st["opponent"].get("knownInHand") or []
+    lines.append("Cards you know are in your opponent's hand (revealed to you, or returned there from a public "
+                 "zone): %s." % (", ".join(known) or "none"))
+    lines.append("(Not shown: cards revealed from a library, and anything before last turn other than what is "
+                 "on the battlefield, in graveyards and in exile.)")
+    return lines
+
+
 def side_text(label, side, is_you):
     lines = ["%s: life %d%s, library %d cards, %s." % (
         label, side["life"], (", %d poison" % side["poison"]) if side.get("poison") else "",
         side["library"],
         "hand (%d): %s" % (side["handCount"], ", ".join(side["hand"]) if side["hand"] else "empty")
         if is_you else "%d cards in hand" % side["handCount"])]
-    lines.append("  Lands played this turn: %d. Untapped mana available: %d (counting mana that can be spent only "
-                 "on some spells, such as Cavern of Souls' or a restricted Treasure's)." % (
-                     side["landsPlayedThisTurn"], side["manaOpen"]))
+    lines.append("  Lands played this turn: %d. Untapped mana available: %s." % (
+        side["landsPlayedThisTurn"], mana_text(side)))
     lands = [p for p in side["battlefield"] if p["types"].split(" - ")[0].endswith("Land") and "Creature" not in p["types"]]
     others = [p for p in side["battlefield"] if p not in lands]
     lines.append("  Lands: " + ("; ".join(
@@ -268,6 +329,14 @@ def side_text(label, side, is_you):
 
 def decklist_text(main):
     return ", ".join("%d %s" % (v, k) for k, v in sorted(main.items()))
+
+
+def castable_note(st):
+    """Round 3 snapshots count cost reductions and increases; older ones did not."""
+    if "abilitiesThisTurn" in st:
+        return ("; cost reductions and increases are counted, except convoke, delve, improvise and reductions "
+                "whose size you choose")
+    return "; spells that cost less because of a cost reduction may be missing from this list"
 
 
 def decision_text(d, game):
@@ -295,18 +364,17 @@ def decision_text(d, game):
         return q, opts
     if kind == "main2":
         q = "It is your second main phase (combat is over this turn)."
-        opts = ("Castable now (as far as mana and targets go; spells that cost less because of a cost reduction "
-                "may be missing from this list): %s. You may cast any of these (and play a land if you "
+        opts = ("Castable now (as far as mana and targets go%s): %s. You may cast any of these (and play a land if you "
                 "have not this turn), or cast nothing and hold them. Answer as: Land: <name or none>; Cast: ... or none."
-                % ", ".join(ctx["castable"]))
+                % (castable_note(st), ", ".join(ctx["castable"])))
         return q, opts
     if kind in ("upkeep", "draw", "endstep"):
         where = {"upkeep": "It is your upkeep (you have not drawn yet this turn).",
                  "draw": "It is your draw step; you have just drawn your card for the turn.",
                  "endstep": "It is the end step of your opponent's turn; your turn is next."}[kind]
-        opts = ("Castable now at instant speed (spells that cost less because of a cost reduction may be missing "
-                "from this list): %s. Cast one or more of them now (say what and on what target), "
-                "or cast nothing now. Answer as: Cast: <spell (target)>, ... or none." % ", ".join(ctx["castable"]))
+        opts = ("Castable now at instant speed (as far as mana and targets go%s): %s. Cast one or more of them now "
+                "(say what and on what target), or cast nothing now. Answer as: Cast: <spell (target)>, ... or none."
+                % (castable_note(st), ", ".join(ctx["castable"])))
         return where, opts
     if kind == "attack":
         cands = {p["id"]: p for p in you["battlefield"]}
@@ -359,12 +427,7 @@ def case_text(cid, d, game):
         lines += side_text("YOU", st["you"], True)
         lines += side_text("OPPONENT", st["opponent"], False)
         if "spellsThisTurn" in st:
-            for key, label in (("spellsLastTurn", "Spells cast last turn"), ("spellsThisTurn", "Spells cast so far this turn")):
-                sp = st[key]
-                lines.append("%s: you %s; opponent %s." % (label, ", ".join(sp["you"]) or "none",
-                                                          ", ".join(sp["opponent"]) or "none"))
-            lines.append("(No other history is shown: abilities activated, cards revealed, or whether a condition "
-                         "such as a crime has been met this turn.)")
+            lines += history_text(st)
         if st["stack"]:
             lines.append("STACK (top first): " + "; ".join(
                 "%s (%s's %s%s)" % (s["name"], "your" if s["controller"] == "you" else "opponent",

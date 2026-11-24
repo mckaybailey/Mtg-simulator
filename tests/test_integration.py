@@ -122,6 +122,17 @@ class ForgeIntegrationTest(unittest.TestCase):
                 self.assertEqual(player["turns"], sum(d["kind"] == "main" for d in mine))
             for d in decisions:
                 self.assertNotIn("hand", d["state"]["opponent"] or {})  # never the opponent's hand
+                if d["kind"] != "mulligan":
+                    st = d["state"]
+                    for side in ("you", "opponent"):
+                        self.assertEqual(st[side]["manaOpen"], st[side]["manaOpenFree"])  # no spending rules here
+                        self.assertEqual([], st[side]["manaRestricted"])
+                        self.assertEqual({"crimes", "lifeGained", "lifeLost", "cardsDrawn", "tokensCreated",
+                                          "creaturesDied", "sacrificed", "discarded"}, set(st[side]["thisTurn"]))
+                        for key in ("abilitiesThisTurn", "abilitiesLastTurn"):
+                            self.assertEqual({"items": [], "more": 0}, st[key][side])  # vanilla creatures
+                    self.assertEqual([], st["opponent"]["knownInHand"])
+                    self.assertNotIn("knownInHand", st["you"])
                 self.assertNotIn("unresolved", d["forge"])
                 self.assertNotIn(d["kind"], ("counter", "endstep", "upkeep", "draw"))  # no counterspells or instants
                 if d["kind"] == "main2":

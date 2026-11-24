@@ -47,10 +47,22 @@ and the player's untapped free mana sources can pay the printed mana cost with X
 sources are permanents whose mana ability costs only a tap (no summoning sickness), sacrificing
 itself, or life; each makes the colours its `Produced$` names (`Any`, `Chosen`, `Combo` → any
 colour; `Amount$` when it is a number); coloured symbols are matched to distinct sources;
-Phyrexian symbols are paid with life above 2; cost reductions and mana-pool mana are ignored. A
+Phyrexian symbols are paid with life above 2; mana-pool mana is ignored. A
 spree or tiered spell also needs one mode's additional cost (`ModeCost$`) on top of the printed
 cost, for a mode whose required targets exist (since 24 Nov; before, Three Steps Ahead counted as
-castable with one mana open).
+castable with one mana open). Since round 3 of the probe (24 Nov) the cost is changed as Forge
+would change it on casting (`adjustedMana`, mirroring `CostAdjustment.adjust`): the spell's own
+`RaiseCost$` / `ReduceCost$`, and the `RaiseCost` and `ReduceCost` static abilities on the
+battlefield, the stack, the command zone and the card itself (its own statics only for a spell of
+the face they are on, so Hearth Elemental's discount does not reach Stoke Genius), each tested with
+Forge's private `CostAdjustment.checkRequirement` and reductions sized by
+`applyReduceCostAbility` (both called by reflection; both only read the game). Left out: reductions
+whose size the player chooses (`UpTo$`), raises that are not pure mana or depend on the chosen
+modes or targets, statics that need the spell's targets (`ValidTarget$`; none are chosen yet), set
+costs (Trinisphere), face-down casts, and convoke, improvise, delve, emerge, offering and assist.
+This adds discounted cards (Eddymurk Crab, Hearth Elemental, Momo's flyers, ...) to the `idleOwn`,
+`idleOpp` and `counter` misplay counts where they were castable only with the discount; runs
+before 24 Nov counted them only at full price.
 
 | Field | Definition |
 |---|---|
@@ -94,7 +106,22 @@ and Forge's choice under `forge`.
 `state` holds only what the deciding player may know: `turn`, `phase`, `activePlayer` (`you` /
 `opponent`), `you` and `opponent` (`life`, `poison` when above 0, `hand` for `you` only (sorted
 names), `handCount`, `library` count, `landsPlayedThisTurn`, `manaOpen` = the tracker's free mana
-units (`manaUnits`, see "Castable"), `battlefield`, `graveyard`, face-up `exile`), and `stack`
+units (`manaUnits`, see "Castable"), `manaOpenFree` = those of them that can be spent on anything,
+`manaRestricted` = one entry per unit with a spending rule (`source` name, `rule` = the ability's
+"Spend this mana only ..." sentence, `onlyUnderRule`: true when the unit makes mana only under the
+rule, false when only some of its colours need it, as Cavern of Souls' coloured mana does),
+`thisTurn` (`crimes`, `lifeGained`, `lifeLost`, `cardsDrawn`, `tokensCreated` from Forge's
+per-turn counters, `creaturesDied` (names, tokens marked) as the tracker saw them move from the
+battlefield to a graveyard, `sacrificed`, `discarded`), for `opponent` only `knownInHand` (cards
+in their hand the deciding player has seen: returned there from a public zone, or in their hand
+when a hand-revealing effect of the deciding player resolved: a `Discard` with a `Reveal...` mode
+such as Duress, or `RevealHand`; a card is forgotten once it leaves the hand), `battlefield`,
+`graveyard`, face-up `exile`), `abilitiesThisTurn` and `abilitiesLastTurn` (`you` / `opponent`:
+`items` = activated abilities and triggers as they went on the stack, `source`, `kind` ability /
+trigger, `text` = Forge's stack text with players written you / opponent and its bracketed
+annotations dropped, face-down sources unnamed and without text for the other player; at most 25 a
+player and turn, `more` counts the rest; mana abilities do not use the stack and are not listed),
+and `stack`
 (`name`, `controller`, `kind` spell / ability / trigger, `targets`). A permanent: `id`, `name`,
 `types`, `tapped`, for creatures `power`, `toughness`, `damage` and `sick` (when present),
 `counters`, `attachedTo` (an id), `token`; a token also has `text` (its script's Oracle text, else
