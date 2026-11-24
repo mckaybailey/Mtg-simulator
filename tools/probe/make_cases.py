@@ -203,10 +203,28 @@ def sample(decisions, cards, n, seed):
     return chosen[:n]
 
 
+def chosen_text(chosen):
+    """The choices made for a permanent as it entered or resolved (the driver's `chosen` object)."""
+    words = []
+    for key, label in (("type", "type"), ("type2", "second type"), ("colors", "colour"), ("player", "player"),
+                       ("number", "number"), ("cards", "card"), ("named", "card name"), ("mode", "mode"),
+                       ("direction", "direction"), ("evenOdd", "odd or even"), ("sector", "sector")):
+        v = chosen.get(key)
+        if v is None:
+            continue
+        if isinstance(v, list):
+            v = ", ".join(v)
+        words.append("%s %s" % (label, v))
+    return "chose " + "; ".join(words)
+
+
 def perm_text(p, controller_you):
     bits = [p["name"]]
     if p.get("token"):
-        bits.append("(token)")
+        if "text" in p:
+            bits.append("(token: %s)" % (p["text"].replace("\\n", " ").replace("\n", " ") if p["text"] else "no abilities"))
+        else:
+            bits.append("(token)")
     if "power" in p:
         bits.append("%s/%s" % (p["power"], p["toughness"]))
     flags = []
@@ -220,6 +238,8 @@ def perm_text(p, controller_you):
                                for k, v in p["counters"].items()))
     if p.get("attachedTo") is not None:
         flags.append("attached to #%s" % p["attachedTo"])
+    if p.get("chosen"):
+        flags.append(chosen_text(p["chosen"]))
     return "#%s %s [%s] — %s" % (p["id"], " ".join(bits), p["types"], "; ".join(flags))
 
 
@@ -229,12 +249,14 @@ def side_text(label, side, is_you):
         side["library"],
         "hand (%d): %s" % (side["handCount"], ", ".join(side["hand"]) if side["hand"] else "empty")
         if is_you else "%d cards in hand" % side["handCount"])]
-    lines.append("  Lands played this turn: %d. Untapped mana available: %d." % (
-        side["landsPlayedThisTurn"], side["manaOpen"]))
+    lines.append("  Lands played this turn: %d. Untapped mana available: %d (counting mana that can be spent only "
+                 "on some spells, such as Cavern of Souls' or a restricted Treasure's)." % (
+                     side["landsPlayedThisTurn"], side["manaOpen"]))
     lands = [p for p in side["battlefield"] if p["types"].split(" - ")[0].endswith("Land") and "Creature" not in p["types"]]
     others = [p for p in side["battlefield"] if p not in lands]
     lines.append("  Lands: " + ("; ".join(
-        "#%s %s (%s)" % (p["id"], p["name"], "tapped" if p["tapped"] else "untapped") for p in lands) or "none"))
+        "#%s %s (%s%s)" % (p["id"], p["name"], "tapped" if p["tapped"] else "untapped",
+                           "; " + chosen_text(p["chosen"]) if p.get("chosen") else "") for p in lands) or "none"))
     lines.append("  Other permanents:" + ("" if others else " none"))
     for p in others:
         lines.append("    " + perm_text(p, is_you))
@@ -267,12 +289,14 @@ def decision_text(d, game):
              "which land you play (if any) and which spells you cast this turn, each marked "
              "before combat, during combat or after combat. Cards you do not name are held. "
              "(Attacks are decided separately; you may say in a few words whether you intend to attack.)")
-        opts = ("Any land from your hand (one per turn) and any spells you can pay for, or casting nothing. "
+        opts = ("Any land you may play (one per turn unless an effect allows more) and any spells you can pay "
+                "for, or casting nothing. "
                 "Answer as: Land: <name or none>; Cast: <spell (timing)>, ... or none.")
         return q, opts
     if kind == "main2":
         q = "It is your second main phase (combat is over this turn)."
-        opts = ("Castable now (as far as mana and targets go): %s. You may cast any of these (and play a land if you "
+        opts = ("Castable now (as far as mana and targets go; spells that cost less because of a cost reduction "
+                "may be missing from this list): %s. You may cast any of these (and play a land if you "
                 "have not this turn), or cast nothing and hold them. Answer as: Land: <name or none>; Cast: ... or none."
                 % ", ".join(ctx["castable"]))
         return q, opts
@@ -280,7 +304,8 @@ def decision_text(d, game):
         where = {"upkeep": "It is your upkeep (you have not drawn yet this turn).",
                  "draw": "It is your draw step; you have just drawn your card for the turn.",
                  "endstep": "It is the end step of your opponent's turn; your turn is next."}[kind]
-        opts = ("Castable now at instant speed: %s. Cast one or more of them now (say what and on what target), "
+        opts = ("Castable now at instant speed (spells that cost less because of a cost reduction may be missing "
+                "from this list): %s. Cast one or more of them now (say what and on what target), "
                 "or cast nothing now. Answer as: Cast: <spell (target)>, ... or none." % ", ".join(ctx["castable"]))
         return where, opts
     if kind == "attack":
@@ -333,6 +358,13 @@ def case_text(cid, d, game):
             PHASES.get(st["phase"], st["phase"])))
         lines += side_text("YOU", st["you"], True)
         lines += side_text("OPPONENT", st["opponent"], False)
+        if "spellsThisTurn" in st:
+            for key, label in (("spellsLastTurn", "Spells cast last turn"), ("spellsThisTurn", "Spells cast so far this turn")):
+                sp = st[key]
+                lines.append("%s: you %s; opponent %s." % (label, ", ".join(sp["you"]) or "none",
+                                                          ", ".join(sp["opponent"]) or "none"))
+            lines.append("(No other history is shown: abilities activated, cards revealed, or whether a condition "
+                         "such as a crime has been met this turn.)")
         if st["stack"]:
             lines.append("STACK (top first): " + "; ".join(
                 "%s (%s's %s%s)" % (s["name"], "your" if s["controller"] == "you" else "opponent",
@@ -353,6 +385,9 @@ def names_in(d, game):
         s = st.get(side, {})
         names |= set(s.get("hand", [])) | set(s.get("graveyard", [])) | set(s.get("exile", []))
         names |= {p["name"] for p in s.get("battlefield", [])}
+        for p in s.get("battlefield", []):  # cards named or chosen for a permanent (ids stripped)
+            ch = p.get("chosen", {})
+            names |= set(ch.get("named", [])) | {re.sub(r" \(\d+\)$", "", c) for c in ch.get("cards", [])}
     names |= {s["name"] for s in st.get("stack", [])}
     return names
 
@@ -365,9 +400,17 @@ def forge_words(d):
     if kind in ("main", "main2", "upkeep", "draw", "endstep"):
         phase = {"MAIN1": "before combat", "MAIN2": "after combat", "END_OF_TURN": "end step", "UPKEEP": "upkeep",
                  "DRAW": "draw step"}
-        cast = ", ".join("%s (%s)" % (c["name"], phase.get(c.get("phase"), "during combat" if "COMBAT" in str(c.get("phase")) else str(c.get("phase")).lower()))
-                         if isinstance(c, dict) and kind == "main" else (c["name"] if isinstance(c, dict) else c)
-                         for c in fo.get("cast", [])) or "none"
+        def one(c):
+            if not isinstance(c, dict):
+                return c
+            notes = []
+            if kind == "main":
+                notes.append(phase.get(c.get("phase"), "during combat" if "COMBAT" in str(c.get("phase"))
+                                       else str(c.get("phase")).lower()))
+            if c.get("targets"):
+                notes.append("targeting " + ", ".join(c["targets"]))
+            return c["name"] + (" (%s)" % "; ".join(notes) if notes else "")
+        cast = ", ".join(one(c) for c in fo.get("cast", [])) or "none"
         land = ", ".join(fo.get("lands", [])) or "none"
         return ("Land: %s; Cast: %s" % (land, cast)) if kind in ("main", "main2") else "Cast: %s" % cast
     if kind == "attack":

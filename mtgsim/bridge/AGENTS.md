@@ -47,7 +47,10 @@ and the player's untapped free mana sources can pay the printed mana cost with X
 sources are permanents whose mana ability costs only a tap (no summoning sickness), sacrificing
 itself, or life; each makes the colours its `Produced$` names (`Any`, `Chosen`, `Combo` → any
 colour; `Amount$` when it is a number); coloured symbols are matched to distinct sources;
-Phyrexian symbols are paid with life above 2; cost reductions and mana-pool mana are ignored.
+Phyrexian symbols are paid with life above 2; cost reductions and mana-pool mana are ignored. A
+spree or tiered spell also needs one mode's additional cost (`ModeCost$`) on top of the printed
+cost, for a mode whose required targets exist (since 24 Nov; before, Three Steps Ahead counted as
+castable with one mana open).
 
 | Field | Definition |
 |---|---|
@@ -79,12 +82,12 @@ and Forge's choice under `forge`.
 | `kind` | Taken when | `context` | `forge` |
 |---|---|---|---|
 | `counter` | an opponent casts a spell while the player holds a counter that is castable (as in `counter.passed`) and could target it | `spell` (`id`, `name`, `manaValue`), `castableCounters` | `{"action":"counter","with":NAME}` if the player cast a counter at that spell, else `{"action":"pass","result":"resolved"\|"fizzled"\|"left the stack"}` |
-| `main` | the active player's first main phase begins (once a turn) | `{}` | `cast` (spells the player cast from then to cleanup, `name` and `phase`), `lands` played, `manaOpenAtCleanup` (free mana units, as below) |
+| `main` | the active player's first main phase begins (once a turn) | `{}` | `cast` (spells the player cast from then to cleanup, `name`, `phase` and `targets`), `lands` played, `manaOpenAtCleanup` (free mana units, as below) |
 | `attack` | the declare-attackers step begins and the active player has an untapped creature without summoning sickness or defender | `canAttack` (ids) | `attackers` (`id`, `name`, `attacking`: `opponent` or a planeswalker's name), sorted by id; `[]` when no one attacked |
-| `main2` | the active player's second main phase begins and a non-land card in hand is castable (the tracker's check, sorcery timing) | `castable` (names) | `cast` (spells cast in that phase), `lands` played in it |
-| `upkeep` | the active player's upkeep begins and they hold a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step), `lands` |
-| `draw` | the active player's draw step: taken when the step's draw reaches their hand (the step's event comes before the draw), if they then hold an instant-speed castable card | `castable` (names) | `cast` (spells cast in that step), `lands` |
-| `endstep` | the opponent's end step begins and the player holds a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step), `lands`; `[]` when the card was held |
+| `main2` | the active player's second main phase begins and a non-land card in hand is castable (the tracker's check, sorcery timing) | `castable` (names) | `cast` (spells cast in that phase, `name` and `targets`), `lands` played in it |
+| `upkeep` | the active player's upkeep begins and they hold a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step, `name` and `targets`), `lands` |
+| `draw` | the active player's draw step: taken when the step's draw reaches their hand (the step's event comes before the draw), if they then hold an instant-speed castable card | `castable` (names) | `cast` (spells cast in that step, `name` and `targets`), `lands` |
+| `endstep` | the opponent's end step begins and the player holds a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step, `name` and `targets`), `lands`; `[]` when the card was held |
 | `block` | the declare-blockers step begins and the player is attacked (or their planeswalker is) and has an untapped creature | `attackers` (`id`, `name`, `attacking`: `you` or the planeswalker) | `blocks` (`blocker`, `name`, `attacker`); `[]` for no blocks |
 | `mulligan` | each hand decided on before the first turn | `mulligansSoFar`, `onThePlay` | `{"action":"mulligan"}`, or `{"action":"keep","bottom":[names]}` (London: the cards put on the bottom) |
 
@@ -94,7 +97,17 @@ names), `handCount`, `library` count, `landsPlayedThisTurn`, `manaOpen` = the tr
 units (`manaUnits`, see "Castable"), `battlefield`, `graveyard`, face-up `exile`), and `stack`
 (`name`, `controller`, `kind` spell / ability / trigger, `targets`). A permanent: `id`, `name`,
 `types`, `tapped`, for creatures `power`, `toughness`, `damage` and `sick` (when present),
-`counters`, `attachedTo` (an id), `token`. Opposing face-down cards are shown as face-down, never
+`counters`, `attachedTo` (an id), `token`; a token also has `text` (its script's Oracle text, else
+the ability text Forge shows for it; `""` for a vanilla token). `chosen` (when anything is set)
+holds the choices made for the permanent, from the card's `getChosen*` / `getNamedCards` fields:
+`type`, `type2`, `colors`, `player` (`you` / `opponent`), `number`, `cards` (names, with the id for
+a permanent), `named`, `mode`, `direction`, `evenOdd`, `sector`. On the deciding player's own
+permanents they come from the card (secret choices included); on the opponent's from the public
+card view, where a secret choice stays unset until revealed, and chosen cards only when they are
+in a public zone. `state` also has `spellsThisTurn` and `spellsLastTurn` (`you` / `opponent`:
+names of spells cast, copies left out, an opposing face-down spell as `face-down spell`). Cast
+entries' `targets` (and the stack's) are `Name (id)` for cards, `spell Name`, `you` / `opponent`,
+over the spell's sub-abilities and chosen modes. These fields were added 24 Nov 2026. Opposing face-down cards are shown as face-down, never
 named; the opponent's hand and library order never appear. A mulligan's state is the one taken
 when the last card of that hand was drawn (the mulligan event fires only after the new hand is
 drawn). A decision still open when the game ends gets `{"unresolved":"game ended"}`.
@@ -103,7 +116,12 @@ Snapshots are taken from the tracker's handlers and obey its rules below (read o
 23 Nov 2026: 90 seed-1 games of three pairings with snapshots are identical to the same games
 played by the driver before snapshots existed, and 40 games with and without them agree record for
 record (`VALIDATION.md`, "Decision snapshots"); the same 90 again after `main2` and `endstep`
-were added, and again after `upkeep` and `draw`.
+were added, and again after `upkeep` and `draw`. The 24 Nov additions (token text, `chosen`, cast
+targets, the spells of this turn and the last, spree costs) were checked against the step B run
+(`runs/probe-b`, old driver): 180 of 180 games of three planning decks' gauntlets identical; the
+snapshots differ only by the new fields and by spree cards (Three Steps Ahead, Lively Dirge) no
+longer counted castable without a payable mode, which also changes those cards' `idleOwn`,
+`idleOpp` and `counter` misplay counts.
 
 ## Behaviour that matters
 

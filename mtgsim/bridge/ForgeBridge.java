@@ -1140,7 +1140,36 @@ public final class ForgeBridge {
                     return false;
                 }
             }
+            if (sa.getApi() == ApiType.Charm && (c.hasKeyword(Keyword.SPREE) || c.hasKeyword(Keyword.TIERED))) {
+                return modeCostPayable(units, mana, p, sa);
+            }
             return canPayMana(units, mana, p, sa);
+        }
+
+        /**
+         * Spree and Tiered: the printed cost plus at least one mode's additional cost ("ModeCost$", which Forge
+         * adds as a cost raise when the spell is cast), for a mode whose required targets exist.
+         */
+        private boolean modeCostPayable(final List<Unit> units, final ManaCost base, final Player p, final SpellAbility sa) {
+            final List<AbilitySub> choices = sa.getAdditionalAbilityList("Choices");
+            if (choices == null) {
+                return false;
+            }
+            for (final AbilitySub choice : choices) {
+                ManaCost total = base;
+                for (SpellAbility s = choice; s != null; s = s.getSubAbility()) {
+                    if (s.hasParam("ModeCost")) {
+                        final ManaCost extra = new Cost(s.getParam("ModeCost"), false).getTotalMana();
+                        if (extra != null) {
+                            total = ManaCost.combine(total, extra);
+                        }
+                    }
+                }
+                if (canPayMana(units, total, p, sa) && chainTargetsAvailable(choice)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static boolean controlsNamed(final Player p, final String name) {
@@ -1931,6 +1960,8 @@ public final class ForgeBridge {
             }
             openCounters.clear();
             closeSteps(null);
+            castLastTurn = castThisTurn;
+            castThisTurn = new ArrayList<>();
             if (!started) {
                 flushHands(seatOf(event.turnOwner()));
             }
@@ -2007,14 +2038,17 @@ public final class ForgeBridge {
         }
 
         private void snapCast(final int seat, final String name, final SpellAbility sa) {
+            noteTurnCast(seat, sa);
             if (mainSnap != null && mainSnap.choice == null && seat == mainSnap.seat
                     && game.getPhaseHandler().getTurn() == mainTurn) {
                 final PhaseType ph = game.getPhaseHandler().getPhase();
-                mainCasts.add("{\"name\":" + quote(name) + ",\"phase\":" + quote(ph == null ? null : ph.name()) + "}");
+                mainCasts.add("{\"name\":" + quote(name) + ",\"phase\":" + quote(ph == null ? null : ph.name())
+                        + ",\"targets\":" + namesJson(chainTargets(sa, sa.getActivatingPlayer())) + "}");
             }
             for (final Snap st : openSteps) {
                 if (st.seat == seat) {
-                    st.casts.add(name);
+                    st.casts.add("{\"name\":" + quote(name) + ",\"targets\":"
+                            + namesJson(chainTargets(sa, sa.getActivatingPlayer())) + "}");
                 }
             }
             if (openCounters.isEmpty()) {
@@ -2208,7 +2242,7 @@ public final class ForgeBridge {
                 if (phase != null && phase == s.phase) {
                     continue; // a repeated step
                 }
-                s.choice = "{\"cast\":" + namesJson(s.casts) + ",\"lands\":" + namesJson(s.lands) + "}";
+                s.choice = "{\"cast\":[" + String.join(",", s.casts) + "],\"lands\":" + namesJson(s.lands) + "}";
                 openSteps.remove(i);
             }
         }
@@ -2298,6 +2332,49 @@ public final class ForgeBridge {
             return null;
         }
 
+        /** The targets of one ability (not its sub-abilities), as player me sees them. */
+        private static void addTargets(final List<String> out, final SpellAbility sa, final Player me) {
+            if (sa.getTargets() == null) {
+                return;
+            }
+            for (final Card t : sa.getTargets().getTargetCards()) {
+                out.add(t.isFaceDown() && t.getController() != me ? "face-down card" : nameOf(t) + " (" + t.getId() + ")");
+            }
+            for (final SpellAbility t : sa.getTargets().getTargetSpells()) {
+                out.add(t.getHostCard() == null ? "a spell" : "spell " + nameOf(t.getHostCard()));
+            }
+            for (final Player t : sa.getTargets().getTargetPlayers()) {
+                out.add(t == me ? "you" : "opponent");
+            }
+        }
+
+        /** Every target chosen for a spell, its sub-abilities and modes included, as its caster sees them. */
+        private static List<String> chainTargets(final SpellAbility sa, final Player me) {
+            final List<String> out = new ArrayList<>();
+            for (SpellAbility s = sa; s != null; s = s.getSubAbility()) {
+                addTargets(out, s, me);
+            }
+            return out;
+        }
+
+        /** Spells cast this turn and the turn before (seat, name; face-down spells unnamed for the other seat). */
+        private List<Object[]> castThisTurn = new ArrayList<>();
+        private List<Object[]> castLastTurn = new ArrayList<>();
+
+        private void noteTurnCast(final int seat, final SpellAbility sa) {
+            castThisTurn.add(new Object[] {seat, nameOf(sa.getHostCard()), sa.getHostCard().isFaceDown()});
+        }
+
+        private String castsJson(final List<Object[]> casts, final int seat, final int viewerSeat) {
+            final List<String> names = new ArrayList<>();
+            for (final Object[] c : casts) {
+                if ((Integer) c[0] == seat) {
+                    names.add((Boolean) c[2] && seat != viewerSeat ? "face-down spell" : (String) c[1]);
+                }
+            }
+            return namesJson(names);
+        }
+
         /** What player p may know: own hand, both battlefields, graveyards, face-up exile, the stack, counts. */
         private String stateJson(final Player me) {
             Player opp = null;
@@ -2315,6 +2392,12 @@ public final class ForgeBridge {
             sb.append(",\"activePlayer\":").append(active == null ? "null" : quote(active == me ? "you" : "opponent"));
             sb.append(",\"you\":").append(playerJson(me, me, true));
             sb.append(",\"opponent\":").append(opp == null ? "null" : playerJson(opp, me, false));
+            final int meSeat = seatOfPlayer(me);
+            final int oppSeat = opp == null ? -2 : seatOfPlayer(opp);
+            sb.append(",\"spellsThisTurn\":{\"you\":").append(castsJson(castThisTurn, meSeat, meSeat))
+                    .append(",\"opponent\":").append(castsJson(castThisTurn, oppSeat, meSeat)).append('}');
+            sb.append(",\"spellsLastTurn\":{\"you\":").append(castsJson(castLastTurn, meSeat, meSeat))
+                    .append(",\"opponent\":").append(castsJson(castLastTurn, oppSeat, meSeat)).append('}');
             sb.append(",\"stack\":[");
             boolean first = true;
             for (final SpellAbilityStackInstance si : game.getStack()) {
@@ -2326,16 +2409,8 @@ public final class ForgeBridge {
                 sb.append(",\"controller\":").append(quote(mine ? "you" : "opponent"));
                 sb.append(",\"kind\":").append(quote(sa == null ? null : sa.isSpell() ? "spell" : sa.isTrigger() ? "trigger" : "ability"));
                 final List<String> targets = new ArrayList<>();
-                if (sa != null && sa.getTargets() != null) {
-                    for (final Card t : sa.getTargets().getTargetCards()) {
-                        targets.add(t.isFaceDown() && t.getController() != me ? "face-down card" : nameOf(t) + " (" + t.getId() + ")");
-                    }
-                    for (final SpellAbility t : sa.getTargets().getTargetSpells()) {
-                        targets.add(t.getHostCard() == null ? "a spell" : "spell " + nameOf(t.getHostCard()));
-                    }
-                    for (final Player t : sa.getTargets().getTargetPlayers()) {
-                        targets.add(t == me ? "you" : "opponent");
-                    }
+                if (sa != null) {
+                    addTargets(targets, sa, me);
                 }
                 sb.append(",\"targets\":").append(namesJson(targets)).append('}');
                 first = false;
@@ -2414,6 +2489,114 @@ public final class ForgeBridge {
             }
             if (c.isToken()) {
                 sb.append(",\"token\":true");
+                if (!hidden) {
+                    sb.append(",\"text\":").append(quote(tokenText(c)));
+                }
+            }
+            if (!hidden) {
+                final String chosen = chosenJson(c, viewer);
+                if (chosen != null) {
+                    sb.append(",\"chosen\":").append(chosen);
+                }
+            }
+            return sb.append('}').toString();
+        }
+
+        /**
+         * A token's rules text: its script's Oracle text, or else the ability text Forge keeps for display (the card
+         * view's cached copy, so nothing is recomputed); "" for a token with no abilities.
+         */
+        private static String tokenText(final Card c) {
+            final String oracle = c.getOracleText();
+            if (oracle != null && !oracle.trim().isEmpty()) {
+                return oracle.trim();
+            }
+            final CardView.CardStateView state = c.getView().getCurrentState();
+            final String shown = state == null ? null : state.getAbilityText();
+            if (shown == null) {
+                return "";
+            }
+            return shown.replaceAll("<[^>]*>", "").replace("\r\n", "\n").replaceAll("\n{2,}", "\n").trim();
+        }
+
+        /**
+         * The choices made for a permanent (a type, colours, a player, a number, cards, names, a mode, a direction,
+         * odd or even, a sector), or null when there are none. The controller sees its own choices, secret ones
+         * included; for the other player's permanents only the public view is read (a secret choice is unset there
+         * until revealed), and chosen cards only when they are in a public zone.
+         */
+        private static String chosenJson(final Card c, final Player viewer) {
+            final Map<String, String> out = new TreeMap<>();
+            final boolean own = c.getController() == viewer;
+            final CardView v = c.getView();
+            final String type = own ? c.getChosenType() : v.getChosenType();
+            if (type != null && !type.isEmpty()) {
+                out.put("type", quote(type));
+            }
+            final String type2 = own ? c.getChosenType2() : v.getChosenType2();
+            if (type2 != null && !type2.isEmpty()) {
+                out.put("type2", quote(type2));
+            }
+            final List<String> colours = new ArrayList<>();
+            final Iterable<String> cs = own ? c.getChosenColors() : v.getChosenColors();
+            if (cs != null) {
+                for (final String s : cs) {
+                    colours.add(s);
+                }
+            }
+            if (!colours.isEmpty()) {
+                out.put("colors", namesJson(colours));
+            }
+            if (own) {
+                if (c.getChosenPlayer() != null) {
+                    out.put("player", quote(c.getChosenPlayer() == viewer ? "you" : "opponent"));
+                }
+            } else if (v.getChosenPlayer() != null) {
+                out.put("player", quote(v.getChosenPlayer() == viewer.getView() ? "you" : "opponent"));
+            }
+            final String number = own ? (c.getChosenNumber() == null ? null : String.valueOf(c.getChosenNumber()))
+                    : v.getChosenNumber();
+            if (number != null && !number.isEmpty()) {
+                out.put("number", quote(number));
+            }
+            final List<String> cards = new ArrayList<>();
+            for (final Card t : c.getChosenCards()) {
+                final ZoneType z = t.getZone() == null ? null : t.getZone().getZoneType();
+                final boolean visible = !t.isFaceDown() && (z == ZoneType.Battlefield || z == ZoneType.Graveyard
+                        || z == ZoneType.Exile || z == ZoneType.Stack || (z == ZoneType.Hand && t.getOwner() == viewer));
+                if (own || visible) {
+                    cards.add(t.isFaceDown() && t.getController() != viewer ? "face-down card"
+                            : z == ZoneType.Battlefield ? nameOf(t) + " (" + t.getId() + ")" : nameOf(t));
+                }
+            }
+            if (!cards.isEmpty()) {
+                out.put("cards", namesJson(cards));
+            }
+            final List<String> named = own ? c.getNamedCards() : v.getNamedCard();
+            if (named != null && !named.isEmpty()) {
+                out.put("named", namesJson(new ArrayList<>(named)));
+            }
+            final String mode = own ? c.getChosenMode() : v.getChosenMode();
+            if (mode != null && !mode.isEmpty()) {
+                out.put("mode", quote(mode));
+            }
+            final Object dir = own ? c.getChosenDirection() : v.getChosenDirection();
+            if (dir != null) {
+                out.put("direction", quote(String.valueOf(dir)));
+            }
+            final Object evenOdd = own ? c.getChosenEvenOdd() : v.getChosenEvenOdd();
+            if (evenOdd != null) {
+                out.put("evenOdd", quote(String.valueOf(evenOdd)));
+            }
+            if (own && c.getChosenSector() != null) {
+                out.put("sector", quote(c.getChosenSector()));
+            }
+            if (out.isEmpty()) {
+                return null;
+            }
+            final StringBuilder sb = new StringBuilder("{");
+            for (final Map.Entry<String, String> e : out.entrySet()) {
+                sb.append(sb.length() > 1 ? "," : "").append(quote(e.getKey())).append(':').append(e.getValue());
             }
             return sb.append('}').toString();
         }
