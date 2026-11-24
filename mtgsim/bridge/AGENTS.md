@@ -148,7 +148,15 @@ targets, the spells of this turn and the last, spree costs) were checked against
 (`runs/probe-b`, old driver): 180 of 180 games of three planning decks' gauntlets identical; the
 snapshots differ only by the new fields and by spree cards (Three Steps Ahead, Lively Dirge) no
 longer counted castable without a payable mode, which also changes those cards' `idleOwn`,
-`idleOpp` and `counter` misplay counts.
+`idleOpp` and `counter` misplay counts. The round-3 additions (cost changes, the restricted-mana
+split, `thisTurn`, `knownInHand`, the abilities of this turn and the last) were checked the same way
+on the whole step B run (`runs/probe-b3` against `runs/probe-b`): 419 of 420 games identical; the
+snapshots differ from `runs/probe-b2` only by the new fields and by discounted cards (Eddymurk
+Crab, Sapling Nursery, Sunderflock, Momo's Dragons, Hearth Elemental) added to castable lists,
+which adds 71 `main2` / `upkeep` / `draw` / `endstep` decisions and removes none. The one other game
+(Four-Color Control against Orzhov Lifegain, game 6) does not replay even on the old driver without
+snapshots (18, 22 and 16 turns in five runs): some decision in it depends on the clock, so 419 of
+420 is what to expect from that run.
 
 ## Behaviour that matters
 
