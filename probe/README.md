@@ -115,11 +115,10 @@ found wrong.
 
 ## Fix before step D
 
-**Status, 24 Nov 2026 (round 2, see the end):**
-- **Done:** items 1, 2, 4 and 8.
-- **Partly done:** 3 (spree fixed; cost reductions only noted in the case text), 5 (spells this
-  turn and last; no abilities, reveals or crimes) and 6 (a note, no split count). They are to be
-  finished in round 3 (`docs/ai-pilot-status.md`, latest checkpoint).
+**Status, 24 Nov 2026 (round 3, see the end):**
+- **Done:** items 1, 2, 4 and 8 (round 2), and 3, 5 and 6 (round 3: cost changes in the castable
+  lists, abilities, turn conditions and known cards in the history, the restricted part of the
+  open mana). What is still left out of each is named in the case text and in "Round 3" below.
 - **Item 7:** done for the spell and counter agreements, which were read by hand; a misread was
   fixed.
 - **Item 9:** left to step D.
@@ -289,6 +288,78 @@ The other flips are the model answering the same question differently a second t
 mulligans and blocks. About one case in thirteen flips, so one answer per case is a noisy
 measure.
 
-**For step D.** Grade round 2's 96 disagreements (`round2/merged.jsonl`, `agree` false). For the
-agreeing cases, show the 10 `main` cases that differ only in timing, and the ones above whose
-modes or copy choices are unrecorded, or count them as equal and say so.
+**For step D.** Superseded by round 3, below.
+
+## Round 3 (24 November 2026)
+
+**What changed.** The tracker (`mtgsim/bridge/AGENTS.md`) now:
+- applies cost changes in the castable check, as Forge would apply them on casting: the spell's own
+  `RaiseCost$` / `ReduceCost$` and the `RaiseCost` / `ReduceCost` statics on the battlefield, the
+  stack, the command zone and the card itself (Eddymurk Crab, Hearth Elemental, Sunderflock,
+  Momo's discount, affinity), tested and sized by Forge's own `CostAdjustment` code. Left out:
+  reductions whose size the player chooses, convoke, delve, improvise and the like, set costs,
+  statics that need the spell's targets;
+- splits the open mana: `manaOpenFree`, and `manaRestricted` with each spending rule;
+- records `abilitiesThisTurn` / `abilitiesLastTurn` (activated abilities and triggers as they went
+  on the stack, Forge's stack text), `thisTurn` per player (crimes, life gained and lost, cards
+  drawn, tokens created, creatures that died, sacrifices, discards) and the opponent's
+  `knownInHand` (returned to hand from a public zone, or seen when the player's Duress-style or
+  reveal-hand effect resolved).
+
+The case text shows all of these: "Untapped mana available: 10 (2 of them from Tablet of
+Discovery: Spend this mana only to cast instant and sorcery spells)", the abilities of both turns,
+a line of this turn's conditions per player, and "Cards you know are in your opponent's hand".
+Still not shown, and said so: cards revealed from a library, and older history than last turn
+beyond the public zones.
+
+**Commands** (as round 2):
+```
+bash probe/run/probe-b3.sh                       # step B again -> runs/probe-b3 (about 30 min)
+python3 tools/compare_games.py runs/probe-b/DECK runs/probe-b3/DECK    # for each of the 7 decks
+python3 tools/probe/make_cases.py runs/probe-b3 --out probe/round3 \
+    --same-as probe/round2/key.jsonl --old-run runs/probe-b2
+# 20 fresh subagents, one batch each, tools/probe/answer_prompt.txt; then
+python3 tools/probe/extract_answers.py --out probe/round3 TRANSCRIPTS...
+python3 tools/probe/collect.py --out probe/round3
+```
+
+**Checks.** Step B replayed: 419 of 420 games identical. The other (Four-Color Control against
+Orzhov Lifegain, game 6) does not replay from its seed even on the old driver without snapshots
+(18, 22 and 16 turns in five runs); its one case, C045, is at turn 5, before the game diverges.
+The snapshots differ from round 2's only by the new fields and by discounted cards added to
+castable lists (71 more decisions, none fewer). All 198 decisions were found again. One castable
+list in the cases changed (C162 gains Eddymurk Crab); 47 cases show restricted mana, 29 known
+cards, 117 abilities or triggers. Twenty fresh subagents answered; `extract_answers.py` reported
+no problems.
+
+**Comparison fix.** `collect.py` stops reading casts at a part that opens with a cost or choice
+note ("collecting evidence with Duress, Duress and Superior Spider-Man and naming Kíli" had
+counted Duress and Spider-Man as casts). It moved C018 to agreement and changes no case of rounds
+1 or 2. Every spell and counter agreement was read by hand; none is false. Unrecorded choices
+remain in C102 (Theorix Charm's mode), C135 and C189 (evoke).
+
+**Result** (`python3 tools/probe/collect.py --out probe/round3`):
+
+| | cases | agree | agreement (95% CI) |
+|---|---|---|---|
+| all | 198 | 105 | 53% (46–60%) |
+| planning decks | 173 | 90 | 52% (45–59%) |
+| creature decks | 25 | 15 | 60% (41–77%) |
+| main | 60 | 21 | 35% (24–48%) |
+| main2 | 15 | 4 | 27% (11–52%) |
+| block | 33 | 19 | 58% (41–73%) |
+| attack | 27 | 18 | 67% (48–81%) |
+| mulligan | 24 | 17 | 71% (51–85%) |
+| endstep | 14 | 7 | 50% (27–73%) |
+| counter | 10 | 6 | 60% (31–83%) |
+| upkeep | 8 | 6 | 75% (41–93%) |
+| draw | 7 | 7 | 100% (65–100%) |
+
+Agreement is where it was. 173 of 198 cases get the same verdict as in round 2; 25 flip, 14 to
+agreement and 11 away. One follows plainly from the new text: in C135 the opponent's hand is known
+to hold Starscape Cleric, and the answer now evokes Deceit to take it, as Forge did. The rest look
+like the answerer's own variation, one case in eight this time.
+
+**For step D.** Grade round 3's 93 disagreements (`round3/merged.jsonl`, `agree` false). For the
+agreeing cases, show the 9 `main` cases that differ only in timing and the three whose modes or
+evoke choices are unrecorded, or count them as equal and say so.

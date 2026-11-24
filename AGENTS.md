@@ -54,9 +54,10 @@ subagents (`probe/`, `tools/probe/`; they agree with Forge on 51%, 44–58%), ar
 listed in `probe/README.md`, "Fix before step D", were fixed on 24 Nov (token text, chosen values,
 cast targets, recent spells, spree costs; step B replayed 420 of 420 games identically) and the
 same 198 decisions were answered again (`probe/round2/`): agreement 52% (45–58%), unchanged. Gaps
-3, 5 and 6 (cost reductions, history, restricted mana) were only partly fixed; the user wants them
-done fully as round 3 before step D, the user's blind grading: start from the latest checkpoint
-("START HERE") in `docs/ai-pilot-status.md`, which has the plan and the commands.
+3, 5 and 6 (cost reductions, history, restricted mana) were finished the same day as round 3
+(`probe/round3/`; step B replayed 419 of 420, the other game does not replay on any driver):
+agreement 53% (46–60%), unchanged again. Next is step D, the user's blind grading of round 3's 93
+disagreements: start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 

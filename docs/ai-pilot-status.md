@@ -5,7 +5,52 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 24 Nov 2026, later (latest): finish case gaps 3, 5 and 6 fully, then step D. START HERE
+## CHECKPOINT 24 Nov 2026, night (latest): round 3 answered; next is step D. START HERE
+
+**State of the repository.** Round 3 is committed and pushed on `claude/relaxed-franklin-4vtvog`
+with rounds 2 and the case-gap work before it; no pull request is open for the 24 Nov commits.
+
+**What the user asked (24 Nov).** Finish case gaps 3, 5 and 6 fully (see the checkpoint below
+for what "fully" meant), re-run step B, rebuild and re-answer the cases as round 3, re-collect.
+
+**Done.**
+- **Gap 3, cost changes:** `adjustedMana` in the tracker applies `RaiseCost` / `ReduceCost`
+  (the spell's own params and statics on the battlefield, stack, command zone and the card
+  itself), using Forge's private `CostAdjustment.checkRequirement` and
+  `applyReduceCostAbility` by reflection (both read only). The card's own statics apply only to
+  a spell of their face: a first version gave Stoke Genius Hearth Elemental's discount. Left
+  out, and said in the case text: `UpTo$`, convoke, delve, improvise, emerge, offering, assist,
+  set costs, `ValidTarget$` statics. Discounted cards now count in `idleOwn` / `idleOpp` /
+  `counter` (noted in `mtgsim/bridge/AGENTS.md`).
+- **Gap 5, history:** `abilitiesThisTurn` / `abilitiesLastTurn` (from `GameEventSpellAbilityCast`
+  of abilities and triggers; Forge's stack text, players as you / opponent, Forge's bracketed
+  annotations removed in the case text), `thisTurn` per player (Forge's per-turn counters, with
+  `getCommittedCrimeThisTurn`, plus deaths seen by the tracker), and the opponent's `knownInHand`
+  (returned from a public zone, or seen by a resolved Discard `Reveal…` / RevealHand of the
+  player; forgotten when the card leaves the hand). Reveals do not fire an event in Forge, hence
+  the reading at resolution. Not covered: cards revealed from a library.
+- **Gap 6, restricted mana:** `manaOpenFree` and `manaRestricted` (source, rule sentence,
+  whether the unit makes mana only under the rule).
+- **Checks:** smoke test and the integration test (now checks the new fields' shape) pass; step B
+  replayed 419 of 420 (`probe/run/probe-b3.tar.xz`); Four-Color Control against Orzhov Lifegain
+  game 6 does not replay even on the old driver without snapshots (18, 22, 16 turns in five runs),
+  a clock-dependent game like the two Four-Color Control games of the best-of-three check.
+- **Cases** `probe/round3/`: all 198 found again; **answers** from 20 fresh subagents;
+  `collect.py` now stops reading casts at a cost or choice note (moved C018 only).
+
+**Result.** 105 of 198, 53% (46–60%); planning decks 52% (45–59%): unchanged from rounds 1 and 2.
+173 of 198 cases keep their round-2 verdict; one of the 25 flips plainly follows from the new text
+(C135, a known Starscape Cleric). Detail in `probe/README.md`, "Round 3", and `VALIDATION.md`.
+
+**Next: step D,** as planned in the checkpoints below, on round 3.
+- Grade the 93 disagreements in `probe/round3/merged.jsonl` (`agree` false). Show `text`, the
+  answer's `model` and Forge's `forge` as A and B in random order. Never show the `reason`.
+- Show the 9 agreeing `main` cases that differ only in timing, and C102, C135 and C189 (mode or
+  evoke unrecorded), or count them as equal and say so.
+- The answerer flips about one case in eight between askings; if the result is near the gate, a
+  second answer per disagreement would show how stable the preference is.
+
+## CHECKPOINT 24 Nov 2026, later: finish case gaps 3, 5 and 6 fully, then step D (superseded by the checkpoint above)
 
 **What the user asked (24 Nov).** Round 2 (the checkpoint below) fixed gaps 3, 5 and 6 of
 `probe/README.md`, "Fix before step D", only partly. The user wants them done fully before step D.

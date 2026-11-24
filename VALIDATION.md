@@ -25,6 +25,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Decision snapshots do not change games (`--snapshots`, 23 Nov) | 90 of 90 games identical to the old driver's (three pairings, seed 1), three times (as the kinds were added), 40 of 40 with and without snapshots; see "Decision snapshots" |
 | Decision probe, steps B and C (23 Nov): 200 blind cases | a Claude subagent's choice and Forge's agree on 51% (44–58%) of cases, 49% (41–56%) of the planning decks' 175; least on spell decisions (main phase 32%, second main 19%), where the answer usually casts more. Which is better is step D's grading; see "Decision probe" |
 | Decision probe, round 2 (24 Nov): the same decisions with the case gaps fixed | 420 of 420 step B games replay identically with the new tracker; 198 of the 200 decisions found again (two existed only through a spree-cost bug); fresh answerers agree with Forge on 102 of 198, 52% (45–58%), planning decks 49% (42–57%): no change. 183 of 198 cases get the same verdict in both rounds; see "Decision probe" |
+| Decision probe, round 3 (24 Nov): cost reductions, restricted mana and turn history added | 419 of 420 step B games replay identically (the other does not replay on the old driver either); all 198 decisions found again; fresh answerers agree with Forge on 105 of 198, 53% (46–60%), planning decks 52% (45–59%): no change. 173 of 198 cases get the same verdict as in round 2; see "Decision probe" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -948,6 +949,44 @@ and blocks that go the other way on a second asking). So about one case in thirt
 two askings of the same model: a single answer per case is a noisy measure, and step D's grades
 inherit that. Of the agreeing spell cases where Forge targeted something, all 3 name the same
 target; 10 of 15 agreeing `main` cases with casts differ in timing (Forge after combat).
+
+**Round 3 (24 Nov 2026).** The tracker's castable check now applies the cost changes Forge would
+apply on casting (Forge's own `CostAdjustment` requirement test and reduction step, read only;
+convoke, delve, improvise and reductions whose size the player chooses left out), and the
+snapshots split the open mana into free mana and mana with a spending rule (Cavern of Souls,
+Great Hall of the Biblioplex, Tablet of Discovery), and record the abilities and triggers of this
+turn and the last, this turn's conditions (crimes, life gained and lost, cards drawn, tokens,
+creatures that died, sacrifices, discards) and the opponent's cards the player has seen
+(`mtgsim/bridge/AGENTS.md`). Replaying step B (`probe/run/probe-b3.tar.xz`) gave 419 of 420 games
+identical to the first run. The other, Four-Color Control against Orzhov Lifegain game 6, gave
+18, 22 and 16 turns in five runs, including two on the old driver without snapshots: it does not
+replay from its seed, like the two Four-Color Control games of the best-of-three check. The
+snapshots differ from round 2's only by the new fields and by discounted cards (Eddymurk Crab,
+Sapling Nursery, Sunderflock, Momo's Dragons, Hearth Elemental) added to castable lists, which
+adds 71 decisions and removes none. All 198 decisions were found again; the only case from the
+non-replaying game (C045) is at turn 5, before it diverges at turn 13. Of the 198 cases, 47 now
+show restricted mana, 29 cards known in the opponent's hand, and 117 abilities or triggers; one
+castable list changed (C162 gains Eddymurk Crab). Twenty fresh subagents answered; each read only
+its own batch file. The comparison now stops reading casts at a cost or choice note ("collecting
+evidence with Duress, ...", "discarding ...", "naming ..."), which moved C018 to agreement and no
+case of rounds 1 or 2.
+
+| | Round 2 (198 cases) | Round 3 (198 cases) |
+|---|---|---|
+| all | 102, 52% (45–58%) | 105, 53% (46–60%) |
+| planning decks | 85 of 173, 49% (42–57%) | 90 of 173, 52% (45–59%) |
+| creature decks | 17 of 25, 68% (48–83%) | 15 of 25, 60% (41–77%) |
+| main | 21 of 60, 35% (24–48%) | 21 of 60, 35% (24–48%) |
+| main2 | 2 of 15, 13% | 4 of 15, 27% (11–52%) |
+
+Agreement is unchanged. 173 of 198 cases get the same verdict as in round 2; 25 flip (14 to
+agreement, 11 away). One follows plainly from the new text: in C135 the opponent's hand is known
+to hold Starscape Cleric, and the answer now evokes Deceit to take it, as Forge did. The rest
+look like the answerer's own variation, as between rounds 1 and 2 (one case in eight here, one in
+thirteen there). Every agreeing spell and counter case was read by hand; none is a false match,
+though some still hide an unrecorded choice (Theorix Charm's mode in C102, evoke in C135 and
+C189). Both agreeing spell cases where Forge targeted something name its target; 9 of 14 agreeing
+`main` cases with casts differ in timing.
 
 ## The goldfish model
 

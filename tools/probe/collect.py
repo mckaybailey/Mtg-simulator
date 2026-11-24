@@ -58,10 +58,17 @@ def top_level_parts(text):
     return parts + [cur]
 
 
+# A part that opens with how a spell is paid for or what is chosen for it ("collecting evidence with Duress,
+# Duress and Superior Spider-Man and naming Kili"): it and the parts after it name cards, not casts.
+NOTE = re.compile(r"^\s*(?:and\s+)?(?:collect|discard|nam(?:e|ing)\b|sacrific|pay(?:ing)?\b|copy|copying|exil)", re.I)
+
+
 def drop_held(cast, own_turn_only):
     """Leave out the spells an answer only holds, or (in a decision about this turn) casts on a later turn."""
     keep = []
     for part in top_level_parts(cast):
+        if NOTE.search(part):
+            break
         if HELD.search(part) or (own_turn_only and LATER.search(part)):
             continue
         keep.append(part)
