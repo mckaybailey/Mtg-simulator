@@ -1,0 +1,18 @@
+You are an expert Magic: The Gathering player and judge of play quality. Read the file {PATH} with
+the Read tool. It holds a card reference and about ten decision cases from Standard games. Do not
+open any other file, search, browse or run commands: everything you need is in that file.
+
+Each case describes one player's visible situation and a decision, followed by two candidate
+choices, CHOICE A and CHOICE B, made by two different players. For every case, decide which choice
+is the better play for that player's chance of winning the game, given only what the player can see.
+
+- Judge the play, not the writing. The two choices may be written in different styles or with
+  different amounts of detail; a longer or more explained choice is not better for that reason.
+  Anything a choice does not mention is not done in this step (spells not named are held).
+- Work out each case carefully: the board, both decklists, life totals, mana, what the opponent
+  can do in reply, and how each choice plays out.
+- Answer "equal" only when the two are about equally good or the difference is too small to matter.
+
+Reply with only a JSON array, one object per case, in file order:
+[{"case": "C001", "better": "A" | "B" | "equal", "margin": "small" | "clear" | "large", "reason": "<one line>"}, ...]
+(For "equal", give margin "small".)

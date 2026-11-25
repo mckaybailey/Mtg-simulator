@@ -1,0 +1,457 @@
+CARD REFERENCE (Oracle text of every card named in this batch)
+
+Bitter Triumph {1}{B} — Instant
+As an additional cost to cast this spell, discard a card or pay 3 life.
+Destroy target creature or planeswalker.
+
+Blazemire Verge — Land
+{T}: Add {B}.
+{T}: Add {R}. Activate only if you control a Swamp or a Mountain.
+
+Blood Crypt — Land — Swamp Mountain
+({T}: Add {B} or {R}.)
+As Blood Crypt enters, you may pay 2 life. If you don't, it enters tapped.
+
+Burst Lightning {R} — Instant
+Kicker {4} (You may pay an additional {4} as you cast this spell.)
+Burst Lightning deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead.
+
+Cavern of Souls — Land
+As Cavern of Souls enters, choose a creature type.
+{T}: Add {C}.
+{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.
+
+Clarion Conqueror {2}{W} — Creature — Dragon 3/3
+Flying
+Activated abilities of artifacts, creatures, and planeswalkers can't be activated.
+
+Day of Black Sun {X}{B}{B} — Sorcery
+Each creature with mana value X or less loses all abilities until end of turn. Destroy those creatures.
+
+Deadly Cover-Up {3}{B}{B} — Sorcery
+As an additional cost to cast this spell, you may collect evidence 6.
+Destroy all creatures. If evidence was collected, exile a card from an opponent's graveyard. Then search its owner's graveyard, hand, and library for any number of cards with that name and exile them. That player shuffles, then draws a card for each card exiled from their hand this way.
+
+Deceit {4}{UB}{UB} — Creature — Elemental Incarnation 5/5
+When this creature enters, if {U}{U} was spent to cast it, return up to one other target nonland permanent to its owner's hand.
+When this creature enters, if {B}{B} was spent to cast it, target opponent reveals their hand. You choose a nonland card from it. That player discards that card.
+Evoke {U/B}{U/B}
+
+Doomsday Excruciator {B}{B}{B}{B}{B}{B} — Creature — Demon 6/6
+Flying
+When Doomsday Excruciator enters, if it was cast, each player exiles all but the bottom six cards of their library face down.
+At the beginning of your upkeep, draw a card.
+
+Dream Beavers {B} — Creature — Beaver Nightmare 1/1
+Flying
+When this creature enters, each opponent loses 1 life and you gain 1 life. Scry 1. (Look at the top card of your library. You may put that card on the bottom.)
+
+Duress {B} — Sorcery
+Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.
+
+Eddymurk Crab {5}{U}{U} — Creature — Elemental Crab 5/5
+Flash
+This spell costs {1} less to cast for each instant and sorcery card in your graveyard.
+Eddymurk Crab enters tapped if it's not your turn.
+When Eddymurk Crab enters, tap up to two target creatures.
+
+Emeritus of Ideation {3}{U}{U} — Creature — Human Wizard 5/5
+Flying, ward {2}
+This creature enters prepared.
+Whenever this creature attacks, you may exile eight cards from your graveyard. If you do, this creature becomes prepared.
+
+Enduring Curiosity {2}{U}{U} — Enchantment Creature — Cat Glimmer 4/3
+Flash
+Whenever a creature you control deals combat damage to a player, draw a card.
+When Enduring Curiosity dies, if it was a creature, return it to the battlefield under its owner's control. It's an enchantment. (It's not a creature.)
+
+Erode {W} — Instant
+Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.
+
+Fireglass Mentor {B}{R} — Creature — Lizard Warlock 2/1
+At the beginning of your second main phase, if an opponent lost life this turn, exile the top two cards of your library. Choose one of them. Until end of turn, you may play that card.
+
+Flamecache Gecko {1}{R} — Creature — Lizard Warlock 2/2
+When Flamecache Gecko enters, if an opponent lost life this turn, add {B}{R}.
+{1}{R}, Discard a card: Draw a card.
+
+Floodpits Drowner {1}{U} — Creature — Merfolk 2/1
+Flash
+Vigilance
+When Floodpits Drowner enters, tap target creature an opponent controls and put a stun counter on it.
+{1}{U}, {T}: Shuffle Floodpits Drowner and target creature with a stun counter on it into their owners' libraries.
+
+Flow State {1}{U} — Sorcery
+Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. If there is an instant card and a sorcery card in your graveyard, instead put two of them into your hand and the rest on the bottom of your library in any order.
+
+Get Out {U}{U} — Instant
+Choose one —
+• Counter target creature or enchantment spell.
+• Return one or two target creatures and/or enchantments you own to your hand.
+
+Gev, Scaled Scorch {B}{R} — Legendary Creature — Lizard Mercenary 3/2
+Ward—Pay 2 life.
+Other creatures you control enter with an additional +1/+1 counter on them for each opponent who lost life this turn.
+Whenever you cast a Lizard spell, Gev, Scaled Scorch deals 1 damage to target opponent.
+
+Gloomlake Verge — Land
+{T}: Add {U}.
+{T}: Add {B}. Activate only if you control an Island or a Swamp.
+
+Hearth Elemental {5}{R} — Creature — Elemental 4/5
+This spell costs {X} less to cast, where X is the number of cards in your graveyard that are instant cards, sorcery cards, and/or have an Adventure.
+  (adventure) Stoke Genius {1}{R} — Sorcery — Adventure
+Discard your hand, then draw two cards. (Then exile this card. You may cast the creature later from exile.)
+
+Hidden Lair — Land
+{T}: Add {C}.
+{T}: Add {U} or {B}. Activate only if this land entered this turn or if your control a basic land.
+
+Hired Claw {R} — Creature — Lizard Mercenary 1/2
+Whenever you attack with one or more Lizards, Hired Claw deals 1 damage to target opponent.
+{1}{R}: Put a +1/+1 counter on Hired Claw. Activate only if an opponent lost life this turn and only once each turn.
+
+Impractical Joke {R} — Sorcery
+Damage can't be prevented this turn. Impractical Joke deals 3 damage to up to one target creature or planeswalker.
+
+Ingris Stingerquill {B}{R}{R} — Legendary Creature — Elder Sphinx 1/4
+Flying
+Whenever a creature you control attacks, that creature deals 1 damage to each opponent.
+{4}: Create a 2/2 colorless Wizard Soldier creature token named Cadet. Then creatures you control gain haste until end of turn.
+
+Inspiring Vantage — Land
+Inspiring Vantage enters tapped unless you control two or fewer other lands.
+{T}: Add {R} or {W}.
+
+Iridescent Vinelasher {B} — Creature — Lizard Assassin 1/2
+Offspring {2} (You may pay an additional {2} as you cast this spell. If you do, when this creature enters, create a 1/1 token copy of it.)
+Landfall — Whenever a land you control enters, this creature deals 1 damage to target opponent.
+
+Island — Basic Land — Island
+({T}: Add {U}.)
+
+Kaito, Bane of Nightmares {2}{U}{B} — Legendary Planeswalker — Kaito
+Ninjutsu {1}{U}{B} ({1}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)
+During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4 Ninja creature and has hexproof.
+[+1]: You get an emblem with "Ninjas you control get +1/+1."
+[0]: Surveil 2. Then draw a card for each opponent who lost life this turn.
+[-2]: Tap target creature. Put two stun counters on it.
+
+Maelstrom of the Spirit Dragon — Land
+{T}: Add {C}.
+{T}: Add one mana of any color. Spend this mana only to cast a Dragon spell or an Omen spell.
+{4}, {T}, Sacrifice this land: Search your library for a Dragon card, reveal it, put it into your hand, then shuffle.
+
+Magmatic Hellkite {2}{R}{R} — Creature — Dragon 4/5
+Flying
+When this creature enters, destroy target nonbasic land an opponent controls. Its controller searches their library for a basic land card, puts it on the battlefield tapped with a stun counter on it, then shuffles. (If a permanent with a stun counter would become untapped, remove one from it instead.)
+
+Master of Barbs {1}{R} — Creature — Lizard Bard 2/1
+Menace
+Whenever one or more opponents are dealt noncombat damage, creatures you control get +1/+0 until end of turn.
+
+Momo, Friendly Flier {W} — Legendary Creature — Lemur Bat Ally 1/1
+Flying
+The first non-Lemur creature spell with flying you cast during each of your turns costs {1} less to cast.
+Whenever another creature you control with flying enters, Momo gets +1/+1 until end of turn.
+
+Mountain — Basic Land — Mountain
+({T}: Add {R}.)
+
+Multiversal Passage — Land
+As this land enters, choose a basic land type. Then you may pay 2 life. If you don't, it enters tapped.
+This land is the chosen type.
+
+Nova Hellkite {3}{R}{R} — Creature — Dragon 4/5
+Flying, haste
+When this creature enters, it deals 1 damage to target creature an opponent controls.
+Warp {2}{R} (You may cast this card from your hand for its warp cost. Exile this creature at the beginning of the next end step, then you may cast it from exile on a later turn.)
+
+Opt {U} — Instant
+Scry 1.
+Draw a card.
+
+Plains — Basic Land — Plains
+({T}: Add {W}.)
+
+Prismari Charm {U}{R} — Instant
+Choose one —
+• Surveil 2, then draw a card.
+• Prismari Charm deals 1 damage to each of one or two targets.
+• Return target nonland permanent to its owner's hand.
+
+Requiting Hex {B} — Instant
+As an additional cost to cast this spell, you may blight 1. (You may put a -1/-1 counter on a creature you control.)
+Destroy target creature with mana value 2 or less. If this spell's additional cost was paid, you gain 2 life.
+
+Restless Reef — Land
+Restless Reef enters tapped.
+{T}: Add {U} or {B}.
+{2}{U}{B}: Restless Reef becomes a 4/4 blue and black Shark creature with deathtouch until end of turn. It's still a land.
+Whenever Restless Reef attacks, target player mills 4 cards.
+
+Riverpyre Verge — Land
+{T}: Add {R}.
+{T}: Add {U}. Activate only if you control an Island or a Mountain.
+
+Rockface Village — Land
+{T}: Add {C}.
+{T}: Add {R}. Spend this mana only to cast a creature spell.
+{R}, {T}: Target Lizard, Mouse, Otter, or Raccoon you control gets +1/+0 and gains haste until end of turn. Activate only as a sorcery.
+
+Sacred Foundry — Land — Mountain Plains
+({T}: Add {R} or {W}.)
+As Sacred Foundry enters, you may pay 2 life. If you don't, it enters tapped.
+
+Sarkhan, Dragon Ascendant {1}{R} — Legendary Creature — Human Druid 2/2
+When Sarkhan enters, you may behold a Dragon. If you do, create a Treasure token. (To behold a Dragon, choose a Dragon you control or reveal a Dragon card from your hand.)
+Whenever a Dragon you control enters, put a +1/+1 counter on Sarkhan. Until end of turn, Sarkhan becomes a Dragon in addition to its other types and gains flying.
+
+Seasoned Cryomancer {1}{U}{U} — Creature — Human Wizard 2/2
+When this creature enters, draw two cards, then discard two cards. When you discard one or more nonland cards this way, tap up to that many target creatures and put a stun counter on each of them.
+{3}{U}{U}, Exile this card from your graveyard: Draw two cards.
+
+Shipwreck Marsh — Land
+Shipwreck Marsh enters tapped unless you control two or more other lands.
+{T}: Add {U} or {B}.
+
+Shoot the Sheriff {1}{B} — Instant
+Destroy target non-outlaw creature. (Assassins, Mercenaries, Pirates, Rogues, and Warlocks are outlaws. Everyone else is fair game.)
+
+Sleight of Hand {U} — Sorcery
+Look at the top two cards of your library. Put one of them into your hand and the other on the bottom of your library.
+
+Smaug the Magnificent {2}{R}{R} — Legendary Creature — Dragon 4/3
+Flying, haste
+Whenever Smaug attacks, he deals damage equal to the number of Treasures you control to any target.
+At the beginning of your upkeep, create a Treasure token.
+
+Soulstone Sanctuary — Land
+{T}: Add {C}.
+{4}: This land becomes a 3/3 creature with vigilance and all creature types. It's still a land.
+
+Spell Pierce {U} — Instant
+Counter target noncreature spell unless its controller pays {2}.
+
+Spell Snare {U} — Instant
+Counter target spell with mana value 2.
+
+Spirebluff Canal — Land
+Spirebluff Canal enters tapped unless you control two or fewer other lands.
+{T}: Add {U} or {R}.
+
+Spyglass Siren {U} — Creature — Siren Pirate 1/1
+Flying
+When Spyglass Siren enters, create a Map token. (It's an artifact with "{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.")
+
+Starting Town — Land — Town
+This land enters tapped unless it's your first, second, or third turn of the game.
+{T}: Add {C}.
+{T}, Pay 1 life: Add one mana of any color.
+
+Steam Vents — Land — Island Mountain
+({T}: Add {U} or {R}.)
+As Steam Vents enters, you may pay 2 life. If you don't, it enters tapped.
+
+Stingerquill Charm {B}{R} — Instant
+Choose one —
+• Stingerquill Charm deals 3 damage to any target.
+• Target creature gains first strike and deathtouch until end of turn.
+• Create a 2/2 colorless Wizard Soldier creature token named Cadet. It gains haste until end of turn.
+
+Stinging Vitriol {B}{R} — Sorcery
+Stinging Vitriol deals 2 damage to target opponent. That player reveals their hand. You choose a nonland card from it. They discard that card.
+
+Stormcarved Coast — Land
+Stormcarved Coast enters tapped unless you control two or more other lands.
+{T}: Add {U} or {R}.
+
+Strategic Betrayal {1}{B} — Sorcery
+Target opponent exiles a creature they control and their graveyard.
+
+Sunbillow Verge — Land
+{T}: Add {W}.
+{T}: Add {R}. Activate only if you control a Mountain or a Plains.
+
+Sunderflock {7}{U}{U} — Creature — Elemental 5/5
+This spell costs {X} less to cast, where X is the greatest mana value among Elementals you control.
+Flying
+When this creature enters, if you cast it, return all non-Elemental creatures to their owners' hands.
+
+Superior Spider-Man {2}{U}{B} — Legendary Creature — Spider Human Hero 4/4
+Mind Swap — You may have Superior Spider-Man enter as a copy of any creature card in a graveyard, except his name is Superior Spider-Man and he's a 4/4 Spider Human Hero in addition to his other types. When you do, exile that card.
+
+Swamp — Basic Land — Swamp
+({T}: Add {B}.)
+
+The Theorist, Jace Beleren {2}{U}{U} — Legendary Planeswalker — Jace
+At the beginning of each opponent's draw step, you draw a card.
+[+1]: Create a 1/1 blue Illusion creature token.
+[-2]: For each opponent, return up to one target artifact or creature that player controls to its owner's hand.
+[-6]: Draw three cards. Then put X +1/+1 counters on each creature you control, where X is the number of cards in your hand.
+
+The Wondrous Wasp {1}{U} — Legendary Creature — Human Hero 2/1
+Flash
+Flying
+Wasp's Sting — When The Wondrous Wasp enters, tap up to one target creature. It loses all abilities for as long as The Wondrous Wasp remains on the battlefield.
+
+Theorix Charm {U}{B} — Instant
+Choose one —
+• Counter target noncreature spell unless its controller pays {2}.
+• Target creature gets -2/-2 until end of turn.
+• Mill three cards, then draw a card. (To mill three cards, put the top three cards of your library into your graveyard.)
+
+Thought-Stalker Warlock {2}{B} — Creature — Lizard Warlock 2/2
+Menace (This creature can't be blocked except by two or more creatures.)
+When Thought-Stalker Warlock enters, choose target opponent. If they lost life this turn, they reveal their hand, you choose a nonland card from it, and they discard that card. Otherwise, they discard a card.
+
+Tishana's Tidebinder {2}{U} — Creature — Merfolk Wizard 3/2
+Flash
+When Tishana's Tidebinder enters, counter up to one target activated or triggered ability. If an ability of an artifact, creature, or planeswalker is countered this way, that permanent loses all abilities for as long as Tishana's Tidebinder remains on the battlefield. (Mana abilities can't be targeted.)
+
+Traumatic Critique {X}{U}{R} — Instant
+Traumatic Critique deals X damage to any target. Draw two cards, then discard a card.
+
+Twinmaw Stormbrood {5}{W} — Creature — Dragon 5/4
+Flying
+When this creature enters, you gain 5 life.
+  (other face) Charring Bite {1}{R} — Sorcery — Omen
+Charring Bite deals 5 damage to target creature without flying. (Then shuffle this card into its owner's library.)
+
+Uldaros Theorix {3}{U}{B}{B} — Legendary Creature — Elder Sphinx 5/5
+Flying
+When Uldaros Theorix enters, if you cast him, exile up to one target nonland card of each card type from your graveyard. Copy those cards. You may cast any number of spells with total mana value 6 or less from among the copies without paying their mana costs. (Permanent spells cast this way become tokens.)
+
+Undercity Sewers — Land — Island Swamp
+({T}: Add {U} or {B}.)
+Undercity Sewers enters tapped.
+When Undercity Sewers enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
+
+Valley Flamecaller {2}{R} — Creature — Lizard Warlock 3/3
+If a Lizard, Mouse, Otter, or Raccoon you control would deal damage to a permanent or player, it deals that much damage plus 1 instead.
+
+Voice of Victory {1}{W} — Creature — Human Bard 1/3
+Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)
+Your opponents can't cast spells during your turn.
+
+Wan Shi Tong, Librarian {X}{U}{U} — Legendary Creature — Bird Spirit 1/1
+Flash
+Flying, vigilance
+When Wan Shi Tong enters, put X +1/+1 counters on him. Then draw half X cards, rounded down.
+Whenever an opponent searches their library, put a +1/+1 counter on Wan Shi Tong and draw a card.
+
+Watery Grave — Land — Island Swamp
+({T}: Add {U} or {B}.)
+As Watery Grave enters, you may pay 2 life. If you don't, it enters tapped.
+
+We Say Thee Nay! {1}{U} — Instant — Arcane
+Teamwork 2 (As an additional cost to cast this spell, you may tap any number of creatures you control with total power 2 or more.)
+Counter target spell unless its controller pays {2}. Counter that spell unless its controller pays {4} instead if this spell was cast using teamwork.
+
+Winternight Stories {2}{U} — Sorcery
+Draw three cards. Then discard two cards unless you discard a creature card.
+Harmonize {4}{U} (You may cast this card from your graveyard for its harmonize cost. You may tap a creature you control to reduce that cost by {X}, where X is its power. Then exile this spell.)
+
+Yuriko, Hope from the Shadows {U} — Legendary Creature — Human Ninja 1/1
+Flash
+When Yuriko enters, choose one —
+• Target creature gets -X/-0 until end of turn, where X is the number of cards in your graveyard.
+• Surveil 2. (Look at the top two cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.)
+
+
+CASES
+
+=== CASE C198 ===
+You are playing Dimir Midrange against Rakdos Lizards (Standard, best-of-one, both decklists are open).
+Your decklist (60): 2 Bitter Triumph, 4 Dream Beavers, 4 Enduring Curiosity, 4 Floodpits Drowner, 4 Gloomlake Verge, 1 Hidden Lair, 4 Island, 4 Kaito, Bane of Nightmares, 3 Requiting Hex, 2 Restless Reef, 2 Shipwreck Marsh, 2 Shoot the Sheriff, 2 Soulstone Sanctuary, 1 Spell Snare, 4 Spyglass Siren, 1 Strategic Betrayal, 4 Swamp, 2 The Wondrous Wasp, 2 Tishana's Tidebinder, 1 Wan Shi Tong, Librarian, 4 Watery Grave, 2 We Say Thee Nay!, 1 Yuriko, Hope from the Shadows
+Opponent's decklist (60): 4 Blazemire Verge, 4 Blood Crypt, 3 Burst Lightning, 2 Cavern of Souls, 2 Fireglass Mentor, 4 Flamecache Gecko, 3 Gev, Scaled Scorch, 4 Hired Claw, 3 Ingris Stingerquill, 4 Iridescent Vinelasher, 4 Master of Barbs, 4 Mountain, 1 Multiversal Passage, 2 Rockface Village, 2 Starting Town, 4 Stingerquill Charm, 3 Stinging Vitriol, 3 Swamp, 3 Thought-Stalker Warlock, 1 Valley Flamecaller
+Turn 9 of the game (turns of both players counted together; you went first), your declare attackers step.
+YOU: life 13, library 50 cards, hand (2): Enduring Curiosity, Swamp.
+  Lands played this turn: 1. Untapped mana available: 5.
+  Lands: #3 Swamp (untapped); #17 Shipwreck Marsh (untapped); #30 Soulstone Sanctuary (untapped); #6 Island (untapped); #46 Gloomlake Verge (untapped)
+  Other permanents:
+    #60 Enduring Curiosity 4/3 [Enchantment Creature - Cat Glimmer] — untapped
+  Graveyard: Requiting Hex, We Say Thee Nay!
+OPPONENT: life 20, library 49 cards, 2 cards in hand.
+  Lands played this turn: 0. Untapped mana available: 1.
+  Lands: #123 Swamp (tapped); #129 Rockface Village (tapped); #90 Blazemire Verge (untapped); #99 Blood Crypt (tapped)
+  Other permanents:
+    #89 Iridescent Vinelasher 1/2 [Creature - Lizard Assassin] — tapped
+    #134 Gev, Scaled Scorch 3/2 [Legendary Creature - Lizard Mercenary] — untapped; summoning sick
+  Graveyard: Iridescent Vinelasher, Ingris Stingerquill, Hired Claw
+Spells cast last turn: you Enduring Curiosity; opponent Gev, Scaled Scorch.
+Spells cast so far this turn: you none; opponent none.
+Abilities and triggers put on the stack last turn — you: none | opponent: Iridescent Vinelasher trigger: Landfall — Whenever a land you control enters, this creature deals 1 damage to target opponent. (targeting you).; Hired Claw trigger: Whenever you attack with one or more Lizards, Hired Claw deals 1 damage to target opponent. (targeting you)]..
+Abilities and triggers put on the stack so far this turn — you: none | opponent: none.
+This turn so far, you: crimes committed 0; life gained 0; life lost 0; cards drawn 1; tokens created 0.
+This turn so far, opponent: crimes committed 0; life gained 0; life lost 0; cards drawn 0; tokens created 0.
+Cards you know are in your opponent's hand (revealed to you, or returned there from a public zone): none.
+(Not shown: cards revealed from a library, and anything before last turn other than what is on the battlefield, in graveyards and in exile.)
+DECISION: It is your declare attackers step.
+OPTIONS: Creatures that can attack: #60 Enduring Curiosity 4/3. Choose which of them attack (any subset, or none). Choices are written as: Attack: #id, #id ... or none.
+
+CHOICE A: Attack: #60
+CHOICE B: Attack: none
+
+=== CASE C199 ===
+You are playing Dimir Excruciator against Boros Dragons (Standard, best-of-one, both decklists are open).
+Your decklist (60): 3 Bitter Triumph, 2 Cavern of Souls, 1 Day of Black Sun, 1 Deadly Cover-Up, 4 Deceit, 2 Doomsday Excruciator, 3 Duress, 2 Emeritus of Ideation, 4 Gloomlake Verge, 3 Requiting Hex, 4 Restless Reef, 3 Seasoned Cryomancer, 4 Shipwreck Marsh, 1 Strategic Betrayal, 4 Superior Spider-Man, 7 Swamp, 1 The Theorist, Jace Beleren, 2 Theorix Charm, 1 Uldaros Theorix, 1 Undercity Sewers, 4 Watery Grave, 3 Winternight Stories
+Opponent's decklist (60): 4 Burst Lightning, 3 Cavern of Souls, 4 Clarion Conqueror, 2 Erode, 4 Inspiring Vantage, 3 Maelstrom of the Spirit Dragon, 4 Magmatic Hellkite, 4 Momo, Friendly Flier, 1 Mountain, 4 Multiversal Passage, 4 Nova Hellkite, 1 Plains, 4 Sacred Foundry, 4 Sarkhan, Dragon Ascendant, 4 Smaug the Magnificent, 4 Sunbillow Verge, 2 Twinmaw Stormbrood, 4 Voice of Victory
+Turn 13 of the game (turns of both players counted together; you went first), your second main phase.
+YOU: life 4, library 41 cards, hand (3): Doomsday Excruciator, Duress, Swamp.
+  Lands played this turn: 1. Untapped mana available: 5 (Cavern of Souls's other colours: Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered).
+  Lands: #1 Cavern of Souls (untapped; chose type Human); #24 Watery Grave (untapped); #12 Shipwreck Marsh (tapped); #32 Gloomlake Verge (untapped); #56 Swamp (tapped); #8 Restless Reef (untapped); #11 Shipwreck Marsh (untapped)
+  Other permanents: none
+  Graveyard: Requiting Hex, Bitter Triumph, Uldaros Theorix, Watery Grave, Seasoned Cryomancer, Restless Reef, Doomsday Excruciator, Winternight Stories, Bitter Triumph
+OPPONENT: life 16, library 43 cards, 4 cards in hand.
+  Lands played this turn: 0. Untapped mana available: 0.
+  Lands: #101 Inspiring Vantage (tapped); #102 Inspiring Vantage (tapped); #87 Sunbillow Verge (tapped); #128 Multiversal Passage (tapped; chose type Island)
+  Other permanents:
+    #108 Clarion Conqueror 3/3 [Creature - Dragon] — tapped
+  Graveyard: Sarkhan, Dragon Ascendant, Nova Hellkite, Multiversal Passage, Nova Hellkite, Maelstrom of the Spirit Dragon, Inspiring Vantage, Maelstrom of the Spirit Dragon, Magmatic Hellkite
+Spells cast last turn: you none; opponent none.
+Spells cast so far this turn: you Bitter Triumph; opponent none.
+Abilities and triggers put on the stack last turn — you: none | opponent: Maelstrom of the Spirit Dragon ability: Maelstrom of the Spirit Dragon (81) - opponent searches their library for a Dragon card, reveals it, puts it into their hand, then shuffles..
+Abilities and triggers put on the stack so far this turn — you: none | opponent: none.
+This turn so far, you: crimes committed 1; life gained 0; life lost 3; cards drawn 1; tokens created 0.
+This turn so far, opponent: crimes committed 0; life gained 0; life lost 0; cards drawn 0; tokens created 0; creatures died: Magmatic Hellkite.
+Cards you know are in your opponent's hand (revealed to you, or returned there from a public zone): none.
+(Not shown: cards revealed from a library, and anything before last turn other than what is on the battlefield, in graveyards and in exile.)
+DECISION: It is your second main phase (combat is over this turn).
+OPTIONS: Castable now (as far as mana and targets go; cost reductions and increases are counted, except convoke, delve, improvise and reductions whose size you choose): Duress. You may cast any of these (and play a land if you have not this turn), or cast nothing and hold them. Choices are written as: Land: <name or none>; Cast: ... or none.
+
+CHOICE A: Land: none; Cast: Winternight Stories
+CHOICE B: Land: none; Cast: Duress
+
+=== CASE C200 ===
+You are playing Izzet Spellementals against Boros Dragons (Standard, best-of-one, both decklists are open).
+Your decklist (60): 3 Burst Lightning, 4 Eddymurk Crab, 1 Flow State, 2 Get Out, 4 Hearth Elemental, 2 Impractical Joke, 6 Island, 1 Multiversal Passage, 4 Opt, 4 Prismari Charm, 4 Riverpyre Verge, 4 Sleight of Hand, 1 Spell Pierce, 2 Spell Snare, 4 Spirebluff Canal, 4 Steam Vents, 1 Stormcarved Coast, 4 Sunderflock, 3 Traumatic Critique, 2 Winternight Stories
+Opponent's decklist (60): 4 Burst Lightning, 3 Cavern of Souls, 4 Clarion Conqueror, 2 Erode, 4 Inspiring Vantage, 3 Maelstrom of the Spirit Dragon, 4 Magmatic Hellkite, 4 Momo, Friendly Flier, 1 Mountain, 4 Multiversal Passage, 4 Nova Hellkite, 1 Plains, 4 Sacred Foundry, 4 Sarkhan, Dragon Ascendant, 4 Smaug the Magnificent, 4 Sunbillow Verge, 2 Twinmaw Stormbrood, 4 Voice of Victory
+Turn 20 of the game (turns of both players counted together; you went first), your opponent's declare blockers step.
+YOU: life 8, library 32 cards, hand (5): Hearth Elemental, Impractical Joke, Spell Pierce, Sunderflock, Sunderflock.
+  Lands played this turn: 0. Untapped mana available: 0.
+  Lands: #28 Island (tapped); #6 Steam Vents (tapped); #40 Multiversal Passage (tapped; chose type Island); #43 Riverpyre Verge (tapped); #26 Island (tapped); #8 Steam Vents (tapped); #7 Steam Vents (tapped); #24 Island (tapped); #45 Riverpyre Verge (tapped)
+  Other permanents:
+    #31 Hearth Elemental 4/5 [Creature - Elemental] — untapped
+  Graveyard: Get Out, Prismari Charm, Sunderflock, Burst Lightning, Spell Snare, Sunderflock, Get Out, Spirebluff Canal, Island, Traumatic Critique, Opt
+  Exile (face up): Winternight Stories, Winternight Stories
+OPPONENT: life 1, library 43 cards, 5 cards in hand.
+  Lands played this turn: 0. Untapped mana available: 0.
+  Lands: #93 Sacred Foundry (tapped); #77 Cavern of Souls (tapped; chose type Dragon); #92 Sacred Foundry (tapped); #127 Multiversal Passage (tapped; chose type Island); #81 Maelstrom of the Spirit Dragon (tapped)
+  Other permanents:
+    #103 Magmatic Hellkite 4/5 [Creature - Dragon] — tapped
+    #124 Nova Hellkite 4/5 [Creature - Dragon] — tapped
+  Graveyard: Sarkhan, Dragon Ascendant, Smaug the Magnificent, Twinmaw Stormbrood, Nova Hellkite, Erode
+Spells cast last turn: you Traumatic Critique; opponent none.
+Spells cast so far this turn: you Opt; opponent Nova Hellkite.
+Abilities and triggers put on the stack last turn — you: none | opponent: none.
+Abilities and triggers put on the stack so far this turn — you: none | opponent: Nova Hellkite trigger: When this creature enters, it deals 1 damage to target creature an opponent controls. (targeting Hearth Elemental (31))..
+This turn so far, you: crimes committed 0; life gained 0; life lost 0; cards drawn 1; tokens created 0.
+This turn so far, opponent: crimes committed 1; life gained 0; life lost 0; cards drawn 1; tokens created 0.
+Cards you know are in your opponent's hand (revealed to you, or returned there from a public zone): Voice of Victory.
+(Not shown: cards revealed from a library, and anything before last turn other than what is on the battlefield, in graveyards and in exile.)
+DECISION: Your opponent has declared attackers; it is your declare blockers step.
+OPTIONS: Attacking: #103 Magmatic Hellkite 4/5 attacking you; #124 Nova Hellkite 4/5 attacking you. Your untapped creatures: #31 Hearth Elemental 4/5. Choose blocks (each blocker blocks one attacker; several may block the same attacker), or no blocks. Choices are written as: Blocks: #blocker -> #attacker, ... or none.
+
+CHOICE A: Blocks: #31 -> #103
+CHOICE B: Blocks: none
