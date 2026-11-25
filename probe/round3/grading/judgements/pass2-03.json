@@ -1,0 +1,62 @@
+[
+{
+"case": "C043",
+"better": "A",
+"margin": "clear",
+"reason": "An all-out 20-power attack forces both their creatures to chump, which puts them at 1 with an empty board; at 1 life you die to any burn either way, so holding blockers back gains little and leaves their pingers and attackers alive."
+},
+{
+"case": "C044",
+"better": "A",
+"margin": "clear",
+"reason": "Get Out uses mana that would otherwise go to waste. It returns Crab to hand to be recast for UU on their turn, tapping the 8/6 deathtouch-lifelink token and Thorin, which buys a full turn at 4 life."
+},
+{
+"case": "C047",
+"better": "B",
+"margin": "clear",
+"reason": "Hearth Elemental can't block the flying Ingris or the menace Warlock, so it does nothing at home; attacking deals 4 free damage, and the only risk is a Charm trick with the Warlock."
+},
+{
+"case": "C048",
+"better": "A",
+"margin": "small",
+"reason": "Both cast Day of Judgment. A keeps mana open for No More Lies and Consult at the end step; B taps out for a second Tablet, and its land play (Cori Mountain Monastery) is not in hand."
+},
+{
+"case": "C050",
+"better": "A",
+"margin": "small",
+"reason": "Flashing in Tidebinder now gives only a vanilla 3/2 that can't block the Hellkite. Holding it can counter a Magmatic Hellkite land-destruction trigger or blank Smaug."
+},
+{
+"case": "C051",
+"better": "A",
+"margin": "large",
+"reason": "Harmonizer and Ascension before combat, then the graveyard Passage and Tunnel, chain landfall triggers: doubled power plus trample from Ascension on Explorer lets it trample through the 1/1s for lethal. B wastes every landfall by casting after combat."
+},
+{
+"case": "C053",
+"better": "A",
+"margin": "clear",
+"reason": "Spider-Man as Cryomancer gives a 4/4 plus draw-2 filtering to find the missing fifth land. With 4 mana, Deceit can only be evoked for one mode, trading a card for a temporary bounce of Nursery or a single discard."
+},
+{
+"case": "C060",
+"better": "A",
+"margin": "clear",
+"reason": "A 3-land, 7-card hand with cheap threats (two Sarkhans, Voice of Victory) and Burst Lightning is a clear keep against control on the draw."
+},
+{
+"case": "C061",
+"better": "A",
+"margin": "small",
+"reason": "The opponent is tapped out, so Bitter Triumph on Smaug can wait until after the draw; that allows a better choice of discard and target with nothing lost, and A does not rule out casting it this turn."
+},
+{
+"case": "C062",
+"better": "equal",
+"margin": "small",
+"reason": "The opponent is at 3 with no blockers and no untapped mana, so the attack (Smaug alone plus its Treasure trigger) is lethal either way; Biotech only adds redundancy."
+}
+]

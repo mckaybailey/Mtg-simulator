@@ -5,7 +5,47 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 24 Nov 2026, night (latest): round 3 answered; next is step D. START HERE
+## CHECKPOINT 25 Nov 2026 (latest): step D graded by subagent judges. START HERE
+
+**State of the repository.** Committed and pushed on `claude/relaxed-franklin-4vtvog`, after
+rounds 2 and 3. No pull request is open for the 24–25 Nov commits.
+
+**What the user asked (25 Nov).** Use subagents to judge step D's decisions instead of the user
+grading them.
+
+**Done.** All of it is in `probe/round3/grading/`; `probe/README.md`, "Step D", has the full
+account.
+- `tools/probe/make_grading.py` built 20 blind sheets: the 93 disagreements twice over, with A
+  and B swapped in pass 2 and the cases regrouped. Formatting tells are written alike on both
+  sides, and the answer's reason is left out.
+- 20 fresh subagents graded them under `tools/probe/grade_prompt.txt`.
+- `tools/probe/extract_grades.py` took the grades from the transcripts. All 20 judges read only
+  their own sheet.
+- `tools/probe/collect_grades.py` tallies the grades.
+
+**Result.** Answerer better in 69 cases, Forge in 9, no preference in 15. For the planning decks
+it is 63 to 8, 89% (79–94%) of decided cases. The judges show no position bias (A 83, B 83, equal
+20) and the two passes differ in 14 of 93 cases. Leaving out the 7 cases where Forge's `main`
+choice names a card drawn later in the phase gives 90% (80–95%).
+
+**Caveat.** The gate's interval is met, but the judges are the same model family as the answerer.
+The grade measures "Claude prefers Claude's choice" as much as better play, so it is an upper
+bound. Forge's 8 wins include plain answerer errors (C005 an uncastable Uldaros, C119 a Drowner
+with no target), so the judging is not reflexive.
+
+**Next: the user's decision.** Possible next steps, my recommendation first:
+1. **A small check by the user.** Grade about 20 of the cases (stratified, including some of
+   Forge's wins and some splits) on a page that saves the marks. If the user agrees with the
+   judges on most of them, the 89% holds and the in-game step is justified. About 30–60 minutes of
+   the user's time instead of 93 cases.
+2. Go straight to the in-game step (the LLM pilots the planning decks in real games). Its result
+   is win rates, which no Claude judge grades.
+3. A judge from another model family, which needs an API key the project has avoided.
+
+Also fix in the case builder: the `main` / `main2` choice of Forge should list only cards in the
+hand at the decision, or say where a later card came from (7 cases).
+
+## CHECKPOINT 24 Nov 2026, night: round 3 answered; next is step D (superseded by the checkpoint above)
 
 **State of the repository.** Round 3 is committed and pushed on `claude/relaxed-franklin-4vtvog`
 with rounds 2 and the case-gap work before it; no pull request is open for the 24 Nov commits.

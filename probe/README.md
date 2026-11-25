@@ -14,6 +14,7 @@ latest checkpoint. This folder holds the data. The scripts that made it are in `
 | `answers.jsonl` | the blind answers: `case`, `choice`, `reason`, `batch`, and `note` where something was done by hand (two cases, see below) |
 | `run/probe-b2.tar.xz`, `run/probe-b2.sh`, `run/probe-b2.log` | **Round 2's step B**: the same 420 games replayed by the fixed tracker (24 Nov), identical game for game; unpack with `tar -C runs -xJf probe/run/probe-b2.tar.xz` |
 | `round2/` | **Round 2** (24 Nov): the same decisions rebuilt with the gaps below fixed, and answered again. `batches/`, `cases.jsonl`, `key.jsonl`, `answers.jsonl` and `merged.jsonl` as here (198 cases; C128 and C177 dropped). Use this round for step D |
+| `round3/grading/` | **Step D** (25 Nov): the blind sheets, `grading-key.jsonl`, the judges' `judgements/` and the unblinded `grades.jsonl`; see "Step D" below |
 | `merged.jsonl` | key, case text and answer side by side, with `agree` (the mechanical comparison) and `timing` (whether a `main` case that agrees on its spells also agrees on casting them before or after combat) |
 
 ## How the cases were made
@@ -363,3 +364,63 @@ like the answerer's own variation, one case in eight this time.
 **For step D.** Grade round 3's 93 disagreements (`round3/merged.jsonl`, `agree` false). For the
 agreeing cases, show the 9 `main` cases that differ only in timing and the three whose modes or
 evoke choices are unrecorded, or count them as equal and say so.
+
+## Step D: blind grading by subagent judges (25 November 2026)
+
+**What the user asked (25 Nov).** Have subagents judge the disagreements instead of grading them
+by hand.
+
+**How.** `python3 tools/probe/make_grading.py` (seed 1) wrote `round3/grading/sheets/`: the 93
+disagreements of round 3, each with Forge's and the answerer's choice as an unnamed CHOICE A and
+CHOICE B, in seeded random order, and a card reference for the cases on the sheet. The answer's
+reason is not shown. Formatting that would mark Forge's side is written the same way on both sides:
+"(resolved)", how the bottomed cards are written, and the names after attacker and blocker numbers.
+The answerer's main-phase plans stay longer than Forge's, so the prompt
+(`tools/probe/grade_prompt.txt`) says detail is not merit.
+
+Every case was graded twice by fresh subagents, 20 in all. Pass 2 swaps A and B and groups the
+cases differently, so no judge sees a case twice. `extract_grades.py` took the grades from the
+transcripts and checked that each judge read only its own sheet and graded exactly its cases.
+`collect_grades.py` unblinds them with `grading-key.jsonl` and writes `grades.jsonl`. A case goes
+to one side when both passes pick it, or one picks it and the other says equal; otherwise it has
+no preference. The 105 agreeing cases count as equal and were not graded, including the 9
+timing-only `main` cases and C102, C135 and C189.
+
+**Result** (`python3 tools/probe/collect_grades.py`):
+
+| | cases | answerer better | Forge better | no preference | answerer's share of decided (95% CI) |
+|---|---|---|---|---|---|
+| all | 93 | 69 | 9 | 15 | 88% (80–94%) |
+| planning decks | 83 | 63 | 8 | 12 | 89% (79–94%) |
+| creature decks | 10 | 6 | 1 | 3 | 86% (49–97%) |
+| main | 39 | 29 | 3 | 7 | 91% (76–97%) |
+| main2 | 11 | 5 | 3 | 3 | 62% (31–86%) |
+| block | 14 | 11 | 0 | 3 | 100% (74–100%) |
+| attack | 9 | 7 | 0 | 2 | 100% (65–100%) |
+| mulligan | 7 | 6 | 1 | 0 | 86% (49–97%) |
+| endstep | 7 | 6 | 1 | 0 | 86% (49–97%) |
+| counter | 4 | 3 | 1 | 0 | 75% (30–95%) |
+| upkeep | 2 | 2 | 0 | 0 | 100% (34–100%) |
+
+- **Over all 173 planning decisions** (agreements as equal), the answerer is better in 63 and Forge
+  in 8.
+- **Strict count:** counting only cases where both passes pick the same side, the planning decks
+  give 58 to 7, 89% (79–95%).
+- **Position bias:** the judges picked A 83 times, B 83 times and equal 20 times out of 186
+  grades. The two passes give different grades in 14 of 93 cases.
+- **Cards played later in the phase:** Forge's `main` choice covers the whole phase, so it can name
+  a land or spell drawn later in the turn. Judges read those as illegal ("not in hand"). This
+  affects 7 cases (C039, C048, C051, C093, C142, C157, C199). Leaving them out gives 61 to 7 for
+  the planning decks, 90% (80–95%).
+- **The judges are not simply siding with the longer answer.** Several Forge wins are the
+  answerer's own errors, caught by both passes. In C005, Uldaros costs 7 with 6 mana available. In
+  C119, Drowner is flashed in with no target. In C138, Jace is the better play against an equip
+  deck.
+
+**Reading.** On paper, the planning decks' grade clears the gate, an interval excluding 50%. But
+the judges are the same kind of Claude model as the answerer. A judge that reasons the way the
+answerer does will prefer the answerer's choice, whether or not it is better. This step cannot
+tell "Claude plays these spots better than Forge" from "Claude agrees with Claude". The bias can
+only push toward the answerer, so the 89% is an upper bound. The share Forge wins, 8 of 83, is the
+informative part: the judges do not side with the answerer reflexively. The figure still needs a
+check by someone other than Claude before the in-game step is built on it.
