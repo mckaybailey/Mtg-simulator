@@ -1,0 +1,62 @@
+[
+{
+"case": "C100",
+"better": "B",
+"margin": "large",
+"reason": "Emeritus 5/5 eats the 3/3 Gecko for free (opponent's 2 open mana is creature-only and Ingris costs 3); not blocking drops you from 7 to 4 for nothing."
+},
+{
+"case": "C101",
+"better": "equal",
+"margin": "small",
+"reason": "At 2 life against two lifegain-drain Clerics, fliers and a lifelinker, neither line stops lethal next turn; bouncing the token or adding a 6/6 blocker both leave enough damage through."
+},
+{
+"case": "C103",
+"better": "A",
+"margin": "clear",
+"reason": "Uses mana that would otherwise go unspent to kill Sarkhan, which grows into a flying threat with each Dragon, before your turn."
+},
+{
+"case": "C105",
+"better": "A",
+"margin": "clear",
+"reason": "Against hasty Dragons with Momo's cost reduction, holding up Inevitable Defeat and falling back to kicked Star Charts at end step beats tapping out for a sorcery-speed Stock Up."
+},
+{
+"case": "C106",
+"better": "equal",
+"margin": "small",
+"reason": "Both block each Robot with one creature; the assignments differ only in which identical Robot each blocker takes, so the outcome is the same."
+},
+{
+"case": "C109",
+"better": "A",
+"margin": "clear",
+"reason": "Theorix Charm cleanly kills the 2/1, costs no card or life, saves Bitter Triumph for Amalia or Haliya, and the Verge is the better land to play now."
+},
+{
+"case": "C112",
+"better": "B",
+"margin": "clear",
+"reason": "Curving out with Ingris uses all three mana while the control deck has one open and cannot counter; a lone after-combat Mentor wastes mana and its trigger does nothing."
+},
+{
+"case": "C116",
+"better": "A",
+"margin": "small",
+"reason": "Uses the spare mana to deploy sweeper-proof equipment, though holding the Collar for a later Kili draw trigger has slight merit."
+},
+{
+"case": "C117",
+"better": "A",
+"margin": "clear",
+"reason": "Voice of Victory stops you casting spells on the opponent's turn, so the flash creature must be cast now or wait a full turn; it adds a body and card draw."
+},
+{
+"case": "C119",
+"better": "A",
+"margin": "small",
+"reason": "Flashing in Drowner with no target throws away its tap-stun-and-shuffle effect, which is premium against equipped Dwarves; holding it with Tidebinder for their turn is better than a vanilla 2/1."
+}
+]

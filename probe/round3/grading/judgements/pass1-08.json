@@ -1,0 +1,62 @@
+[
+{
+"case": "C150",
+"better": "B",
+"margin": "clear",
+"reason": "Critique kills Moseo, the recursion and lifegain engine, and still filters cards; Winternight only draws while the opponent's board snowballs"
+},
+{
+"case": "C152",
+"better": "A",
+"margin": "clear",
+"reason": "Five lands with fixing plus cheap interaction (Hex) and Cryomancer is a fine keep on the play against aggro"
+},
+{
+"case": "C153",
+"better": "B",
+"margin": "clear",
+"reason": "Drowner trades for Vinelasher, a pumped 3/2 dealing 4 through Flamecaller, with no mana open for tricks; this saves 4 life and removes the landfall pinger"
+},
+{
+"case": "C154",
+"better": "A",
+"margin": "small",
+"reason": "At 9 life, trading a spare 1/1 Monk token for the Pest saves life and removes a lifegain attacker at little cost"
+},
+{
+"case": "C155",
+"better": "A",
+"margin": "clear",
+"reason": "At 2 life against lethal fliers, holding Spell Pierce does nothing; Winternight digs for answers and fills the graveyard for Crab and Hearth"
+},
+{
+"case": "C156",
+"better": "B",
+"margin": "small",
+"reason": "The second Drowner stuns Miner, keeps the board and sets up the Drowner shuffle; the ninjutsu line bounces Wasp and leaves a 2-loyalty Kaito exposed to a ferocious menace attack"
+},
+{
+"case": "C157",
+"better": "B",
+"margin": "clear",
+"reason": "Both wrath around the indestructible Marvel, but B attacks for 6 lifelink and keeps Three Steps as a hard counter; A names a land not in hand and spends the counter at sorcery speed"
+},
+{
+"case": "C162",
+"better": "B",
+"margin": "clear",
+"reason": "After two Sleights, Crab costs UU at flash on the opponent's turn to tap attackers; bouncing a hasty, warpable Hellkite at sorcery speed is weak tempo"
+},
+{
+"case": "C164",
+"better": "A",
+"margin": "clear",
+"reason": "Blocking Prowler saves Kaito at 2 loyalty; with no block, 4+ damage (Prowler can pump) kills Kaito, worth far more than Yuriko"
+},
+{
+"case": "C167",
+"better": "A",
+"margin": "clear",
+"reason": "A second Starcage exiles only a Pest token (Moseo is MV 3); holding Three Steps or Consult at end step is far better value"
+}
+]

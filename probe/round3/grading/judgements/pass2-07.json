@@ -1,0 +1,62 @@
+[
+{
+"case": "C139",
+"better": "A",
+"margin": "small",
+"reason": "The hand has no other land, so Elves plus Freebooter puts two bodies down and ramps toward Smaug and Misty Mountains; Biotech's Lander costs 2 more mana to use."
+},
+{
+"case": "C140",
+"better": "B",
+"margin": "clear",
+"reason": "Both plans take no damage. With Flamecaller's +1, B's double blocks kill both Hearth Elementals; A kills only one and throws away Hired Claw."
+},
+{
+"case": "C142",
+"better": "A",
+"margin": "small",
+"reason": "A adds a land drop (Cavern is not listed in hand) and casts Emeritus after combat, which gives away less; B wastes the land drop for nothing."
+},
+{
+"case": "C145",
+"better": "B",
+"margin": "small",
+"reason": "The shock land plus Dream Beavers uses the turn-1 mana and enables the Verge; Verge alone produces no black, so A does nothing this turn."
+},
+{
+"case": "C147",
+"better": "A",
+"margin": "clear",
+"reason": "Voice of Victory stops you casting spells on the opponent's turn, so flash is useless; casting Curiosity now is the only way to use the mana."
+},
+{
+"case": "C150",
+"better": "A",
+"margin": "clear",
+"reason": "Critique for X=1 kills Moseo, the lifegain recursion engine, and still draws; Winternight only digs."
+},
+{
+"case": "C152",
+"better": "B",
+"margin": "clear",
+"reason": "Five lands with Requiting Hex and Cryomancer, which can rummage away the extra lands, is a fine keep against Lizards."
+},
+{
+"case": "C153",
+"better": "A",
+"margin": "clear",
+"reason": "The opponent has no mana open, so Drowner, whose ETB is spent, safely trades with Vinelasher, a landfall pinger boosted by Flamecaller, and saves 3 life."
+},
+{
+"case": "C154",
+"better": "B",
+"margin": "small",
+"reason": "At 9 life, trading a spare Monk token for the life-gaining Pest is a fair, slightly favourable exchange."
+},
+{
+"case": "C155",
+"better": "B",
+"margin": "clear",
+"reason": "At 2 life facing fliers, holding mana does nothing because no card is castable; Winternight digs for outs and fills the graveyard to cut Crab's cost."
+}
+]

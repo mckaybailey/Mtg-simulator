@@ -1,0 +1,62 @@
+[
+{
+"case": "C051",
+"better": "B",
+"margin": "clear",
+"reason": "B casts Harmonizer and Ascension before combat, so the lands entering (Ascension's basic, Passage, Tunnel) double the attackers' power, and the opponent's 2 open mana cannot pay for a counterspell; A wastes every landfall trigger by casting after combat."
+},
+{
+"case": "C053",
+"better": "A",
+"margin": "clear",
+"reason": "Evoking Deceit to bounce Sapling Nursery stops a token engine the opponent's known lands would feed, and it puts Deceit in the graveyard for Spider-Man to copy later; Spider-Man copying Cryomancer is just a 4/4 that loots and leaves Nursery in play."
+},
+{
+"case": "C060",
+"better": "B",
+"margin": "large",
+"reason": "Three lands, cheap threats, Voice of Victory and removal on the draw against control is a clear keep."
+},
+{
+"case": "C061",
+"better": "B",
+"margin": "small",
+"reason": "The opponent is tapped out, so waiting until after the draw loses nothing; it keeps the choice of discard cost and the Spider-Man-copies-Deceit line (UUBB) open for the main phase."
+},
+{
+"case": "C062",
+"better": "equal",
+"margin": "small",
+"reason": "The opponent is at 3, tapped out and has no creatures, so attacking (or sacrificing tokens with Sackville out) wins either way; Biotech only adds redundancy."
+},
+{
+"case": "C067",
+"better": "B",
+"margin": "clear",
+"reason": "Adding Hired Claw gives one more Ingris trigger and risks nothing against a 1/3 blocker, so it deals 1-2 more damage."
+},
+{
+"case": "C070",
+"better": "A",
+"margin": "small",
+"reason": "At 23 life against an opponent at 7, attacking with everything puts them to 2-3 instead of 5; keeping chump blockers home matters little."
+},
+{
+"case": "C072",
+"better": "A",
+"margin": "large",
+"reason": "A develops Biotech and Pursuit, kills the dangerous Mossborn Hydra cheaply by sacrificing Freebooter (which leaves a Treasure), and lets Treasure sacrifices ping with Biotech; B spends all 5 mana to kill one Icetill Explorer."
+},
+{
+"case": "C074",
+"better": "equal",
+"margin": "small",
+"reason": "Three unblockable flying Bats deal exactly lethal at 3 life, so neither set of blocks changes the outcome."
+},
+{
+"case": "C075",
+"better": "B",
+"margin": "large",
+"reason": "Attacking into an empty board and ninjutsuing Kaito deals damage and lands a planeswalker that can stun Dwalin or draw; A does nothing with its mana (Requiting Hex cannot hit Dwalin)."
+}
+]

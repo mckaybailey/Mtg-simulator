@@ -1,0 +1,62 @@
+[
+{
+"case": "C001",
+"better": "B",
+"margin": "small",
+"reason": "The Swamp's mana is otherwise wasted, and killing Momo removes the flier that discounts their Dragons; the case for A is saving Hex for Voice of Victory or Sarkhan."
+},
+{
+"case": "C002",
+"better": "A",
+"margin": "small",
+"reason": "A two-land hand against aggro wants cheap spells; the six-black-mana Excruciator is dead for many turns, though it could have been discard fodder for Bitter Triumph."
+},
+{
+"case": "C003",
+"better": "equal",
+"margin": "small",
+"reason": "I am at 1 life facing four attackers with three blockers, so one attacker gets through and I lose either way."
+},
+{
+"case": "C004",
+"better": "B",
+"margin": "clear",
+"reason": "Keeping the Treasure gets the second Saga to four Treasures and a 6/6 Dragon a turn sooner, and the Elves are free to attack while Dwalin is tapped; A spends the Treasure and Elves mana on the slow Obsessive Pursuit."
+},
+{
+"case": "C005",
+"better": "A",
+"margin": "clear",
+"reason": "B cannot be cast: Uldaros costs 7 and only 6 mana is available after the land drop, while A at least uses its mana on Duress."
+},
+{
+"case": "C007",
+"better": "B",
+"margin": "clear",
+"reason": "The 1/1 Cryomancer trades with the 2/1 Enlightened Confidant, a card-advantage engine; at 22 life the Cryomancer is cheap to lose and keeps its graveyard draw ability."
+},
+{
+"case": "C008",
+"better": "B",
+"margin": "small",
+"reason": "Torch is an instant and nothing else costs 1, so holding it keeps the same Miner kill (exiling it) available on their turn with the option of a better target."
+},
+{
+"case": "C009",
+"better": "A",
+"margin": "large",
+"reason": "Voice of Victory stops me casting spells on their turn, so passing with nothing cast wastes the whole turn; exiling Voice with a 3-point drain and then casting Consult uses all six mana."
+},
+{
+"case": "C012",
+"better": "B",
+"margin": "clear",
+"reason": "Their hand is empty and two high-count Ascensions would grow Chocobo every land drop; Countersculpt (Jace beheld, so UU) hard-counters it, while No More Lies fails against their 10 open mana."
+},
+{
+"case": "C015",
+"better": "B",
+"margin": "clear",
+"reason": "Starcage now exiles only one Llanowar Elves; holding up Countersculpt or Three Steps Ahead (or Consult at end step) for their four-drop is better, saving Starcage for when they have more cheap creatures."
+}
+]

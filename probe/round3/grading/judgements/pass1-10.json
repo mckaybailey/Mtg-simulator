@@ -1,3 +1,20 @@
-[{"case": "C198", "better": "A", "margin": "clear", "reason": "Attacking for 4 forces a bad spot: if Gev blocks, the opponent trades their key engine for Curiosity, which comes back as a card-draw enchantment; unblocked, it deals 4 and draws a card. The second Curiosity in hand can be flashed in as a blocker."},
-{"case": "C199", "better": "A", "margin": "clear", "reason": "At 4 life facing a flier, drawing three with harmonize (Excruciator can be the discard) digs for removal or a sweeper. Duress only hits a Burst Lightning or Erode in a hand of mostly creatures and does not stop the clock."},
-{"case": "C200", "better": "A", "margin": "large", "reason": "Not blocking takes 8 damage at 8 life and loses on the spot. Blocking one Hellkite with the 4/5 leaves you at 4 against an opponent at 1."}]
+[
+{
+"case": "C198",
+"better": "A",
+"margin": "clear",
+"reason": "Attacking for 4 forces a bad spot: if Gev blocks, the opponent trades their key engine for Curiosity, which comes back as a card-draw enchantment; unblocked, it deals 4 and draws a card. The second Curiosity in hand can be flashed in as a blocker."
+},
+{
+"case": "C199",
+"better": "A",
+"margin": "clear",
+"reason": "At 4 life facing a flier, drawing three with harmonize (Excruciator can be the discard) digs for removal or a sweeper. Duress only hits a Burst Lightning or Erode in a hand of mostly creatures and does not stop the clock."
+},
+{
+"case": "C200",
+"better": "A",
+"margin": "large",
+"reason": "Not blocking takes 8 damage at 8 life and loses on the spot. Blocking one Hellkite with the 4/5 leaves you at 4 against an opponent at 1."
+}
+]
