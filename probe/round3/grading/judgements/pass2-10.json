@@ -1,0 +1,3 @@
+[{"case": "C003", "better": "equal", "margin": "small", "reason": "At 1 life against four attackers, one with menace, three blockers cannot stop every attacker, so both blocks lose (B's single block on the menace Warlock is not even legal)."},
+{"case": "C004", "better": "A", "margin": "clear", "reason": "Keeping the Treasure leaves 2 Treasures, so both Sagas reach 4 next turn for a 6/6 Dragon, and A attacks for 4 while Dwalin is tapped; B spends the Treasure on Pursuit and delays the Dragon."},
+{"case": "C005", "better": "B", "margin": "clear", "reason": "Uldaros costs 7 and only 6 mana is available even after the land drop, so A cannot be cast; B at least uses Duress to strip the opponent's last card."}]
