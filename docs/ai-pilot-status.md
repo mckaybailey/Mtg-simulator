@@ -42,8 +42,13 @@ with no target), so the judging is not reflexive.
    is win rates, which no Claude judge grades.
 3. A judge from another model family, which needs an API key the project has avoided.
 
-Also fix in the case builder: the `main` / `main2` choice of Forge should list only cards in the
-hand at the decision, or say where a later card came from (7 cases).
+**Case builder fixed (25 Nov).** `forge_words` in `tools/probe/make_cases.py` now marks every
+card in Forge's choice that was not in the hand at the decision. The note reads "not in hand at
+the decision: drawn or found later this turn", or "a copy was in your graveyard / exile then".
+Rebuilding round 3 from `runs/probe-b3` changed `forge_text` in exactly the 7 cases. Case texts
+and batches are byte-identical, and agreement is unchanged (105 of 198). `round3/key.jsonl` and
+`merged.jsonl` carry the new text. The step D sheets were left as graded, so those 7 cases were
+judged on the old text. Leaving them out moves the planning share from 89% to 90%.
 
 ## CHECKPOINT 24 Nov 2026, night: round 3 answered; next is step D (superseded by the checkpoint above)
 

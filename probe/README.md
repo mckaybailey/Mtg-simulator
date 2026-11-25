@@ -412,6 +412,10 @@ timing-only `main` cases and C102, C135 and C189.
   a land or spell drawn later in the turn. Judges read those as illegal ("not in hand"). This
   affects 7 cases (C039, C048, C051, C093, C142, C157, C199). Leaving them out gives 61 to 7 for
   the planning decks, 90% (80–95%).
+  Fixed afterwards: `make_cases.py` now marks these cards in Forge's choice ("not in hand at the
+  decision: drawn or found later this turn", or "a copy was in your graveyard / exile then"). The
+  marks are in `round3/key.jsonl` and `merged.jsonl`. The sheets in `round3/grading/sheets/` are
+  kept as they were graded, so rerunning `make_grading.py` now gives new text for those 7 cases.
 - **The judges are not simply siding with the longer answer.** Several Forge wins are the
   answerer's own errors, caught by both passes. In C005, Uldaros costs 7 with 6 mana available. In
   C119, Drowner is flashed in with no target. In C138, Jace is the better play against an equip

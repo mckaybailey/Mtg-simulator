@@ -489,10 +489,29 @@ def forge_words(d):
     if kind in ("main", "main2", "upkeep", "draw", "endstep"):
         phase = {"MAIN1": "before combat", "MAIN2": "after combat", "END_OF_TURN": "end step", "UPKEEP": "upkeep",
                  "DRAW": "draw step"}
+        you = d["state"]["you"]
+        spare = collections.Counter(you.get("hand", []))
+
+        def later(name):
+            """A note for a card Forge used that was not in the hand at the decision.
+
+            Forge's choice covers the whole phase or step, so it can name a card drawn later in it,
+            or one played or cast from another zone; without the note it reads as an illegal play.
+            """
+            if spare[name] > 0:
+                spare[name] -= 1
+                return None
+            where = [z for z in ("graveyard", "exile") if name in you.get(z, [])]
+            return "not in hand at the decision: " + (
+                "a copy was in your %s then" % " and ".join(where) if where else "drawn or found later this turn")
+
         def one(c):
             if not isinstance(c, dict):
                 return c
             notes = []
+            note = later(c["name"])
+            if note:
+                notes.append(note)
             if kind == "main":
                 notes.append(phase.get(c.get("phase"), "during combat" if "COMBAT" in str(c.get("phase"))
                                        else str(c.get("phase")).lower()))
@@ -500,7 +519,11 @@ def forge_words(d):
                 notes.append("targeting " + ", ".join(c["targets"]))
             return c["name"] + (" (%s)" % "; ".join(notes) if notes else "")
         cast = ", ".join(one(c) for c in fo.get("cast", [])) or "none"
-        land = ", ".join(fo.get("lands", [])) or "none"
+        lands = []
+        for name in fo.get("lands", []):
+            note = later(name)
+            lands.append(name + (" (%s)" % note if note else ""))
+        land = ", ".join(lands) or "none"
         return ("Land: %s; Cast: %s" % (land, cast)) if kind in ("main", "main2") else "Cast: %s" % cast
     if kind == "attack":
         return "Attack: " + (", ".join("#%s %s%s" % (a["id"], a["name"], "" if a["attacking"] == "opponent" else " -> " + a["attacking"])
