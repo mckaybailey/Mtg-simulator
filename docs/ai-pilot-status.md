@@ -5,13 +5,14 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 25 Nov 2026 (latest): step D graded by subagent judges. START HERE
+## CHECKPOINT 26 Nov 2026 (latest): step D graded by subagent judges. START HERE
 
 **State of the repository.** Committed and pushed on `claude/relaxed-franklin-4vtvog`, after
 rounds 2 and 3. No pull request is open for the 24–25 Nov commits.
 
-**What the user asked (25 Nov).** Use subagents to judge step D's decisions instead of the user
-grading them.
+**What the user asked (25–26 Nov).** Use subagents to judge step D's decisions instead of the
+user grading them. Then fix the case-builder gap the grading exposed and regrade the 7 cases
+affected. The user has not yet chosen among the next steps below.
 
 **Done.** All of it is in `probe/round3/grading/`; `probe/README.md`, "Step D", has the full
 account.
@@ -27,7 +28,9 @@ account.
 14. For the planning decks it is 63 to 9, 88% (78–93%) of decided cases. The judges show no
 position bias (A 82, B 85, equal 19) and the two passes differ in 12 of 93 cases.
 
-**Caveat.** The gate's interval is met, but the judges are the same model family as the answerer.
+**Caveat.** The gate's interval is met, but the judges are the same model as the answerer. No
+model override was passed to any answerer of rounds 1–3 or to any judge, so all of them inherited
+the session's model; the user asked and was told which.
 The grade measures "Claude prefers Claude's choice" as much as better play, so it is an upper
 bound. Forge's 9 wins include plain answerer errors (C005 an uncastable Uldaros, C119 a Drowner
 with no target), so the judging is not reflexive.
@@ -39,7 +42,18 @@ with no target), so the judging is not reflexive.
    the user's time instead of 93 cases.
 2. Go straight to the in-game step (the LLM pilots the planning decks in real games). Its result
    is win rates, which no Claude judge grades.
-3. A judge from another model family, which needs an API key the project has avoided.
+3. A judge from another model family, which needs an API key the project has avoided. A cheaper
+   half-step needs no key: rerun the 20 sheets with a smaller Claude model as judge (the Agent
+   tool's `model` override). It is still the same family and a weaker judge.
+
+**How to rerun or extend.** `python3 tools/probe/make_grading.py` (sheets, seed 1),
+spawn one fresh subagent per sheet with `tools/probe/grade_prompt.txt` (`{PATH}` set to the
+sheet's absolute path), then `cd tools/probe && python3 extract_grades.py --out
+../../probe/round3/grading <transcripts>` and `python3 collect_grades.py --out
+../../probe/round3/grading`. The transcripts are the subagents' task output files in the
+session's temporary folder. They are gone after a restart; the grades they held are committed in
+`judgements/`. Rerunning `make_grading.py` without `--regrade` overwrites `grading-key.jsonl` and
+the sheets, and the 7 corrected cases then get the new text.
 
 **Case builder fixed (25 Nov).** `forge_words` in `tools/probe/make_cases.py` now marks every
 card in Forge's choice that was not in the hand at the decision. The note reads "not in hand at
