@@ -6,7 +6,8 @@ planning and creature decks and by kind:
   other equal), Forge (likewise), or no preference (both equal, or the passes disagree);
 - the answerer's share of the cases with a verdict, with a 95% Wilson interval (the gate);
 - position bias: how often a judge picked A, and how often the two passes disagree.
-Writes OUT/grades.jsonl, one line per case.
+Writes OUT/grades.jsonl, one line per case. Grades in OUT/judgements/regrade{1,2}.json replace a
+case's earlier grades (cases graded again after their text was corrected).
 """
 import argparse
 import collections
@@ -24,14 +25,18 @@ def main(argv=None):
     key = {k["case"]: k for k in map(json.loads, open(out / "grading-key.jsonl"))}
     grades = collections.defaultdict(dict)  # case -> pass -> (side, margin, reason)
     letters = collections.Counter()
-    for path in sorted((out / "judgements").glob("pass*.json")):
-        p = path.name[4]
+    # regrade{1,2}.json (cases graded again on corrected text) come last and replace the earlier grades
+    paths = sorted((out / "judgements").glob("pass*.json")) + sorted((out / "judgements").glob("regrade*.json"))
+    regraded = set()
+    for path in paths:
+        p = path.name[4] if path.name.startswith("pass") else path.name[7]
+        if path.name.startswith("regrade"):
+            regraded |= {g["case"] for g in json.load(open(path))}
         for g in json.load(open(path)):
             k = key[g["case"]]
             b = g["better"].strip()
-            letters[b] += 1
             side = "equal" if b == "equal" else ("forge" if b == k["forge_letter"][p] else "model")
-            grades[g["case"]][p] = (side, g.get("margin"), g.get("reason"))
+            grades[g["case"]][p] = (side, g.get("margin"), g.get("reason"), b)
     missing = [(c, p) for c in key for p in "12" if p not in grades[c]]
     if missing:
         print("missing grades:", missing)
@@ -62,6 +67,11 @@ def main(argv=None):
         line(g, [r for r in rows if r["group"] == g])
     for kind in sorted({r["kind"] for r in rows}):
         line("  " + kind, [r for r in rows if r["kind"] == kind])
+    if regraded:
+        print("\nregraded on corrected text:", ", ".join(sorted(regraded)))
+    for c in grades:
+        for g in grades[c].values():
+            letters[g[3]] += 1
     total = sum(letters.values())
     print("\njudges picked A %d, B %d, equal %d of %d grades" % (letters["A"], letters["B"], letters["equal"], total))
     margins = collections.Counter((g[0], g[1]) for c in grades for g in grades[c].values())

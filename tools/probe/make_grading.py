@@ -66,6 +66,8 @@ def main(argv=None):
     ap.add_argument("--out", default="probe/round3/grading")
     ap.add_argument("--per-sheet", type=int, default=10)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--regrade", metavar="CASES", help="comma-separated cases to grade again on their current "
+                    "text: writes OUT/sheets/regrade{1,2}.txt with the letters of the existing grading-key.jsonl")
     args = ap.parse_args(argv)
     rnd, out = Path(args.round), Path(args.out)
     ref = load_reference(rnd / "batches")
@@ -73,6 +75,19 @@ def main(argv=None):
     cases = [m for m in merged if m["agree"] is False]
     rng = random.Random(args.seed)
     (out / "sheets").mkdir(parents=True, exist_ok=True)
+    if args.regrade:
+        want = args.regrade.split(",")
+        letters = {k["case"]: k["forge_letter"] for k in map(json.loads, open(out / "grading-key.jsonl"))}
+        chosen = [c for c in cases if c["case"] in want]
+        for p in "12":
+            chunk = []
+            for c in chosen:
+                f = letters[c["case"]][p]
+                forge, model = plain(c["kind"], c["forge"]), plain(c["kind"], c["model"])
+                chunk.append(dict(c, A=forge if f == "A" else model, B=model if f == "A" else forge))
+            (out / "sheets" / ("regrade%s.txt" % p)).write_text(sheet(chunk, ref))
+        print("%d cases to regrade" % len(chosen))
+        return
     key = []
     for c in cases:
         forge_first = rng.random() < 0.5

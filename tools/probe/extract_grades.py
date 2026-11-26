@@ -24,7 +24,7 @@ def main(argv=None):
     for t in args.transcripts:
         tools, texts = read_transcript(t)
         reads = sorted({i.get("file_path", "") for n, i in tools if n == "Read"})
-        m = re.search(r"(pass\d-\d+)\.txt$", reads[0]) if len(reads) == 1 else None
+        m = re.search(r"(pass\d-\d+|regrade\d)\.txt$", reads[0]) if len(reads) == 1 else None
         if not m:
             continue  # not a judge
         sheet = m.group(1)
