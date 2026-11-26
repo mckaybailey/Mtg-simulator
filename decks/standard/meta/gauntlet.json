@@ -17,8 +17,9 @@
    "source_url": "https://melee.gg/Decklist/View/a2eca677-626f-4322-9d84-b4e7010629fc",
    "source_date": "2026-10-24",
    "real_win_rate": 53.4,
-   "sim_win_rate": 67.1,
-   "ai_pilot": "strong"
+   "sim_win_rate": 67.3,
+   "ai_pilot": "strong",
+   "sim_swiss_win_rate": 64.3
   },
   {
    "file": "dimir-midrange.txt",
@@ -31,7 +32,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 54.5,
    "sim_win_rate": 54.7,
-   "ai_pilot": "fair"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 52.6
   },
   {
    "file": "dimir-uldaros.txt",
@@ -44,7 +46,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 49.2,
    "sim_win_rate": 30.8,
-   "ai_pilot": "weak"
+   "ai_pilot": "weak",
+   "sim_swiss_win_rate": 31.5
   },
   {
    "file": "izzet-spellementals.txt",
@@ -57,7 +60,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 44.3,
    "sim_win_rate": 34.3,
-   "ai_pilot": "fair"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 38.1
   },
   {
    "file": "jund-sacrifice.txt",
@@ -70,7 +74,8 @@
    "source_date": "2026-10-24",
    "real_win_rate": 57.6,
    "sim_win_rate": 38.4,
-   "ai_pilot": "weak"
+   "ai_pilot": "weak",
+   "sim_swiss_win_rate": 38.0
   },
   {
    "file": "orzhov-lifegain.txt",
@@ -83,7 +88,8 @@
    "source_date": "2026-10-24",
    "real_win_rate": 53.6,
    "sim_win_rate": 65.3,
-   "ai_pilot": "strong"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 59.6
   },
   {
    "file": "azorius-control.txt",
@@ -95,8 +101,9 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 46.6,
-   "sim_win_rate": 43.9,
-   "ai_pilot": "fair"
+   "sim_win_rate": 43.7,
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 43.4
   },
   {
    "file": "four-color-control.txt",
@@ -108,8 +115,9 @@
    "source_url": "https://www.magic.gg/news/metagame-mentor-mapping-the-standard-frontier-before-magic-world-championship-32",
    "source_date": "2026-11-05",
    "real_win_rate": 48.8,
-   "sim_win_rate": 50.0,
-   "ai_pilot": "fair"
+   "sim_win_rate": 50.2,
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 50.4
   },
   {
    "file": "boros-dragons.txt",
@@ -122,7 +130,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 45.0,
    "sim_win_rate": 63.3,
-   "ai_pilot": "strong"
+   "ai_pilot": "strong",
+   "sim_swiss_win_rate": 62.7
   },
   {
    "file": "azorius-artifacts.txt",
@@ -135,7 +144,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 54.8,
    "sim_win_rate": 44.1,
-   "ai_pilot": "weak"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 45.5
   },
   {
    "file": "boros-dwarves.txt",
@@ -148,7 +158,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 50.2,
    "sim_win_rate": 71.4,
-   "ai_pilot": "strong"
+   "ai_pilot": "strong",
+   "sim_swiss_win_rate": 68.0
   },
   {
    "file": "azorius-momo.txt",
@@ -161,7 +172,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 48.8,
    "sim_win_rate": 51.0,
-   "ai_pilot": "fair"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 46.7
   },
   {
    "file": "dimir-excruciator.txt",
@@ -174,7 +186,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 46.0,
    "sim_win_rate": 31.8,
-   "ai_pilot": "weak"
+   "ai_pilot": "weak",
+   "sim_swiss_win_rate": 35.5
   },
   {
    "file": "rakdos-lizards.txt",
@@ -187,7 +200,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 42.9,
    "sim_win_rate": 62.7,
-   "ai_pilot": "strong"
+   "ai_pilot": "strong",
+   "sim_swiss_win_rate": 57.1
   },
   {
    "file": "izzet-prowess.txt",
@@ -200,7 +214,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 30.6,
    "sim_win_rate": 22.4,
-   "ai_pilot": "fair"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 27.3
   },
   {
    "file": "mono-black-aggro.txt",
@@ -213,7 +228,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 42.6,
    "sim_win_rate": 65.9,
-   "ai_pilot": "strong"
+   "ai_pilot": "strong",
+   "sim_swiss_win_rate": 59.1
   },
   {
    "file": "golgari-midrange.txt",
@@ -226,7 +242,8 @@
    "source_date": "2026-11-05",
    "real_win_rate": 47.5,
    "sim_win_rate": 54.1,
-   "ai_pilot": "fair"
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 54.4
   },
   {
    "file": "grixis-reanimator.txt",
@@ -238,9 +255,10 @@
    "source_url": "https://melee.gg/Decklist/View/aa1117a5-b136-43ee-86fd-b4ec018542d7",
    "source_date": "2026-11-05",
    "real_win_rate": 52.7,
-   "sim_win_rate": 48.8,
-   "ai_pilot": "fair"
+   "sim_win_rate": 48.6,
+   "ai_pilot": "fair",
+   "sim_swiss_win_rate": 48.4
   }
  ],
- "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05 (checked against the article on 2026-11-14). sim_win_rate is its average win rate against the other seventeen decks in a 4,590-game mtgsim round robin (best-of-one, 30 games per pairing, seed 1, Forge AI on both sides, Forge commit 7db198d72e with mtgsim's fourteen Forge patches, combined hash e689217ab372, applied; measured 2026-11-17; 459 of its games replay identically with the revised patch 0020 of --mc deep, combined hash 69b5119ef601). ai_pilot compares the two: 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
+ "calibration": "real_win_rate is the archetype's match win rate in the Magic.gg table of 2026-11-05 (checked against the article on 2026-11-14). sim_win_rate is its average win rate against the other seventeen decks in a 4,590-game mtgsim round robin (best-of-one, 30 games per pairing, seed 1, Forge AI on both sides, Forge commit 7db198d72e with mtgsim's fourteen Forge patches, combined hash e689217ab372, applied; measured 2026-11-17; 459 of its games replay identically with the revised patch 0020 of --mc deep, combined hash 69b5119ef601). sim_swiss_win_rate is its match win rate when that round robin's pairing results are played out as simulated Swiss events of the real events' structure (real_events; python3 -m mtgsim calibrate), the comparison to use because the real rates come from Swiss events. ai_pilot compares sim_swiss_win_rate with real_win_rate (since 2026-11-26; before, sim_win_rate): 'weak' means the AI does at least 10 points worse with the deck than people do, so beating it in a simulation says little; 'strong' means at least 10 points better; 'fair' is within 10 points."
 }

@@ -96,8 +96,8 @@ number. In short, as of 17 November 2026:
   "Other" decks (`decks/standard/fracture-2026-field/`, 18.6% of the field) moves the share-weighted
   SD from 14.9 to 14.5 and the gap from 12.2 to 12.0; the field decks show the same bias.
 - **Still unverified:** `decks/standard/meta/real-matchups-unverified.json` (mtgdecks.net refuses
-  automated requests) and the three melee.gg tournament lists. Real win rates, shares and the
-  nine aggregate lists were checked against the Magic.gg article.
+  automated requests). Real win rates, shares and the nine aggregate lists were checked against
+  the Magic.gg article, the nine melee.gg tournament lists against their melee.gg pages (16 Nov).
 
 How the findings were made, for the next card or deck:
 
