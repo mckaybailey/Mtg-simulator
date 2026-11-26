@@ -5,7 +5,59 @@ goal of the project: make mtgsim's Forge AI play more like real players, so simu
 rates track real ones. Numbers and methods are in `VALIDATION.md`; this note says what is done,
 what was learned and what to do next.
 
-## CHECKPOINT 26 Nov 2026 (latest): step D graded by subagent judges. START HERE
+## CHECKPOINT 26 Nov 2026, evening (latest): in-game LLM pilot planned; build next. START HERE
+
+**State of the repository.** Everything is committed and pushed on `claude/relaxed-franklin-4vtvog`.
+**PR #12** (open, not merged) carries the 24–26 Nov work: probe rounds 2–3, step D, the Swiss
+rate in `gauntlet.json` and the pilot plan. Unit tests pass (309 without the integration tests).
+
+**Done this session (26 Nov).**
+- **Swiss rate in the calibration.** `tools/update_calibration.py` writes `sim_swiss_win_rate`
+  (the run's Swiss calibration line) next to `sim_win_rate` and judges `ai_pilot` on the Swiss
+  gap. Applied to `runs/rr18-cal`: Orzhov Lifegain went from strong to fair (+6.0), Azorius
+  Artifacts from weak to fair (−9.3), and nothing else changed. The table is in
+  `decks/standard/meta/README.md`. That run is the 21 Nov replay of the 17 Nov calibration; four
+  decks' `sim_win_rate` moved by at most 0.2 because a few of its games differ from the original.
+  The commit message of 7e45594 gives a wrong reason for this (a patch revision); a force push to
+  fix it was blocked, so it stands.
+- **Stale notes fixed.** All 18 meta decks have ratings. The melee.gg lists were verified on
+  16 Nov.
+- **The in-game plan: `docs/llm-pilot-plan.md`. Read it first.** Claude subagents make the close
+  decisions in real games. A game is replayed from its seed to its next unanswered decision, so no
+  JVM waits on a subagent, and `decisions.jsonl` plus the seed reproduces every game.
+
+**The user's decisions (26 Nov), all recorded in the plan.**
+- **Decks:** Jund Sacrifice first (−19.6 on the Swiss line), then Dimir Uldaros (−17.7).
+- **Games:** 510 a deck in stage 2, 30 per pairing against the 17 others, seed 1. The baseline arm
+  is the Forge-only games of `runs/rr18-cal`, if the job ids and seeds match.
+- **Both seats:** Claude with a guide to its own deck on both sides. Forge still makes every
+  decision Claude is not given.
+- **Guides:** written now for all 18 meta decks (stage G). Each is one page with the same
+  headings, sourced, frozen in `probe/guides/<deck>.md` before the first game.
+- **No grading:** the user will not grade probe cases (option 1 of the checkpoint below is
+  dropped).
+- **Model:** the user calls the answerers "Opus agents". The session model is used and no model
+  override is passed.
+
+**Measured for the plan.** A planning seat meets 19.9 close spots a game in `runs/probe-b3`
+(`close_spot`; median 17.5, 90th percentile 35). Version 1's kinds (main turn plan, attack,
+block, endstep, counter, mulligan) give 10.3 per planning seat-game. The opponent seat's count is
+not measured yet. A run of the same count over the creature decks was interrupted by the user
+before it printed. Stage 1 measures it. Until then the plan assumes about 20 a game over both
+seats, so about 1,000 subagent batches for stage 2.
+
+**Next, when the user says go** (the user asked for this checkpoint before starting):
+1. **Stage G:** one subagent per meta deck writes its guide from public sources. Check whether
+   WebSearch and the primer sites are reachable first; if they are not, the guide is written from
+   the decklist and card text and says so. Read every guide against the plan's rules
+   (same headings and depth, sources, general strategy only) before committing.
+2. **Stage 0, in parallel:** the driver's decider hook (`decide=`, `answers=`, status `pending`,
+   per-seat log keys), the answer applier for each kind, the orchestrator in `tools/llm_pilot/`,
+   and unit tests. Then the replay test (a Forge-choice decider reproduces baseline games bit for
+   bit) and the enforcement test.
+3. **Then stage 1:** 30 games of Jund Sacrifice against the six creature decks.
+
+## CHECKPOINT 26 Nov 2026: step D graded by subagent judges (superseded by the checkpoint above)
 
 **State of the repository.** Committed and pushed on `claude/relaxed-franklin-4vtvog`, after
 rounds 2 and 3. No pull request is open for the 24–25 Nov commits.

@@ -60,8 +60,10 @@ same 198 decisions were answered again (`probe/round2/`): agreement 52% (45–58
 (`probe/round3/`; step B replayed 419 of 420, the other game does not replay on any driver):
 agreement 53% (46–60%), unchanged again. Step D was graded blind by Claude subagent judges at the
 user's request (25 Nov, `probe/round3/grading/`): answerer better in 63 planning cases, Forge in 9,
-88% (78–93%), an upper bound because the judges share the answerer's model family. Next is the
-user's choice among the options in the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
+88% (78–93%), an upper bound because the judges share the answerer's model family. On 26 Nov the
+user chose the in-game step: Claude subagents with a deck guide make both seats' close decisions in
+real games (`docs/llm-pilot-plan.md`; Jund Sacrifice, then Dimir Uldaros, 510 games each). Nothing
+is built yet. Start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 
