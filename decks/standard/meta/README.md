@@ -44,31 +44,36 @@ To measure that, all eighteen decks were played against each other in the simula
 games, best-of-one, 30 per pairing, seed 1, 17 November 2026) and each deck's simulated win rate
 was set beside its real-world match win rate from the same Magic.gg table. "Simulated" is the
 average over the other seventeen decks, on Forge with mtgsim's fourteen Forge patches
-(`mtgsim/forge_patches/`):
+(`mtgsim/forge_patches/`). "Swiss" is the deck's match win rate when those pairing results are
+played out as simulated events of the real events' structure (`python3 -m mtgsim calibrate`),
+which is how the real rates were produced, so the gap and the AI-pilot rating use it (since 26
+November 2026; before, they used the round-robin column, which rated Orzhov Lifegain strong and
+Azorius Artifacts weak):
 
-| Deck | Real win rate | Simulated | Gap | AI pilot |
-|---|---|---|---|---|
-| Mono-Black Aggro | 42.6% | 65.9% | +23.3 | strong |
-| Boros Dwarves | 50.2% | 71.4% | +21.2 | strong |
-| Rakdos Lizards | 42.9% | 62.7% | +19.8 | strong |
-| Boros Dragons | 45.0% | 63.3% | +18.3 | strong |
-| Mono-Green Landfall | 53.4% | 67.1% | +13.7 | strong |
-| Orzhov Lifegain | 53.6% | 65.3% | +11.7 | strong |
-| Golgari Midrange | 47.5% | 54.1% | +6.6 | fair |
-| Azorius Momo | 48.8% | 51.0% | +2.2 | fair |
-| Four-Color Control | 48.8% | 50.0% | +1.2 | fair |
-| Dimir Midrange | 54.5% | 54.7% | +0.2 | fair |
-| Azorius Control | 46.6% | 43.9% | −2.7 | fair |
-| Grixis Reanimator | 52.7% | 48.8% | −3.9 | fair |
-| Izzet Prowess | 30.6% | 22.4% | −8.2 | fair |
-| Izzet Spellementals | 44.3% | 34.3% | −10.0 | fair |
-| Azorius Artifacts | 54.8% | 44.1% | −10.7 | weak |
-| Dimir Excruciator | 46.0% | 31.8% | −14.2 | weak |
-| Dimir Uldaros | 49.2% | 30.8% | −18.4 | weak |
-| Jund Sacrifice | 57.6% | 38.4% | −19.2 | weak |
+| Deck | Real win rate | Simulated (round robin) | Simulated (Swiss) | Gap (Swiss) | AI pilot |
+|---|---|---|---|---|---|
+| Boros Dwarves | 50.2% | 71.4% | 68.0% | +17.8 | strong |
+| Boros Dragons | 45.0% | 63.3% | 62.7% | +17.7 | strong |
+| Mono-Black Aggro | 42.6% | 65.9% | 59.1% | +16.5 | strong |
+| Rakdos Lizards | 42.9% | 62.7% | 57.1% | +14.2 | strong |
+| Mono-Green Landfall | 53.4% | 67.3% | 64.3% | +10.9 | strong |
+| Golgari Midrange | 47.5% | 54.1% | 54.4% | +6.9 | fair |
+| Orzhov Lifegain | 53.6% | 65.3% | 59.6% | +6.0 | fair |
+| Four-Color Control | 48.8% | 50.2% | 50.4% | +1.6 | fair |
+| Dimir Midrange | 54.5% | 54.7% | 52.6% | −1.9 | fair |
+| Azorius Momo | 48.8% | 51.0% | 46.7% | −2.1 | fair |
+| Azorius Control | 46.6% | 43.7% | 43.4% | −3.2 | fair |
+| Izzet Prowess | 30.6% | 22.4% | 27.3% | −3.3 | fair |
+| Grixis Reanimator | 52.7% | 48.6% | 48.4% | −4.3 | fair |
+| Izzet Spellementals | 44.3% | 34.3% | 38.1% | −6.2 | fair |
+| Azorius Artifacts | 54.8% | 44.1% | 45.5% | −9.3 | fair |
+| Dimir Excruciator | 46.0% | 31.8% | 35.5% | −10.5 | weak |
+| Dimir Uldaros | 49.2% | 30.8% | 31.5% | −17.7 | weak |
+| Jund Sacrifice | 57.6% | 38.4% | 38.0% | −19.6 | weak |
 
 The six newer decks' real win rates rest on only 20–25 players each (about ±7 points). Izzet
-Spellementals sits on the 10-point line between "fair" and "weak"; treat it as weak.
+Spellementals, rated weak on the round-robin column, is fair on the Swiss one (−6.2); Azorius
+Artifacts (−9.3) and Dimir Excruciator (−10.5) sit either side of the 10-point line.
 
 The patches fix cards the AI could not cast or used wrongly, and each moved its deck a lot
 (Azorius Control could not cast seven of its sixty cards and won one game in five; Mono-Green
@@ -126,8 +131,8 @@ format `mtgsim tune --matchups` expects, deliberately: verify and de-duplicate i
   every card is Standard-legal and unbanned according to Forge's format file.
 - The only combo-like deck is Grixis Reanimator (1.0%). The six smaller archetypes' real win
   rates are Dimir Excruciator 46.0%, Rakdos Lizards 42.9%, Izzet Prowess 30.6%, Mono-Black Aggro
-  42.6%, Golgari Midrange 47.5% and Grixis Reanimator 52.7%. Their `sim_win_rate` and
-  `ai_pilot` come from the 18-deck round robin of 17 November 2026 (table above).
+  42.6%, Golgari Midrange 47.5% and Grixis Reanimator 52.7%. Their `sim_win_rate`,
+  `sim_swiss_win_rate` and `ai_pilot` come from the 18-deck round robin of 17 November 2026 (table above).
 - Forge's AI pilots these decks, and it is much better with the creature decks than with Jund
   Sacrifice, Dimir Uldaros, Dimir Excruciator, Azorius Artifacts and the spell-heavy Izzet deck.
   Results against those say more about the AI than the matchup.

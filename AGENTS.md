@@ -16,6 +16,8 @@ measured and how far results can be trusted. Each folder with code or data has i
 `docs/stronger-ai.md` is a design note comparing ways to give mtgsim a stronger pilot than Forge's AI.
 `docs/ai-pilot-status.md` is the handoff note for the unfinished work on the AI pilot: what is done, what was
 learned and what to do next. Read it before working on the AI, patches or calibration.
+`docs/llm-pilot-plan.md` (26 Nov) is the plan for the in-game step: Claude subagents make the planning decks'
+close decisions in real games, by replaying each game to its next unanswered decision. Not built yet.
 `tools/` holds the analysis scripts behind the numbers in `VALIDATION.md` (see its README):
 calibration and arm comparisons, `mc_cost.py` for Monte Carlo runs, and `log_analysis/`, which
 parses the game logs of a `--save-logs` run. `mtgsim/forge_patches/README.md` lists every Forge
@@ -58,8 +60,10 @@ same 198 decisions were answered again (`probe/round2/`): agreement 52% (45–58
 (`probe/round3/`; step B replayed 419 of 420, the other game does not replay on any driver):
 agreement 53% (46–60%), unchanged again. Step D was graded blind by Claude subagent judges at the
 user's request (25 Nov, `probe/round3/grading/`): answerer better in 63 planning cases, Forge in 9,
-88% (78–93%), an upper bound because the judges share the answerer's model family. Next is the
-user's choice among the options in the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
+88% (78–93%), an upper bound because the judges share the answerer's model family. On 26 Nov the
+user chose the in-game step: Claude subagents with a deck guide make both seats' close decisions in
+real games (`docs/llm-pilot-plan.md`; Jund Sacrifice, then Dimir Uldaros, 510 games each). Nothing
+is built yet. Start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 
@@ -96,8 +100,8 @@ number. In short, as of 17 November 2026:
   "Other" decks (`decks/standard/fracture-2026-field/`, 18.6% of the field) moves the share-weighted
   SD from 14.9 to 14.5 and the gap from 12.2 to 12.0; the field decks show the same bias.
 - **Still unverified:** `decks/standard/meta/real-matchups-unverified.json` (mtgdecks.net refuses
-  automated requests) and the three melee.gg tournament lists. Real win rates, shares and the
-  nine aggregate lists were checked against the Magic.gg article.
+  automated requests). Real win rates, shares and the nine aggregate lists were checked against
+  the Magic.gg article, the nine melee.gg tournament lists against their melee.gg pages (16 Nov).
 
 How the findings were made, for the next card or deck:
 
@@ -188,8 +192,9 @@ Always pass on the limits with the numbers:
   records that it had none. New AI profiles that mtgsim selects by name (for example one found
   by `tune`) are not Forge changes: they go in `mtgsim/profiles/`, under the same rule.
 - Work reaches `main` through pull requests from each session's own branch (cloud sessions can
-  push only the branch they are given); open or merge one only when the user asks. As of 23 Nov
-  2026 everything is merged and `main` is the only long-lived branch. Commit messages explain why,
+  push only the branch they are given); open or merge one only when the user asks. PR #12 (probe rounds 2–3,
+  step D) was merged on 26 Nov; the rest of 26 Nov's work follows in the next PR, and `main` is the
+  only long-lived branch. Commit messages explain why,
   not just what.
 - The cloud container restarts without warning, and stops within about 10 minutes of the
   session going idle; background jobs and `/tmp` go with it (`runs/` usually survives a restart,
