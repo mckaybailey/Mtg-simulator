@@ -16,6 +16,8 @@ measured and how far results can be trusted. Each folder with code or data has i
 `docs/stronger-ai.md` is a design note comparing ways to give mtgsim a stronger pilot than Forge's AI.
 `docs/ai-pilot-status.md` is the handoff note for the unfinished work on the AI pilot: what is done, what was
 learned and what to do next. Read it before working on the AI, patches or calibration.
+`docs/llm-pilot-plan.md` (26 Nov) is the plan for the in-game step: Claude subagents make the planning decks'
+close decisions in real games, by replaying each game to its next unanswered decision. Not built yet.
 `tools/` holds the analysis scripts behind the numbers in `VALIDATION.md` (see its README):
 calibration and arm comparisons, `mc_cost.py` for Monte Carlo runs, and `log_analysis/`, which
 parses the game logs of a `--save-logs` run. `mtgsim/forge_patches/README.md` lists every Forge
