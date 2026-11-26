@@ -7,6 +7,11 @@ share the answerer's model. The in-game step answers the question without a judg
 decks play real games in which Claude makes their close decisions, and the result is a win rate.
 This note is the plan for it. Nothing here is built yet.
 
+**Decided by the user (26 Nov).** The decks are Jund Sacrifice, then Dimir Uldaros. Stage 2 uses
+about 500 games a deck: 30 per pairing against the 17 others, 510 games. The user will not grade
+probe cases (probe option 1 is skipped). Each deck gets a researched deck guide before its games
+(see "Before stage 1" below).
+
 ## The question and the gate
 
 **Question.** Does a planning deck that the simulator underrates win more when Claude makes its
@@ -101,6 +106,26 @@ seat and the kinds) and `answers=` (the log path). There is one new result statu
   attacker set or a random legal block, must be carried out as given. A fallback is allowed only
   where the option really is illegal.
 
+**Before stage 1: a deck guide for each deck.** The probe's answerers saw only
+the decklists and the cards' Oracle text, and many of the cards are newer than the model's
+training. Real pilots know their deck's plan. So each deck gets a guide of about one page,
+researched once from public primers, tournament reports and coverage. The guide covers:
+- the game plan and how the deck wins;
+- key cards and interactions, and which cards to protect or hold;
+- mulligan rules;
+- how to play each meta matchup.
+
+Rules:
+- **Sources:** each claim cites its source. If the sites cannot be reached from the environment,
+  the guide is written from the decklist and card text alone, and it says so.
+- **Frozen:** the guide is committed as `probe/guides/<deck>.md` before the deck's first pilot game
+  and never edited during a stage. Every case of that deck gets the same text, so games replay.
+- **General strategy only:** nothing from the simulated games and nothing about a particular game.
+  The rule about hidden information still applies.
+- **What it means for the result:** stage 2 then measures "Claude with the guide" against Forge.
+  The guide's own share of a gain would need a third arm without it, another 510 games. Run that
+  arm only if the gain is large enough to be worth splitting.
+
 **Stage 1: a pilot of 30 games.** Jund Sacrifice, the most underrated deck at −19.6 on the Swiss
 line, plays the six creature decks, 5 games each, seed 1. It has no counterspells, so the first
 real run covers five of the six kinds.
@@ -109,16 +134,15 @@ real run covers five of the six kinds.
 - **Size:** about 300 decisions, or 30 subagent batches.
 - **Purpose:** it checks the mechanics, not the effect. 30 games cannot show a difference.
 
-**Stage 2: the A/B.** Jund Sacrifice against all 17 other meta decks, 15 games per pairing, seed 1:
-255 games.
-- **Baseline arm:** the same games played by Forge alone. Those are games 1–15 of each Jund pairing
-  in the calibration run `runs/rr18-cal`, so they need no new games if the job ids and seeds match.
+**Stage 2: the A/B.** Jund Sacrifice against all 17 other meta decks, 30 games per pairing, seed 1:
+510 games.
+- **Baseline arm:** the same games played by Forge alone. Those are the 510 Jund games of the calibration
+  run `runs/rr18-cal`, so they need no new games if the job ids and seeds match.
   Stage 0 checks that they do.
-- **Size:** about 2,600 decisions, or about 260 subagent batches.
-- **Precision:** each arm is ±6 points. The difference is about ±9 points, because the games share
-  seeds but diverge after the first changed decision.
-- **What it shows:** a gain of 15 or more is clear. One of 9 or more counts as a reliable gain. Half
-  as many games would leave about ±12 on the difference.
+- **Size:** about 5,300 decisions, or about 530 subagent batches.
+- **Precision:** each arm is about ±4.3 points. The difference is about ±6 points, because the games
+  share seeds but diverge after the first changed decision.
+- **What it shows:** a gain of 6 or more counts as a reliable gain, and 15 or more is clear.
 
 **Stage 3: only if stage 2 shows a reliable gain.**
 - Dimir Uldaros (−17.7, holds counterspells), the same way.
@@ -129,9 +153,10 @@ real run covers five of the six kinds.
 
 ## Cost, time and limits
 
-- **Subagent volume:** stage 1 is about 30 batches, stage 2 about 260, stage 3 about 260 per deck.
+- **Subagent volume:** stage 1 is about 30 batches, stage 2 about 530, stage 3 about 530 per deck.
   The minutes per batch are unknown until stage 1 measures them. At an assumed 3–6 minutes and 10
-  at once, stage 2 takes 1.5–3 hours of subagent time, plus replays that overlap it. All of it runs
+  at once, stage 2 takes 2.5–5.5 hours of subagent time, plus replays that overlap it (about 3
+  hours of engine time on 4 cores). All of it runs
   against the session's plan, not an API key. The model is the session's (no override), and each
   answer logs which model gave it.
 - **The session must stay open while a stage runs.** The orchestrator is the main session, and the
@@ -146,13 +171,9 @@ real run covers five of the six kinds.
   still loses the game. A gain also does not make the simulator a cheap tool. Each Claude-piloted
   game costs minutes of subagent time, so this is a measurement, not a new default pilot.
 
-## What needs deciding before stage 0
+## Decisions
 
-1. **The deck.** The proposal is Jund Sacrifice (largest gap, no counterspells), then Dimir
-   Uldaros. Azorius Control has the most counter and hold decisions but is already within 3 points
-   of its real rate.
-2. **The game budget for stage 2.** The proposal is 255 games, ±9 points on the difference. 500
-   games per arm would give about ±6.
-3. **Whether to skip probe option 1,** your own grading of about 20 cases. The in-game result does
-   not depend on the judges, so this plan does not need it. It would still show early whether the
-   88% is believable before the subagent time is spent.
+Made by the user on 26 Nov: the decks are Jund Sacrifice, then Dimir Uldaros; stage 2 uses 510 games
+a deck; probe option 1 is skipped; and a deck guide is written for each deck before its games. Azorius Control was not
+chosen: it has the most counter and hold decisions, but it is already within 3 points of its real
+rate.

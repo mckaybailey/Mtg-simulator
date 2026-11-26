@@ -46,8 +46,9 @@ with no target), so the judging is not reflexive.
    half-step needs no key: rerun the 20 sheets with a smaller Claude model as judge (the Agent
    tool's `model` override). It is still the same family and a weaker judge.
 
-**26 Nov: the user asked for a plan for option 2.** It is `docs/llm-pilot-plan.md`. Nothing is built yet,
-and three choices there wait for the user (the deck, the game budget, whether to do option 1 first).
+**26 Nov: the user asked for a plan for option 2.** It is `docs/llm-pilot-plan.md`. The user chose (26 Nov): Jund
+Sacrifice, then Dimir Uldaros; 510 games a deck in stage 2; no grading by the user; a researched
+deck guide per deck before its games. Nothing is built yet. Next is stage 0 of that plan.
 
 **How to rerun or extend.** `python3 tools/probe/make_grading.py` (sheets, seed 1),
 spawn one fresh subagent per sheet with `tools/probe/grade_prompt.txt` (`{PATH}` set to the
