@@ -192,8 +192,9 @@ Always pass on the limits with the numbers:
   records that it had none. New AI profiles that mtgsim selects by name (for example one found
   by `tune`) are not Forge changes: they go in `mtgsim/profiles/`, under the same rule.
 - Work reaches `main` through pull requests from each session's own branch (cloud sessions can
-  push only the branch they are given); open or merge one only when the user asks. As of 23 Nov
-  2026 everything is merged and `main` is the only long-lived branch. Commit messages explain why,
+  push only the branch they are given); open or merge one only when the user asks. PR #12 (probe rounds 2–3,
+  step D) was merged on 26 Nov; the rest of 26 Nov's work follows in the next PR, and `main` is the
+  only long-lived branch. Commit messages explain why,
   not just what.
 - The cloud container restarts without warning, and stops within about 10 minutes of the
   session going idle; background jobs and `/tmp` go with it (`runs/` usually survives a restart,

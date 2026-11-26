@@ -8,8 +8,10 @@ what was learned and what to do next.
 ## CHECKPOINT 26 Nov 2026, evening (latest): in-game LLM pilot planned; build next. START HERE
 
 **State of the repository.** Everything is committed and pushed on `claude/relaxed-franklin-4vtvog`.
-**PR #12** (open, not merged) carries the 24–26 Nov work: probe rounds 2–3, step D, the Swiss
-rate in `gauntlet.json` and the pilot plan. Unit tests pass (309 without the integration tests).
+**PR #12** (merged 26 Nov) carried probe rounds 2–3 and step D. A
+second PR from the same branch carries the rest of 26 Nov's work: the Swiss rate in
+`gauntlet.json`, the pilot plan and this checkpoint. The user asked for it to be merged too; once
+it is, `main` holds everything. Unit tests pass (309 without the integration tests).
 
 **Done this session (26 Nov).**
 - **Swiss rate in the calibration.** `tools/update_calibration.py` writes `sim_swiss_win_rate`
