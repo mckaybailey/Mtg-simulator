@@ -26,7 +26,7 @@ repository, but every run can be reproduced with the commands and seeds below.
 | Decision probe, steps B and C (23 Nov): 200 blind cases | a Claude subagent's choice and Forge's agree on 51% (44–58%) of cases, 49% (41–56%) of the planning decks' 175; least on spell decisions (main phase 32%, second main 19%), where the answer usually casts more. Which is better is step D's grading; see "Decision probe" |
 | Decision probe, round 2 (24 Nov): the same decisions with the case gaps fixed | 420 of 420 step B games replay identically with the new tracker; 198 of the 200 decisions found again (two existed only through a spree-cost bug); fresh answerers agree with Forge on 102 of 198, 52% (45–58%), planning decks 49% (42–57%): no change. 183 of 198 cases get the same verdict in both rounds; see "Decision probe" |
 | Decision probe, round 3 (24 Nov): cost reductions, restricted mana and turn history added | 419 of 420 step B games replay identically (the other does not replay on the old driver either); all 198 decisions found again; fresh answerers agree with Forge on 105 of 198, 53% (46–60%), planning decks 52% (45–59%): no change. 173 of 198 cases get the same verdict as in round 2; see "Decision probe" |
-| Decision probe, step D (25 Nov): round 3's 93 disagreements graded blind by Claude subagent judges, twice each with A and B swapped | Answerer judged better in 69, Forge in 9, no preference in 15; planning decks 63 to 8, 89% (79–94%) of decided cases. The judges are the same model family as the answerer, so this is an upper bound; see "Decision probe" |
+| Decision probe, step D (25 Nov): round 3's 93 disagreements graded blind by Claude subagent judges, twice each with A and B swapped | Answerer judged better in 69, Forge in 10, no preference in 14; planning decks 63 to 9, 88% (78–93%) of decided cases (7 cases regraded on corrected text, 26 Nov). The judges are the same model family as the answerer, so this is an upper bound; see "Decision probe" |
 | Forge patches for cards the AI never cast | Azorius Control +25.4 points (CI +21.3 to +29.4), Azorius Momo +9.3 (+4.9 to +13.6), Dimir Uldaros +3.8 (not reliable); mirrors 50–54% |
 | Three more patches (14 Nov) | Mono-Green Landfall +20.3 points (CI +16.0 to +24.5) from the Ba Sing Se fix; Nova Hellkite and Chainsaw are now cast but move no win rate (+1.5 and −0.1, not reliable); mirrors 48–55% |
 | Why the creature decks win (1,650 game logs read) | no blocking, removal or card-script flaw found; games turn on how much removal the opponent draws, in game one without sideboards; see below |
@@ -997,16 +997,17 @@ different judges with A and B swapped.
 
 | | answerer better | Forge better | no preference | answerer's share of decided (95% CI) |
 |---|---|---|---|---|
-| all (93) | 69 | 9 | 15 | 88% (80–94%) |
-| planning decks (83) | 63 | 8 | 12 | 89% (79–94%) |
+| all (93) | 69 | 10 | 14 | 87% (78–93%) |
+| planning decks (83) | 63 | 9 | 11 | 88% (78–93%) |
 | creature decks (10) | 6 | 1 | 3 | 86% (49–97%) |
 
-The judges show no position bias: A 83, B 83 and equal 20 of 186 grades. The two passes differ in
-14 of 93 cases. Leaving out the 7 cases where Forge's choice names a card drawn later in the phase
-(judges read it as illegal) gives 90% (80–95%) for the planning decks.
+The judges show no position bias: A 82, B 85 and equal 19 of 186 grades. The two passes differ in
+12 of 93 cases. In 7 cases Forge's choice named a card drawn later in the phase, which the judges
+read as illegal. The case builder now marks such cards, and those 7 cases were regraded on the
+corrected text; the table includes the regrade.
 
 **What it means.** The judges share the answerer's model family, so this result cannot separate
-better play from shared reasoning. It is an upper bound. That Forge wins 8 planning cases, several
+better play from shared reasoning. It is an upper bound. That Forge wins 9 planning cases, several
 of them clear answerer errors, shows the judges do not side with the answerer reflexively.
 
 ## The goldfish model

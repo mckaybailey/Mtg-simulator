@@ -23,20 +23,19 @@ account.
   their own sheet.
 - `tools/probe/collect_grades.py` tallies the grades.
 
-**Result.** Answerer better in 69 cases, Forge in 9, no preference in 15. For the planning decks
-it is 63 to 8, 89% (79–94%) of decided cases. The judges show no position bias (A 83, B 83, equal
-20) and the two passes differ in 14 of 93 cases. Leaving out the 7 cases where Forge's `main`
-choice names a card drawn later in the phase gives 90% (80–95%).
+**Result** (after the regrade below). Answerer better in 69 cases, Forge in 10, no preference in
+14. For the planning decks it is 63 to 9, 88% (78–93%) of decided cases. The judges show no
+position bias (A 82, B 85, equal 19) and the two passes differ in 12 of 93 cases.
 
 **Caveat.** The gate's interval is met, but the judges are the same model family as the answerer.
 The grade measures "Claude prefers Claude's choice" as much as better play, so it is an upper
-bound. Forge's 8 wins include plain answerer errors (C005 an uncastable Uldaros, C119 a Drowner
+bound. Forge's 9 wins include plain answerer errors (C005 an uncastable Uldaros, C119 a Drowner
 with no target), so the judging is not reflexive.
 
 **Next: the user's decision.** Possible next steps, my recommendation first:
 1. **A small check by the user.** Grade about 20 of the cases (stratified, including some of
    Forge's wins and some splits) on a page that saves the marks. If the user agrees with the
-   judges on most of them, the 89% holds and the in-game step is justified. About 30–60 minutes of
+   judges on most of them, the 88% holds and the in-game step is justified. About 30–60 minutes of
    the user's time instead of 93 cases.
 2. Go straight to the in-game step (the LLM pilots the planning decks in real games). Its result
    is win rates, which no Claude judge grades.
@@ -48,7 +47,9 @@ the decision: drawn or found later this turn", or "a copy was in your graveyard 
 Rebuilding round 3 from `runs/probe-b3` changed `forge_text` in exactly the 7 cases. Case texts
 and batches are byte-identical, and agreement is unchanged (105 of 198). `round3/key.jsonl` and
 `merged.jsonl` carry the new text. The step D sheets were left as graded, so those 7 cases were
-judged on the old text. Leaving them out moves the planning share from 89% to 90%.
+judged on the old text. **Regraded (26 Nov):** two fresh judges graded the 7 again on the
+corrected text (`sheets/regrade{1,2}.txt`; `collect_grades.py` uses their grades). Planning went
+from 63 to 8, 89% (79–94%), to 63 to 9, 88% (78–93%).
 
 ## CHECKPOINT 24 Nov 2026, night: round 3 answered; next is step D (superseded by the checkpoint above)
 

@@ -390,10 +390,10 @@ timing-only `main` cases and C102, C135 and C189.
 
 | | cases | answerer better | Forge better | no preference | answerer's share of decided (95% CI) |
 |---|---|---|---|---|---|
-| all | 93 | 69 | 9 | 15 | 88% (80–94%) |
-| planning decks | 83 | 63 | 8 | 12 | 89% (79–94%) |
+| all | 93 | 69 | 10 | 14 | 87% (78–93%) |
+| planning decks | 83 | 63 | 9 | 11 | 88% (78–93%) |
 | creature decks | 10 | 6 | 1 | 3 | 86% (49–97%) |
-| main | 39 | 29 | 3 | 7 | 91% (76–97%) |
+| main | 39 | 29 | 4 | 6 | 88% (73–95%) |
 | main2 | 11 | 5 | 3 | 3 | 62% (31–86%) |
 | block | 14 | 11 | 0 | 3 | 100% (74–100%) |
 | attack | 9 | 7 | 0 | 2 | 100% (65–100%) |
@@ -403,11 +403,11 @@ timing-only `main` cases and C102, C135 and C189.
 | upkeep | 2 | 2 | 0 | 0 | 100% (34–100%) |
 
 - **Over all 173 planning decisions** (agreements as equal), the answerer is better in 63 and Forge
-  in 8.
+  in 9.
 - **Strict count:** counting only cases where both passes pick the same side, the planning decks
-  give 58 to 7, 89% (79–95%).
-- **Position bias:** the judges picked A 83 times, B 83 times and equal 20 times out of 186
-  grades. The two passes give different grades in 14 of 93 cases.
+  gave 58 to 7, 89% (79–95%), before the regrade below.
+- **Position bias:** the judges picked A 82 times, B 85 times and equal 19 times out of 186
+  grades. The two passes give different grades in 12 of 93 cases.
 - **Cards played later in the phase:** Forge's `main` choice covers the whole phase, so it can name
   a land or spell drawn later in the turn. Judges read those as illegal ("not in hand"). This
   affects 7 cases (C039, C048, C051, C093, C142, C157, C199). Leaving them out gives 61 to 7 for
@@ -416,15 +416,22 @@ timing-only `main` cases and C102, C135 and C189.
   decision: drawn or found later this turn", or "a copy was in your graveyard / exile then"). The
   marks are in `round3/key.jsonl` and `merged.jsonl`. The sheets in `round3/grading/sheets/` are
   kept as they were graded, so rerunning `make_grading.py` now gives new text for those 7 cases.
+  **Regraded (26 Nov).** `make_grading.py --regrade C039,...,C199` wrote `sheets/regrade{1,2}.txt`
+  with the corrected text and the same letters, and two fresh judges graded them. Their grades
+  (`judgements/regrade{1,2}.json`) replace the first ones in `collect_grades.py`. Before the
+  regrade the 7 cases went 3 to the answerer, 1 to Forge and 3 to no preference. After it they go 3
+  to the answerer (C048, C051, C157), 2 to Forge (C093, C142) and 2 to no preference (C039, C199).
+  The table above includes the regrade. Only Forge's side carries the note, so in these 7 cases it
+  identifies Forge's choice.
 - **The judges are not simply siding with the longer answer.** Several Forge wins are the
   answerer's own errors, caught by both passes. In C005, Uldaros costs 7 with 6 mana available. In
   C119, Drowner is flashed in with no target. In C138, Jace is the better play against an equip
   deck.
 
-**Reading.** On paper, the planning decks' grade clears the gate, an interval excluding 50%. But
+**Reading.** On paper, the planning decks' grade, 88% (78–93%), clears the gate, an interval excluding 50%. But
 the judges are the same kind of Claude model as the answerer. A judge that reasons the way the
 answerer does will prefer the answerer's choice, whether or not it is better. This step cannot
 tell "Claude plays these spots better than Forge" from "Claude agrees with Claude". The bias can
-only push toward the answerer, so the 89% is an upper bound. The share Forge wins, 8 of 83, is the
+only push toward the answerer, so the 88% is an upper bound. The share Forge wins, 9 of 83, is the
 informative part: the judges do not side with the answerer reflexively. The figure still needs a
 check by someone other than Claude before the in-game step is built on it.
