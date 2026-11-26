@@ -1,0 +1,62 @@
+[
+{
+"case": "C028",
+"better": "B",
+"margin": "small",
+"reason": "Sarkhan is a minor threat Seam Rip can answer; save the only counter for a real Dragon threat (Smaug/Hellkite) since Clarion Conqueror already locks the Jace token"
+},
+{
+"case": "C029",
+"better": "A",
+"margin": "clear",
+"reason": "Triple block deals 5 to kill Nova Hellkite with no tricks possible (only Cavern Dragon mana open) and saves Kaito, at the cost of one creature"
+},
+{
+"case": "C030",
+"better": "A",
+"margin": "small",
+"reason": "Against a sweeper control deck, a single resilient warded threat that grows off later lifegain beats committing two low-impact cards (Sanctifier and Case)"
+},
+{
+"case": "C031",
+"better": "B",
+"margin": "clear",
+"reason": "Nothing worth casting this turn, so play the tapped Archive (with surveil) now and keep untapped lands for later turns"
+},
+{
+"case": "C032",
+"better": "A",
+"margin": "large",
+"reason": "Voice of Victory stops you casting spells on the opponent's turn, so flash is useless; cast Curiosity now as a blocker/threat rather than waste the mana"
+},
+{
+"case": "C033",
+"better": "A",
+"margin": "clear",
+"reason": "Two lands on the draw with two cheap removal spells and a 3-drop is a keep (~83% to hit the third land by turn 3); a mulligan to six is worse"
+},
+{
+"case": "C035",
+"better": "B",
+"margin": "clear",
+"reason": "Flying Anchorage threatens lethal either way and the Robot adds nothing through three blockers, but keeping it home stops a lethal crack-back (3+1+1 plus landfall vs 5 life)"
+},
+{
+"case": "C036",
+"better": "B",
+"margin": "large",
+"reason": "Mauler plus Boots equipped for free adds a 3/1 haste attacker for 7 damage on an empty board; Chainsaw has no target and can't be equipped"
+},
+{
+"case": "C039",
+"better": "equal",
+"margin": "small",
+"reason": "Both cast Sleight of Hand; there's no Island in hand, so B's land drop can only happen if Sleight finds one, which is the same as A"
+},
+{
+"case": "C042",
+"better": "equal",
+"margin": "small",
+"reason": "A land was already played this turn, so A's Swamp can't be played; both just cast Forsaken Miner"
+}
+]

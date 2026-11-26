@@ -50,9 +50,16 @@ for future iterations (above). Probe step A, the driver's decision snapshots (`-
 the deciding player's visible state and Forge's choice at nine kinds of decision), is done and
 merged (23 Nov). Step B, a logged run of the planning decks against the creature decks (420 games
 with snapshots, committed packed in `probe/run/`), and step C, 200 cases answered blind by Claude
-subagents (`probe/`, `tools/probe/`; they agree with Forge on 51%, 44–58%), are done. Before step D
-(the user's blind grading of the disagreements), fix the gaps listed in `probe/README.md`, "Fix
-before step D" (token text, cards' chosen types, colours and names, castable lists, Forge's targets and more): start from the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
+subagents (`probe/`, `tools/probe/`; they agree with Forge on 51%, 44–58%), are done. The gaps
+listed in `probe/README.md`, "Fix before step D", were fixed on 24 Nov (token text, chosen values,
+cast targets, recent spells, spree costs; step B replayed 420 of 420 games identically) and the
+same 198 decisions were answered again (`probe/round2/`): agreement 52% (45–58%), unchanged. Gaps
+3, 5 and 6 (cost reductions, history, restricted mana) were finished the same day as round 3
+(`probe/round3/`; step B replayed 419 of 420, the other game does not replay on any driver):
+agreement 53% (46–60%), unchanged again. Step D was graded blind by Claude subagent judges at the
+user's request (25 Nov, `probe/round3/grading/`): answerer better in 63 planning cases, Forge in 9,
+88% (78–93%), an upper bound because the judges share the answerer's model family. Next is the
+user's choice among the options in the latest checkpoint ("START HERE") in `docs/ai-pilot-status.md`.
 
 ## The AI pilot: what is settled, so it is not repeated
 

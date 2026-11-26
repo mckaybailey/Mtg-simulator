@@ -1,0 +1,62 @@
+[
+{
+"case": "C033",
+"better": "B",
+"margin": "clear",
+"reason": "On the draw, two lands with two cheap Bitter Triumphs and a 3- and 4-drop is a fine keep against an aggro Dragons deck; a mulligan to six is worse."
+},
+{
+"case": "C035",
+"better": "A",
+"margin": "clear",
+"reason": "The flying Anchorage is the lethal threat and the opponent's three ground blockers can absorb the ground attackers anyway, so sending the Robot adds nothing and leaves me at 5 with no blocker against the crack-back."
+},
+{
+"case": "C036",
+"better": "A",
+"margin": "clear",
+"reason": "Mauler plus Boots, equipped for free, adds a hasty attacker with ward for about 7 lifelink damage against an empty board; Chainsaw has no target and does nothing this turn."
+},
+{
+"case": "C039",
+"better": "equal",
+"margin": "small",
+"reason": "There is no land in hand, so both choices come to the same thing: cast Sleight of Hand and play a land only if it finds one."
+},
+{
+"case": "C042",
+"better": "equal",
+"margin": "small",
+"reason": "A land was already played this turn, so the Swamp cannot be played; both choices just cast Forsaken Miner."
+},
+{
+"case": "C043",
+"better": "A",
+"margin": "small",
+"reason": "The all-in attack is one short of lethal (the two blockers stop 10 of 20, leaving 10 against 11 life) and leaves me at 1 with everything tapped, dead to any hasty Lizard via Rockface Village; attacking with two still puts them to 1 or costs them creatures while keeping blockers home."
+},
+{
+"case": "C044",
+"better": "equal",
+"margin": "small",
+"reason": "Bouncing the Crab now uses mana that would otherwise go unspent and sets up a cheap flash Crab to tap their attackers next turn; holding Get Out allows the same trick for 2 more mana and keeps the counter mode, so the two roughly balance."
+},
+{
+"case": "C047",
+"better": "B",
+"margin": "clear",
+"reason": "Hearth Elemental makes Sunderflock cost 3, which I can cast now; attacking into an untapped blocker with BR open (Stingerquill Charm deathtouch) risks losing it for only 4 damage."
+},
+{
+"case": "C048",
+"better": "B",
+"margin": "small",
+"reason": "Cori Mountain Monastery is not in hand, so A is really Day of Judgment plus a second Tablet I don't need; Day of Judgment plus Consult at end step keeps No More Lies or card selection open, which is better for control."
+},
+{
+"case": "C050",
+"better": "B",
+"margin": "small",
+"reason": "The only trigger to counter now is the warped Hellkite's exile trigger, which I want to resolve; holding Tidebinder to stop a Magmatic Hellkite or other ETB trigger is worth more than a 3/2 body at end step."
+}
+]

@@ -1,0 +1,62 @@
+[
+{
+"case": "C156",
+"better": "B",
+"margin": "small",
+"reason": "Ninjutsu Kaito gets 3 extra damage in and a planeswalker onto the board, and Kaito's -2 stuns the equipped 4/3 Miner for two turns; A only adds a 2/1 and keeps Kaito in hand."
+},
+{
+"case": "C157",
+"better": "equal",
+"margin": "small",
+"reason": "Both wipe the Hellkite and keep indestructible Marvel; the extra land and Three Steps Ahead's draw against an opponent with no cards in hand barely change anything."
+},
+{
+"case": "C162",
+"better": "A",
+"margin": "clear",
+"reason": "Bouncing a Hellkite that gets recast next turn is weak tempo; A keeps UU up to flash in Eddymurk Crab (cheap after the Sleights) or Burst Lightning on the opponent's turn."
+},
+{
+"case": "C164",
+"better": "B",
+"margin": "clear",
+"reason": "Without a block Kaito takes 4 and dies; chumping Prowler with the 1/1 Yuriko keeps Kaito alive at 2 loyalty."
+},
+{
+"case": "C167",
+"better": "B",
+"margin": "clear",
+"reason": "A second Starcage would exile only a Pest token; holding up the Three Steps Ahead counter, then Consult the Star Charts at end step, uses the mana far better."
+},
+{
+"case": "C169",
+"better": "B",
+"margin": "clear",
+"reason": "With both attacking, 9 damage is lethal against 7 life, so Hellkite must block and either dies or lets 5 through; keeping Hearth Elemental home does nothing against flyers."
+},
+{
+"case": "C172",
+"better": "B",
+"margin": "clear",
+"reason": "A 1/1 Illusion token trades with Starscape Cleric, the opponent's drain engine, and their deck has no combat tricks."
+},
+{
+"case": "C176",
+"better": "B",
+"margin": "clear",
+"reason": "Two Torches now exile both Forsaken Miners (so they cannot come back) against an empty hand, and the tapped Crypt costs no life at 9; A risks holding removal and paying 2 life."
+},
+{
+"case": "C179",
+"better": "B",
+"margin": "small",
+"reason": "Sacrificing a Treasure to Bargain leaves Misty Mountains Cold one short of four Treasures at chapter IV, so no 6/6 Dragon, and the second Conqueror keeps the Treasures locked anyway; holding Torch keeps the Dragon on schedule."
+},
+{
+"case": "C180",
+"better": "B",
+"margin": "small",
+"reason": "At 56 life, holding the Illusions back as blockers is pointless; attacking with everything adds damage and pressure against tiny blockers."
+}
+]

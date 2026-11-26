@@ -1,0 +1,281 @@
+Azorius Control vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  2 games/min  about 26 min left
+  18/60 games  18 games/min  about 2 min left
+  36/60 games  24 games/min  about 60s left
+  60/60 games  30 games/min  about 0s left
+
+Opponent             Games  W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ---  --------  ------  -------  -------  ------------  -------------
+Mono-Black Aggro        10  4-6     40.0%  17-69%      40%      40%          14.2            9.3
+Rakdos Lizards          10  4-6     40.0%  17-69%      33%      43%          14.2            6.7
+Boros Dwarves           10  3-7     30.0%  11-60%      33%      29%          12.3            7.4
+Mono-Green Landfall     10  3-7     30.0%  11-60%      33%      25%          13.7            8.9
+Boros Dragons           10  1-9     10.0%   2-40%       0%      17%          25.0            8.8
+Orzhov Lifegain         10  1-9     10.0%   2-40%      17%       0%          13.0           11.0
+
+Overall: 16-44 in 60 decided games
+  Raw record            26.7%  (95% CI 17-39%)
+  Each opponent equal   26.7%  (95% CI 15-38%)
+  Weighted by meta share 23.5%  (95% CI 8-39%)
+  On the play 25.9%, on the draw 27.3%; mulligan rate 13.3%
+
+Cards in Azorius Control: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                                 IWD pts  Seen  Not seen  In opener  Played when seen
+-----------------------------------  -------  ----  --------  ---------  ----------------
+1 Captain Marvel, Earth's Protector   +41.2*   50%        9%        38%               54%
+2 Day of Judgment                     +33.3*   43%       10%        43%               80%
+3 Seam Rip                            +32.5*   38%        5%        41%               88%
+3 Jace's Machinations                 +26.4*   36%       10%        29%               62%
+2 Erode                               +26.4*   36%       10%        21%               97%
+2 Pinnacle Starcage                   +20.6    34%       14%        33%               87%
+2 Three Steps Ahead                   +19.0    33%       14%        27%              100%
+3 Petrified Hamlet                    +18.3    34%       16%        50%               97%
+2 Meticulous Archive                  +18.3    34%       16%         9%               91%
+2 Theorist's Sanctum                   +8.1    30%       22%        30%               97%
+3 Island                               +6.2    29%       23%        20%               84%
+1 Restless Anchorage                   +0.5    27%       26%         9%               85%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/azorius-control
+
+Report:  runs/probe-b3/azorius-control/report.html
+Data:    runs/probe-b3/azorius-control/summary.json  (raw games: runs/probe-b3/azorius-control/games.jsonl)
+Four-Color Control vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  2 games/min  about 27 min left
+  18/60 games  18 games/min  about 2 min left
+  46/60 games  31 games/min  about 27s left
+  60/60 games  36 games/min  about 0s left
+
+Opponent             Games  W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ---  --------  ------  -------  -------  ------------  -------------
+Boros Dragons           10  5-5     50.0%  24-76%      60%      40%          12.2            6.2
+Mono-Green Landfall     10  5-5     50.0%  24-76%      67%      43%          11.6            6.2
+Mono-Black Aggro        10  4-6     40.0%  17-69%      50%      25%          11.0            5.8
+Boros Dwarves           10  2-8     20.0%   6-51%      25%      17%          10.0            7.6
+Rakdos Lizards          10  2-8     20.0%   6-51%     100%       0%          13.0            5.8
+Orzhov Lifegain         10  1-9     10.0%   2-40%       0%      20%          10.0            9.9
+
+Overall: 19-41 in 60 decided games
+  Raw record            31.7%  (95% CI 21-44%)
+  Each opponent equal   31.7%  (95% CI 20-44%)
+  Weighted by meta share 35.8%  (95% CI 20-52%)
+  On the play 44.0%, on the draw 22.9%; mulligan rate 10.0%
+
+Cards in Four-Color Control: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                       IWD pts  Seen  Not seen  In opener  Played when seen
+-------------------------  -------  ----  --------  ---------  ----------------
+1 Together as One           +40.3*   57%       16%        17%               48%
+2 Hallowed Fountain         +37.4*   48%       11%        20%               79%
+2 Firebending Lesson        +36.7*   50%       13%        33%               87%
+3 Consult the Star Charts   +30.2*   43%       13%        40%               78%
+1 Sear                      +24.5    48%       23%        17%               95%
+2 Gloomlake Verge           +23.9*   42%       19%        32%               97%
+...
+1 Shattered Sanctum         +17.2    43%       26%        36%               86%
+2 Godless Shrine            +14.6    39%       24%        50%               97%
+2 Flashback                 +12.5    38%       25%        33%               84%
+2 Blood Crypt               +10.0    37%       27%        10%               80%
+2 Sacred Foundry             +5.5    34%       29%        42%               90%
+2 Lightning Helix            +0.9    32%       31%        46%               79%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/four-color-control
+
+Report:  runs/probe-b3/four-color-control/report.html
+Data:    runs/probe-b3/four-color-control/summary.json  (raw games: runs/probe-b3/four-color-control/games.jsonl)
+Izzet Spellementals vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  2 games/min  about 24 min left
+  23/60 games  25 games/min  about 89s left
+  60/60 games  41 games/min  about 0s left
+
+Opponent             Games  W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ---  --------  ------  -------  -------  ------------  -------------
+Rakdos Lizards          10  6-4     60.0%  31-83%      50%      75%           8.5            6.2
+Boros Dragons           10  3-7     30.0%  11-60%      40%      20%           9.3            6.9
+Mono-Green Landfall     10  3-7     30.0%  11-60%      25%      33%           8.3            7.7
+Orzhov Lifegain         10  3-7     30.0%  11-60%      33%      29%          10.0            6.7
+Boros Dwarves           10  2-8     20.0%   6-51%      25%       0%           7.5            6.9
+Mono-Black Aggro        10  2-8     20.0%   6-51%      25%       0%          10.5            5.2
+
+Overall: 19-41 in 60 decided games
+  Raw record            31.7%  (95% CI 21-44%)
+  Each opponent equal   31.7%  (95% CI 20-44%)
+  Weighted by meta share 30.2%  (95% CI 14-46%)
+  On the play 32.4%, on the draw 30.8%; mulligan rate 63.3%
+
+Cards in Izzet Spellementals: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                   IWD pts  Seen  Not seen  In opener  Played when seen
+---------------------  -------  ----  --------  ---------  ----------------
+2 Get Out               +36.7*   50%       13%        30%               50%
+1 Stormcarved Coast     +30.6*   50%       19%        53%               96%
+2 Spell Snare           +23.9*   42%       19%        36%               45%
+1 Flow State            +21.1    44%       23%        50%               72%
+3 Burst Lightning       +18.1    39%       21%        58%               83%
+1 Multiversal Passage   +12.5    40%       28%        29%               70%
+2 Impractical Joke       +9.8    37%       27%        45%               78%
+3 Traumatic Critique     -5.1    30%       35%         0%               73%
+1 Spell Pierce           -6.9    27%       34%        20%               18%
+2 Winternight Stories   -12.1    26%       38%         0%               87%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/izzet-spellementals
+
+Report:  runs/probe-b3/izzet-spellementals/report.html
+Data:    runs/probe-b3/izzet-spellementals/summary.json  (raw games: runs/probe-b3/izzet-spellementals/games.jsonl)
+Dimir Midrange vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  2 games/min  about 23 min left
+  21/60 games  21 games/min  about 1 min left
+  45/60 games  30 games/min  about 29s left
+  60/60 games  36 games/min  about 0s left
+
+Opponent             Games  W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ---  --------  ------  -------  -------  ------------  -------------
+Boros Dwarves           10  4-6     40.0%  17-69%      33%      43%           7.2            6.8
+Mono-Green Landfall     10  3-7     30.0%  11-60%      50%      17%           8.7            8.0
+Mono-Black Aggro        10  3-7     30.0%  11-60%      20%      40%           9.7            7.4
+Boros Dragons           10  2-8     20.0%   6-51%      25%       0%           8.5            9.1
+Orzhov Lifegain         10  2-8     20.0%   6-51%      14%      33%           7.5            8.8
+Rakdos Lizards          10  2-8     20.0%   6-51%      14%      33%           8.0            7.0
+
+Overall: 16-44 in 60 decided games
+  Raw record            26.7%  (95% CI 17-39%)
+  Each opponent equal   26.7%  (95% CI 15-39%)
+  Weighted by meta share 26.6%  (95% CI 11-42%)
+  On the play 23.5%, on the draw 30.8%; mulligan rate 33.3%
+
+Cards in Dimir Midrange: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                         IWD pts  Seen  Not seen  In opener  Played when seen
+---------------------------  -------  ----  --------  ---------  ----------------
+2 Shoot the Sheriff           +31.9*   46%       14%        33%               88%
+2 Restless Reef               +23.7*   39%       16%        33%               89%
+2 Soulstone Sanctuary         +23.2*   38%       14%        33%              100%
+4 Kaito, Bane of Nightmares   +19.0    33%       14%        30%               64%
+2 Bitter Triumph               +8.5    31%       23%        50%               83%
+2 Tishana's Tidebinder         +3.6    29%       25%        17%               71%
+4 Dream Beavers                +2.8    28%       25%        38%               94%
+4 Island                       +2.5    28%       25%        28%              100%
+3 Requiting Hex                -4.2    25%       29%        26%               94%
+2 Shipwreck Marsh              -8.1    22%       30%        25%               89%
+4 Enduring Curiosity          -12.5    22%       35%        16%               62%
+2 The Wondrous Wasp           -13.4    18%       32%        23%              100%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/dimir-midrange
+
+Report:  runs/probe-b3/dimir-midrange/report.html
+Data:    runs/probe-b3/dimir-midrange/summary.json  (raw games: runs/probe-b3/dimir-midrange/games.jsonl)
+Jund Sacrifice vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  2 games/min  about 23 min left
+  23/60 games  25 games/min  about 87s left
+  60/60 games  43 games/min  about 0s left
+
+Opponent             Games  W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ---  --------  ------  -------  -------  ------------  -------------
+Mono-Black Aggro        10  5-5     50.0%  24-76%      33%      75%           8.0            6.6
+Boros Dragons           10  4-6     40.0%  17-69%      33%      43%           7.2            6.7
+Rakdos Lizards          10  3-7     30.0%  11-60%      33%      25%           7.7            6.0
+Orzhov Lifegain         10  2-8     20.0%   6-51%       0%      33%           7.5            8.1
+Boros Dwarves           10  1-9     10.0%   2-40%      17%       0%           6.0            6.4
+Mono-Green Landfall     10  1-9     10.0%   2-40%      33%       0%           5.0            6.3
+
+Overall: 16-44 in 60 decided games
+  Raw record            26.7%  (95% CI 17-39%)
+  Each opponent equal   26.7%  (95% CI 15-38%)
+  Weighted by meta share 19.1%  (95% CI 5-33%)
+  On the play 25.0%, on the draw 28.1%; mulligan rate 23.3%
+
+Cards in Jund Sacrifice: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                        IWD pts  Seen  Not seen  In opener  Played when seen
+--------------------------  -------  ----  --------  ---------  ----------------
+4 Umbral Collar Zealot       +17.5    32%       15%        35%               92%
+4 Lively Dirge               +16.5    34%       18%        33%               88%
+3 Torch the Tower            +16.5    34%       18%        33%               75%
+3 Stomping Ground            +11.7    31%       19%        27%              100%
+4 Starting Town              +11.4    31%       20%        26%              100%
+4 Gene Pollinator             +2.8    28%       25%        18%               92%
+4 Blooming Marsh              -0.5    26%       27%        25%              100%
+3 The Misty Mountains Cold    -1.3    26%       27%        33%               74%
+4 Obsessive Pursuit           -2.3    26%       28%        35%               69%
+2 Overgrown Tomb              -2.5    25%       28%        25%               95%
+4 Greedy Freebooter           -9.1    23%       32%        26%               94%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/jund-sacrifice
+
+Report:  runs/probe-b3/jund-sacrifice/report.html
+Data:    runs/probe-b3/jund-sacrifice/summary.json  (raw games: runs/probe-b3/jund-sacrifice/games.jsonl)
+Dimir Uldaros vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  3 games/min  about 21 min left
+  22/60 games  24 games/min  about 1 min left
+  51/60 games  36 games/min  about 15s left
+  60/60 games  39 games/min  about 0s left
+
+Opponent             Games  W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ---  --------  ------  -------  -------  ------------  -------------
+Rakdos Lizards          10  3-7     30.0%  11-60%      33%       0%          12.3            6.4
+Mono-Green Landfall     10  2-8     20.0%   6-51%      20%      20%           7.5            9.6
+Mono-Black Aggro        10  2-8     20.0%   6-51%      12%      50%          11.5            6.1
+Orzhov Lifegain         10  2-8     20.0%   6-51%      17%      25%          12.0           10.4
+Boros Dwarves           10  1-9     10.0%   2-40%      17%       0%           9.0            8.7
+Boros Dragons           10  1-9     10.0%   2-40%       0%      11%           7.0            7.9
+
+Overall: 11-49 in 60 decided games
+  Raw record            18.3%  (95% CI 11-30%)
+  Each opponent equal   18.3%  (95% CI 7-30%)
+  Weighted by meta share 18.4%  (95% CI 3-33%)
+  On the play 20.0%, on the draw 16.0%; mulligan rate 20.0%
+
+Cards in Dimir Uldaros: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                          IWD pts  Seen  Not seen  In opener  Played when seen
+----------------------------  -------  ----  --------  ---------  ----------------
+3 Seasoned Cryomancer          +20.9    26%        5%        21%               77%
+2 Overlord of the Balemurk     +14.3    25%       11%        21%               81%
+1 Deadly Cover-Up              +10.0    25%       15%        17%               50%
+2 Undercity Sewers              +8.6    22%       13%         8%               76%
+3 Requiting Hex                 +4.0    20%       16%        25%               86%
+2 The Theorist, Jace Beleren    +2.1    19%       17%        12%               52%
+...
+3 Bitter Triumph                +0.2    18%       18%        20%               89%
+3 Uldaros Theorix               -2.5    18%       20%         0%               38%
+1 Emeritus of Ideation          -4.0    16%       20%        14%               36%
+2 Cavern of Souls               -4.2    17%       21%        24%               97%
+2 Duress                       -11.1    14%       25%        13%               86%
+2 Winternight Stories          -13.1    11%       24%         0%               67%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/dimir-uldaros
+
+Report:  runs/probe-b3/dimir-uldaros/report.html
+Data:    runs/probe-b3/dimir-uldaros/summary.json  (raw games: runs/probe-b3/dimir-uldaros/games.jsonl)
+Dimir Excruciator vs 6 opponents: 10 games each, 60 in total (Forge 2.0.17-SNAPSHOT)
+  1/60 games  3 games/min  about 20 min left
+  20/60 games  23 games/min  about 1 min left
+  54/60 games  39 games/min  about 9s left
+  60/60 games  42 games/min  about 0s left
+
+Opponent             Games   W-L  Win rate  95% CI  On play  On draw  Wins on turn  Loses on turn
+-------------------  -----  ----  --------  ------  -------  -------  ------------  -------------
+Mono-Green Landfall     10   2-8     20.0%   6-51%      40%       0%           8.5            7.4
+Boros Dragons           10   1-9     10.0%   2-40%      12%       0%          11.0            7.8
+Mono-Black Aggro        10   1-9     10.0%   2-40%       0%      20%           9.0            7.6
+Orzhov Lifegain         10   1-9     10.0%   2-40%       0%      17%           7.0            7.6
+Rakdos Lizards          10   1-9     10.0%   2-40%      25%       0%           9.0            6.8
+Boros Dwarves           10  0-10      0.0%   0-28%       0%       0%             -            7.2
+
+Overall: 6-54 in 60 decided games
+  Raw record            10.0%  (95% CI 5-20%)
+  Each opponent equal   10.0%  (95% CI 0-20%)
+  Weighted by meta share 13.7%  (95% CI 0-28%)
+  On the play 14.8%, on the draw 6.1%; mulligan rate 16.7%
+
+Cards in Dimir Excruciator: win rate when seen minus when not seen, in points (* = clearly not zero; the rest may be noise):
+Card                    IWD pts  Seen  Not seen  In opener  Played when seen
+----------------------  -------  ----  --------  ---------  ----------------
+3 Seasoned Cryomancer    +16.7*   17%        0%        13%               67%
+3 Winternight Stories     +9.7    14%        4%         5%               67%
+3 Requiting Hex           +3.4    11%        8%        13%               86%
+2 Theorix Charm           +1.3    11%        9%        10%               82%
+3 Duress                  +0.7    10%       10%        13%               90%
+2 Emeritus of Ideation    -0.7    10%       10%        18%               39%
+2 Cavern of Souls         -2.8     8%       11%         0%               88%
+2 Doomsday Excruciator    -4.1     8%       12%         7%               31%
+
+Likely AI misplays, card by card:  python -m mtgsim misplays runs/probe-b3/dimir-excruciator
+
+Report:  runs/probe-b3/dimir-excruciator/report.html
+Data:    runs/probe-b3/dimir-excruciator/summary.json  (raw games: runs/probe-b3/dimir-excruciator/games.jsonl)
+ALLDONE

@@ -12,6 +12,9 @@ latest checkpoint. This folder holds the data. The scripts that made it are in `
 | `cases.jsonl` | the same cases, one line each (`case`, `kind`, `deck`, `text`), for the grading sheet |
 | `key.jsonl` | **not shown to the answerers**: where each case came from (`file`, `game`, `n`), its `kind`, `deck`, `group` (`planning` or `creature`), the hand, and Forge's choice, both raw (`forge`) and in the case's answer format (`forge_text`) |
 | `answers.jsonl` | the blind answers: `case`, `choice`, `reason`, `batch`, and `note` where something was done by hand (two cases, see below) |
+| `run/probe-b2.tar.xz`, `run/probe-b2.sh`, `run/probe-b2.log` | **Round 2's step B**: the same 420 games replayed by the fixed tracker (24 Nov), identical game for game; unpack with `tar -C runs -xJf probe/run/probe-b2.tar.xz` |
+| `round2/` | **Round 2** (24 Nov): the same decisions rebuilt with the gaps below fixed, and answered again. `batches/`, `cases.jsonl`, `key.jsonl`, `answers.jsonl` and `merged.jsonl` as here (198 cases; C128 and C177 dropped). Use this round for step D |
+| `round3/grading/` | **Step D** (25 Nov): the blind sheets, `grading-key.jsonl`, the judges' `judgements/` and the unblinded `grades.jsonl`; see "Step D" below |
 | `merged.jsonl` | key, case text and answer side by side, with `agree` (the mechanical comparison) and `timing` (whether a `main` case that agrees on its spells also agrees on casting them before or after combat) |
 
 ## How the cases were made
@@ -112,6 +115,14 @@ legal. What misled was the case's own option text (gap 4 below). No answer has b
 found wrong.
 
 ## Fix before step D
+
+**Status, 24 Nov 2026 (round 3, see the end):**
+- **Done:** items 1, 2, 4 and 8 (round 2), and 3, 5 and 6 (round 3: cost changes in the castable
+  lists, abilities, turn conditions and known cards in the history, the restricted part of the
+  open mana). What is still left out of each is named in the case text and in "Round 3" below.
+- **Item 7:** done for the spell and counter agreements, which were read by hand; a misread was
+  fixed.
+- **Item 9:** left to step D.
 
 These were found after the answers came in. Fixing items 1–5 changes the case text, so the cases
 must be rebuilt and answered again (about 20 subagent runs). They are cheap next to a grading
@@ -218,3 +229,209 @@ The fixes to items 1, 2, 3 and 8 are changes to the driver's tracker
 replay that is game-for-game identical to a run without them (`tools/compare_games.py`). After
 that, re-run step B, rebuild the cases, re-answer and re-collect. The step B run here stays as
 the record of this round.
+
+## Round 2 (24 November 2026)
+
+**What changed.** The driver's tracker (`mtgsim/bridge/ForgeBridge.java`, documented in
+`mtgsim/bridge/AGENTS.md`) now records:
+- each token's rules text (`text`; empty for a vanilla token, which most of the Illusion, Robot,
+  Dwarf, Skeleton Pirate and Spirit tokens here are);
+- every choice made for a permanent (`chosen`: type, colours, player, number, cards, card names,
+  mode, direction, odd or even, sector), for example Cavern of Souls' type or the card named for
+  Petrified Hamlet; the opponent's only as publicly known;
+- the targets of the spells Forge cast;
+- the spells each player cast this turn and the last;
+- spree and tiered mode costs in the castable check.
+
+The case text (`tools/probe/make_cases.py`) shows these, says lands are "any land you may play",
+notes that castable lists can miss reduced-cost spells and that open mana includes restricted
+mana, and says which history is not shown (abilities, reveals, crimes).
+
+**Checks.** Step B replayed with the new tracker is identical to the first run in all 420 games
+(`tools/compare_games.py`). The snapshots differ only by the new fields and by the spree fix.
+`make_cases.py --same-as probe/key.jsonl --old-run runs/probe-b` found 198 of the 200 decisions
+again. C128 and C177 were recorded only because Three Steps Ahead counted as castable with one
+mana open, so they no longer exist. Twenty fresh general-purpose subagents answered under the
+prompt in `tools/probe/answer_prompt.txt`. `tools/probe/extract_answers.py` took the answers from
+their transcripts and confirmed that each read only its own batch file. Nothing was done by hand
+this round.
+
+**Comparison fixes.** `collect.py` no longer counts a spell the answer says it holds ("Erode
+(hold, cast if needed)", "hold No More Lies (opponent's turn)") as cast; that fix moved C040 in
+round 2 and C197 in round 1. It also reports, for agreeing spell cases, whether the answer names
+Forge's targets. Every spell and counter agreement was read by hand and none is false. Some still
+hide a choice the snapshot does not record: a charm's mode (C102), evoke or not (C189), what
+Superior Spider-Man copies (C026, C034). Attack, block and mulligan agreements compare ids and
+keep or mulligan exactly.
+
+**Result** (`python3 tools/probe/collect.py --out probe/round2`):
+
+| | cases | agree | agreement (95% CI) |
+|---|---|---|---|
+| all | 198 | 102 | 52% (45–58%) |
+| planning decks | 173 | 85 | 49% (42–57%) |
+| creature decks | 25 | 17 | 68% (48–83%) |
+| main | 60 | 21 | 35% (24–48%) |
+| main2 | 15 | 2 | 13% (4–38%) |
+| block | 33 | 18 | 55% (38–70%) |
+| attack | 27 | 18 | 67% (48–81%) |
+| mulligan | 24 | 16 | 67% (47–82%) |
+| endstep | 14 | 9 | 64% (39–84%) |
+| counter | 10 | 5 | 50% (24–76%) |
+| upkeep | 8 | 7 | 88% (53–98%) |
+| draw | 7 | 6 | 86% (49–97%) |
+
+Agreement is where it was. 183 of the 198 cases get the same verdict in both rounds. Of the 15
+that flip, one follows plainly from the new text: in C175 the Treefolk tokens now show reach,
+and the answer no longer attacks into them.
+
+The other flips are the model answering the same question differently a second time, mostly
+mulligans and blocks. About one case in thirteen flips, so one answer per case is a noisy
+measure.
+
+**For step D.** Superseded by round 3, below.
+
+## Round 3 (24 November 2026)
+
+**What changed.** The tracker (`mtgsim/bridge/AGENTS.md`) now:
+- applies cost changes in the castable check, as Forge would apply them on casting: the spell's own
+  `RaiseCost$` / `ReduceCost$` and the `RaiseCost` / `ReduceCost` statics on the battlefield, the
+  stack, the command zone and the card itself (Eddymurk Crab, Hearth Elemental, Sunderflock,
+  Momo's discount, affinity), tested and sized by Forge's own `CostAdjustment` code. Left out:
+  reductions whose size the player chooses, convoke, delve, improvise and the like, set costs,
+  statics that need the spell's targets;
+- splits the open mana: `manaOpenFree`, and `manaRestricted` with each spending rule;
+- records `abilitiesThisTurn` / `abilitiesLastTurn` (activated abilities and triggers as they went
+  on the stack, Forge's stack text), `thisTurn` per player (crimes, life gained and lost, cards
+  drawn, tokens created, creatures that died, sacrifices, discards) and the opponent's
+  `knownInHand` (returned to hand from a public zone, or seen when the player's Duress-style or
+  reveal-hand effect resolved).
+
+The case text shows all of these: "Untapped mana available: 10 (2 of them from Tablet of
+Discovery: Spend this mana only to cast instant and sorcery spells)", the abilities of both turns,
+a line of this turn's conditions per player, and "Cards you know are in your opponent's hand".
+Still not shown, and said so: cards revealed from a library, and older history than last turn
+beyond the public zones.
+
+**Commands** (as round 2):
+```
+bash probe/run/probe-b3.sh                       # step B again -> runs/probe-b3 (about 30 min)
+python3 tools/compare_games.py runs/probe-b/DECK runs/probe-b3/DECK    # for each of the 7 decks
+python3 tools/probe/make_cases.py runs/probe-b3 --out probe/round3 \
+    --same-as probe/round2/key.jsonl --old-run runs/probe-b2
+# 20 fresh subagents, one batch each, tools/probe/answer_prompt.txt; then
+python3 tools/probe/extract_answers.py --out probe/round3 TRANSCRIPTS...
+python3 tools/probe/collect.py --out probe/round3
+```
+
+**Checks.** Step B replayed: 419 of 420 games identical. The other (Four-Color Control against
+Orzhov Lifegain, game 6) does not replay from its seed even on the old driver without snapshots
+(18, 22 and 16 turns in five runs); its one case, C045, is at turn 5, before the game diverges.
+The snapshots differ from round 2's only by the new fields and by discounted cards added to
+castable lists (71 more decisions, none fewer). All 198 decisions were found again. One castable
+list in the cases changed (C162 gains Eddymurk Crab); 47 cases show restricted mana, 29 known
+cards, 117 abilities or triggers. Twenty fresh subagents answered; `extract_answers.py` reported
+no problems.
+
+**Comparison fix.** `collect.py` stops reading casts at a part that opens with a cost or choice
+note ("collecting evidence with Duress, Duress and Superior Spider-Man and naming Kíli" had
+counted Duress and Spider-Man as casts). It moved C018 to agreement and changes no case of rounds
+1 or 2. Every spell and counter agreement was read by hand; none is false. Unrecorded choices
+remain in C102 (Theorix Charm's mode), C135 and C189 (evoke).
+
+**Result** (`python3 tools/probe/collect.py --out probe/round3`):
+
+| | cases | agree | agreement (95% CI) |
+|---|---|---|---|
+| all | 198 | 105 | 53% (46–60%) |
+| planning decks | 173 | 90 | 52% (45–59%) |
+| creature decks | 25 | 15 | 60% (41–77%) |
+| main | 60 | 21 | 35% (24–48%) |
+| main2 | 15 | 4 | 27% (11–52%) |
+| block | 33 | 19 | 58% (41–73%) |
+| attack | 27 | 18 | 67% (48–81%) |
+| mulligan | 24 | 17 | 71% (51–85%) |
+| endstep | 14 | 7 | 50% (27–73%) |
+| counter | 10 | 6 | 60% (31–83%) |
+| upkeep | 8 | 6 | 75% (41–93%) |
+| draw | 7 | 7 | 100% (65–100%) |
+
+Agreement is where it was. 173 of 198 cases get the same verdict as in round 2; 25 flip, 14 to
+agreement and 11 away. One follows plainly from the new text: in C135 the opponent's hand is known
+to hold Starscape Cleric, and the answer now evokes Deceit to take it, as Forge did. The rest look
+like the answerer's own variation, one case in eight this time.
+
+**For step D.** Grade round 3's 93 disagreements (`round3/merged.jsonl`, `agree` false). For the
+agreeing cases, show the 9 `main` cases that differ only in timing and the three whose modes or
+evoke choices are unrecorded, or count them as equal and say so.
+
+## Step D: blind grading by subagent judges (25 November 2026)
+
+**What the user asked (25 Nov).** Have subagents judge the disagreements instead of grading them
+by hand.
+
+**How.** `python3 tools/probe/make_grading.py` (seed 1) wrote `round3/grading/sheets/`: the 93
+disagreements of round 3, each with Forge's and the answerer's choice as an unnamed CHOICE A and
+CHOICE B, in seeded random order, and a card reference for the cases on the sheet. The answer's
+reason is not shown. Formatting that would mark Forge's side is written the same way on both sides:
+"(resolved)", how the bottomed cards are written, and the names after attacker and blocker numbers.
+The answerer's main-phase plans stay longer than Forge's, so the prompt
+(`tools/probe/grade_prompt.txt`) says detail is not merit.
+
+Every case was graded twice by fresh subagents, 20 in all. Pass 2 swaps A and B and groups the
+cases differently, so no judge sees a case twice. `extract_grades.py` took the grades from the
+transcripts and checked that each judge read only its own sheet and graded exactly its cases.
+`collect_grades.py` unblinds them with `grading-key.jsonl` and writes `grades.jsonl`. A case goes
+to one side when both passes pick it, or one picks it and the other says equal; otherwise it has
+no preference. The 105 agreeing cases count as equal and were not graded, including the 9
+timing-only `main` cases and C102, C135 and C189.
+
+**Result** (`python3 tools/probe/collect_grades.py`):
+
+| | cases | answerer better | Forge better | no preference | answerer's share of decided (95% CI) |
+|---|---|---|---|---|---|
+| all | 93 | 69 | 10 | 14 | 87% (78–93%) |
+| planning decks | 83 | 63 | 9 | 11 | 88% (78–93%) |
+| creature decks | 10 | 6 | 1 | 3 | 86% (49–97%) |
+| main | 39 | 29 | 4 | 6 | 88% (73–95%) |
+| main2 | 11 | 5 | 3 | 3 | 62% (31–86%) |
+| block | 14 | 11 | 0 | 3 | 100% (74–100%) |
+| attack | 9 | 7 | 0 | 2 | 100% (65–100%) |
+| mulligan | 7 | 6 | 1 | 0 | 86% (49–97%) |
+| endstep | 7 | 6 | 1 | 0 | 86% (49–97%) |
+| counter | 4 | 3 | 1 | 0 | 75% (30–95%) |
+| upkeep | 2 | 2 | 0 | 0 | 100% (34–100%) |
+
+- **Over all 173 planning decisions** (agreements as equal), the answerer is better in 63 and Forge
+  in 9.
+- **Strict count:** counting only cases where both passes pick the same side, the planning decks
+  gave 58 to 7, 89% (79–95%), before the regrade below.
+- **Position bias:** the judges picked A 82 times, B 85 times and equal 19 times out of 186
+  grades. The two passes give different grades in 12 of 93 cases.
+- **Cards played later in the phase:** Forge's `main` choice covers the whole phase, so it can name
+  a land or spell drawn later in the turn. Judges read those as illegal ("not in hand"). This
+  affects 7 cases (C039, C048, C051, C093, C142, C157, C199). Leaving them out gives 61 to 7 for
+  the planning decks, 90% (80–95%).
+  Fixed afterwards: `make_cases.py` now marks these cards in Forge's choice ("not in hand at the
+  decision: drawn or found later this turn", or "a copy was in your graveyard / exile then"). The
+  marks are in `round3/key.jsonl` and `merged.jsonl`. The sheets in `round3/grading/sheets/` are
+  kept as they were graded, so rerunning `make_grading.py` now gives new text for those 7 cases.
+  **Regraded (26 Nov).** `make_grading.py --regrade C039,...,C199` wrote `sheets/regrade{1,2}.txt`
+  with the corrected text and the same letters, and two fresh judges graded them. Their grades
+  (`judgements/regrade{1,2}.json`) replace the first ones in `collect_grades.py`. Before the
+  regrade the 7 cases went 3 to the answerer, 1 to Forge and 3 to no preference. After it they go 3
+  to the answerer (C048, C051, C157), 2 to Forge (C093, C142) and 2 to no preference (C039, C199).
+  The table above includes the regrade. Only Forge's side carries the note, so in these 7 cases it
+  identifies Forge's choice.
+- **The judges are not simply siding with the longer answer.** Several Forge wins are the
+  answerer's own errors, caught by both passes. In C005, Uldaros costs 7 with 6 mana available. In
+  C119, Drowner is flashed in with no target. In C138, Jace is the better play against an equip
+  deck.
+
+**Reading.** On paper, the planning decks' grade, 88% (78–93%), clears the gate, an interval excluding 50%. But
+the judges are the same kind of Claude model as the answerer. A judge that reasons the way the
+answerer does will prefer the answerer's choice, whether or not it is better. This step cannot
+tell "Claude plays these spots better than Forge" from "Claude agrees with Claude". The bias can
+only push toward the answerer, so the 88% is an upper bound. The share Forge wins, 9 of 83, is the
+informative part: the judges do not side with the answerer reflexively. The figure still needs a
+check by someone other than Claude before the in-game step is built on it.

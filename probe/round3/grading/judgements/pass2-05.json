@@ -1,0 +1,62 @@
+[
+{
+"case": "C087",
+"better": "B",
+"margin": "clear",
+"reason": "B uses both mana for Biotech Specialist (a 1/3 blocker plus a Lander for the sacrifice plan); A spends 1 mana on a second 1/1 and leaves the shock land's mana unused."
+},
+{
+"case": "C088",
+"better": "B",
+"margin": "clear",
+"reason": "Holding Spell Snare and an instant-speed Charm against a deck full of 2-drops is flexible; a sorcery-speed Charm does nothing useful to a 2/2 (1 damage won't kill it, bouncing it is only minor tempo)."
+},
+{
+"case": "C093",
+"better": "B",
+"margin": "clear",
+"reason": "B also kills a Mightform Harmonizer with Bitter Triumph and uses Emeritus's prepared spell, so it handles the opponent's biggest landfall threat; A only adds a Cryomancer. (B's extra spells assume Emeritus's prepared face makes this legal; the file doesn't show that face.)"
+},
+{
+"case": "C095",
+"better": "B",
+"margin": "small",
+"reason": "A flashed Drowner on the opponent's turn can stun whatever they commit, or an attacker; casting it main phase only hits the Vinelasher, which is already tapped, and the unpaid Watery Grave may not even give A the mana."
+},
+{
+"case": "C097",
+"better": "B",
+"margin": "clear",
+"reason": "Keeping three lands with two blue/black dual sources, Dream Beavers and Kaito gives a castable curve; A keeps a colorless Soulstone and a narrow Spell Snare and has shakier colors for Kaito."
+},
+{
+"case": "C100",
+"better": "A",
+"margin": "large",
+"reason": "At 7 life, Emeritus 5/5 blocks and kills the 3/3 Gecko for free (the opponent's open mana can only cast creature spells, so no trick); not blocking drops us to 4."
+},
+{
+"case": "C101",
+"better": "equal",
+"margin": "small",
+"reason": "At 2 life against two Starscape Clerics and a lifelink Confidant, any Confidant attack gains life (even into a blocker) and kills us, so neither line survives a normal attack."
+},
+{
+"case": "C103",
+"better": "B",
+"margin": "clear",
+"reason": "Killing Sarkhan with mana that would otherwise go unused is efficient and stops a creature that grows with dragons (assuming the spell is castable, as the file says; the lone Verge seems to make only blue)."
+},
+{
+"case": "C105",
+"better": "B",
+"margin": "clear",
+"reason": "Holding Inevitable Defeat for the coming Dragon (Magmatic Hellkite or Smaug, or Nova Hellkite from exile), with kicked Consult as a fallback for equal card advantage, beats tapping out at sorcery speed for Stock Up."
+},
+{
+"case": "C106",
+"better": "equal",
+"margin": "small",
+"reason": "Both block each identical 2/2 Robot with one creature; only the pairing differs, so the result is the same."
+}
+]

@@ -1,0 +1,62 @@
+[
+{
+"case": "C016",
+"better": "A",
+"margin": "clear",
+"reason": "Holding Torch for the 1/1 Mossborn Hydra before landfall doubles it matters far more at 7 life than Obsessive Pursuit, which also costs a life."
+},
+{
+"case": "C017",
+"better": "B",
+"margin": "clear",
+"reason": "With no land in hand and an empty opposing board, Winternight Stories digs for the missed land drop (discarding a Spider-Man costs only one card); passing wastes the turn."
+},
+{
+"case": "C020",
+"better": "A",
+"margin": "small",
+"reason": "Blocking Moseo kills its recursion engine and keeps the second Curiosity alive as a creature for one extra life (5 vs 4 taken); blocking Haliya trades the Curiosity's body away."
+},
+{
+"case": "C026",
+"better": "A",
+"margin": "small",
+"reason": "At 4 life against a wide landfall board, a 4/4 Spider-Man copy (e.g. a deathtouch Cultivator) as a second blocker does more than digging for one instant removal spell with 2 mana left."
+},
+{
+"case": "C027",
+"better": "B",
+"margin": "clear",
+"reason": "Cryomancer is an on-curve body that filters and stuns Confidant; A only evokes Deceit for a single effect, trading a strong card for little."
+},
+{
+"case": "C028",
+"better": "A",
+"margin": "small",
+"reason": "Sarkhan is a minor threat that Seam Rip answers; save the only counterspell for a real Dragon such as Smaug or Magmatic Hellkite."
+},
+{
+"case": "C029",
+"better": "B",
+"margin": "clear",
+"reason": "The triple block kills Nova Hellkite (5 damage into 5 toughness) and saves Kaito; the opponent's only open mana is Cavern mana, which can cast no trick, so trading Wan Shi Tong and Siren for their 5-drop and the walker is worth it."
+},
+{
+"case": "C030",
+"better": "A",
+"margin": "small",
+"reason": "Sanctifier plus Case sets up the lifegain engine so next turn's Amalia explores right away; Amalia alone now is a close alternative."
+},
+{
+"case": "C031",
+"better": "A",
+"margin": "small",
+"reason": "Turn 2 has no good 2-mana play (Seam Rip has no target, Consult would see only 2 cards), so this is the turn to play the tapped Archive and keep later land drops untapped."
+},
+{
+"case": "C032",
+"better": "B",
+"margin": "clear",
+"reason": "Voice of Victory stops me casting spells on the opponent's turn, so flash is useless; cast Curiosity now as a blocker and card engine."
+}
+]

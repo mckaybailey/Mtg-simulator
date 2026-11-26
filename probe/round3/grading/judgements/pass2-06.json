@@ -1,0 +1,62 @@
+[
+{
+"case": "C109",
+"better": "B",
+"margin": "clear",
+"reason": "Both kill the 2/1 Cleric; Theorix Charm is the right-sized answer, saving Bitter Triumph (and 3 life or a card) for Amalia/Haliya, and Verge gives colored mana."
+},
+{
+"case": "C112",
+"better": "A",
+"margin": "clear",
+"reason": "Ingris uses all three mana while the opponent has only 1 open (no Countersculpt), developing an evasive threat; B wastes mana on a 2-drop with no trigger."
+},
+{
+"case": "C116",
+"better": "B",
+"margin": "small",
+"reason": "Uses all mana; an extra equipment survives sweepers, carries hone counters and counts toward Kili's storied; little downside against a control deck."
+},
+{
+"case": "C117",
+"better": "B",
+"margin": "large",
+"reason": "Voice of Victory stops flashing it on the opponent's turn, so holding Enduring Curiosity wastes it; cast it now as a blocker and card engine against an opponent at 7."
+},
+{
+"case": "C119",
+"better": "B",
+"margin": "small",
+"reason": "Flashing in Drowner with no target throws away its stun/shuffle removal, which matters a lot against equipped Dwarves; a 2/1 body is minor."
+},
+{
+"case": "C125",
+"better": "A",
+"margin": "clear",
+"reason": "Triple-blocking kills Haliya and blocks more attackers, so you take less damage at 6 life; B only chumps and takes more damage."
+},
+{
+"case": "C127",
+"better": "B",
+"margin": "clear",
+"reason": "A two-lander on the play in a 20-land deck full of cheap spells, with removal that lines up well against early landfall creatures; worth keeping."
+},
+{
+"case": "C129",
+"better": "B",
+"margin": "clear",
+"reason": "Evoking Deceit to bounce a 1/1 or Relic is a poor 2-for-1 against aggro; Winternight Stories digs for lands and threats at full value."
+},
+{
+"case": "C137",
+"better": "equal",
+"margin": "small",
+"reason": "Killing a Vinelasher now or later in the turn plays out about the same; waiting only adds a little information."
+},
+{
+"case": "C138",
+"better": "B",
+"margin": "clear",
+"reason": "Next turn, Leyline Axe on the 5/4 token plus Mauler is about lethal from 15; Jace can bounce the Axe or make a chump blocker and draw damage, while holding counters can't stop an equip."
+}
+]

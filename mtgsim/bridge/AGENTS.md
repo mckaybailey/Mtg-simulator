@@ -47,7 +47,22 @@ and the player's untapped free mana sources can pay the printed mana cost with X
 sources are permanents whose mana ability costs only a tap (no summoning sickness), sacrificing
 itself, or life; each makes the colours its `Produced$` names (`Any`, `Chosen`, `Combo` → any
 colour; `Amount$` when it is a number); coloured symbols are matched to distinct sources;
-Phyrexian symbols are paid with life above 2; cost reductions and mana-pool mana are ignored.
+Phyrexian symbols are paid with life above 2; mana-pool mana is ignored. A
+spree or tiered spell also needs one mode's additional cost (`ModeCost$`) on top of the printed
+cost, for a mode whose required targets exist (since 24 Nov; before, Three Steps Ahead counted as
+castable with one mana open). Since round 3 of the probe (24 Nov) the cost is changed as Forge
+would change it on casting (`adjustedMana`, mirroring `CostAdjustment.adjust`): the spell's own
+`RaiseCost$` / `ReduceCost$`, and the `RaiseCost` and `ReduceCost` static abilities on the
+battlefield, the stack, the command zone and the card itself (its own statics only for a spell of
+the face they are on, so Hearth Elemental's discount does not reach Stoke Genius), each tested with
+Forge's private `CostAdjustment.checkRequirement` and reductions sized by
+`applyReduceCostAbility` (both called by reflection; both only read the game). Left out: reductions
+whose size the player chooses (`UpTo$`), raises that are not pure mana or depend on the chosen
+modes or targets, statics that need the spell's targets (`ValidTarget$`; none are chosen yet), set
+costs (Trinisphere), face-down casts, and convoke, improvise, delve, emerge, offering and assist.
+This adds discounted cards (Eddymurk Crab, Hearth Elemental, Momo's flyers, ...) to the `idleOwn`,
+`idleOpp` and `counter` misplay counts where they were castable only with the discount; runs
+before 24 Nov counted them only at full price.
 
 | Field | Definition |
 |---|---|
@@ -79,22 +94,47 @@ and Forge's choice under `forge`.
 | `kind` | Taken when | `context` | `forge` |
 |---|---|---|---|
 | `counter` | an opponent casts a spell while the player holds a counter that is castable (as in `counter.passed`) and could target it | `spell` (`id`, `name`, `manaValue`), `castableCounters` | `{"action":"counter","with":NAME}` if the player cast a counter at that spell, else `{"action":"pass","result":"resolved"\|"fizzled"\|"left the stack"}` |
-| `main` | the active player's first main phase begins (once a turn) | `{}` | `cast` (spells the player cast from then to cleanup, `name` and `phase`), `lands` played, `manaOpenAtCleanup` (free mana units, as below) |
+| `main` | the active player's first main phase begins (once a turn) | `{}` | `cast` (spells the player cast from then to cleanup, `name`, `phase` and `targets`), `lands` played, `manaOpenAtCleanup` (free mana units, as below) |
 | `attack` | the declare-attackers step begins and the active player has an untapped creature without summoning sickness or defender | `canAttack` (ids) | `attackers` (`id`, `name`, `attacking`: `opponent` or a planeswalker's name), sorted by id; `[]` when no one attacked |
-| `main2` | the active player's second main phase begins and a non-land card in hand is castable (the tracker's check, sorcery timing) | `castable` (names) | `cast` (spells cast in that phase), `lands` played in it |
-| `upkeep` | the active player's upkeep begins and they hold a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step), `lands` |
-| `draw` | the active player's draw step: taken when the step's draw reaches their hand (the step's event comes before the draw), if they then hold an instant-speed castable card | `castable` (names) | `cast` (spells cast in that step), `lands` |
-| `endstep` | the opponent's end step begins and the player holds a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step), `lands`; `[]` when the card was held |
+| `main2` | the active player's second main phase begins and a non-land card in hand is castable (the tracker's check, sorcery timing) | `castable` (names) | `cast` (spells cast in that phase, `name` and `targets`), `lands` played in it |
+| `upkeep` | the active player's upkeep begins and they hold a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step, `name` and `targets`), `lands` |
+| `draw` | the active player's draw step: taken when the step's draw reaches their hand (the step's event comes before the draw), if they then hold an instant-speed castable card | `castable` (names) | `cast` (spells cast in that step, `name` and `targets`), `lands` |
+| `endstep` | the opponent's end step begins and the player holds a non-land card castable at instant speed | `castable` (names) | `cast` (spells cast in that step, `name` and `targets`), `lands`; `[]` when the card was held |
 | `block` | the declare-blockers step begins and the player is attacked (or their planeswalker is) and has an untapped creature | `attackers` (`id`, `name`, `attacking`: `you` or the planeswalker) | `blocks` (`blocker`, `name`, `attacker`); `[]` for no blocks |
 | `mulligan` | each hand decided on before the first turn | `mulligansSoFar`, `onThePlay` | `{"action":"mulligan"}`, or `{"action":"keep","bottom":[names]}` (London: the cards put on the bottom) |
 
 `state` holds only what the deciding player may know: `turn`, `phase`, `activePlayer` (`you` /
 `opponent`), `you` and `opponent` (`life`, `poison` when above 0, `hand` for `you` only (sorted
 names), `handCount`, `library` count, `landsPlayedThisTurn`, `manaOpen` = the tracker's free mana
-units (`manaUnits`, see "Castable"), `battlefield`, `graveyard`, face-up `exile`), and `stack`
+units (`manaUnits`, see "Castable"), `manaOpenFree` = those of them that can be spent on anything,
+`manaRestricted` = one entry per unit with a spending rule (`source` name, `rule` = the ability's
+"Spend this mana only ..." sentence, `onlyUnderRule`: true when the unit makes mana only under the
+rule, false when only some of its colours need it, as Cavern of Souls' coloured mana does),
+`thisTurn` (`crimes`, `lifeGained`, `lifeLost`, `cardsDrawn`, `tokensCreated` from Forge's
+per-turn counters, `creaturesDied` (names, tokens marked) as the tracker saw them move from the
+battlefield to a graveyard, `sacrificed`, `discarded`), for `opponent` only `knownInHand` (cards
+in their hand the deciding player has seen: returned there from a public zone, or in their hand
+when a hand-revealing effect of the deciding player resolved: a `Discard` with a `Reveal...` mode
+such as Duress, or `RevealHand`; a card is forgotten once it leaves the hand), `battlefield`,
+`graveyard`, face-up `exile`), `abilitiesThisTurn` and `abilitiesLastTurn` (`you` / `opponent`:
+`items` = activated abilities and triggers as they went on the stack, `source`, `kind` ability /
+trigger, `text` = Forge's stack text with players written you / opponent and its bracketed
+annotations dropped, face-down sources unnamed and without text for the other player; at most 25 a
+player and turn, `more` counts the rest; mana abilities do not use the stack and are not listed),
+and `stack`
 (`name`, `controller`, `kind` spell / ability / trigger, `targets`). A permanent: `id`, `name`,
 `types`, `tapped`, for creatures `power`, `toughness`, `damage` and `sick` (when present),
-`counters`, `attachedTo` (an id), `token`. Opposing face-down cards are shown as face-down, never
+`counters`, `attachedTo` (an id), `token`; a token also has `text` (its script's Oracle text, else
+the ability text Forge shows for it; `""` for a vanilla token). `chosen` (when anything is set)
+holds the choices made for the permanent, from the card's `getChosen*` / `getNamedCards` fields:
+`type`, `type2`, `colors`, `player` (`you` / `opponent`), `number`, `cards` (names, with the id for
+a permanent), `named`, `mode`, `direction`, `evenOdd`, `sector`. On the deciding player's own
+permanents they come from the card (secret choices included); on the opponent's from the public
+card view, where a secret choice stays unset until revealed, and chosen cards only when they are
+in a public zone. `state` also has `spellsThisTurn` and `spellsLastTurn` (`you` / `opponent`:
+names of spells cast, copies left out, an opposing face-down spell as `face-down spell`). Cast
+entries' `targets` (and the stack's) are `Name (id)` for cards, `spell Name`, `you` / `opponent`,
+over the spell's sub-abilities and chosen modes. These fields were added 24 Nov 2026. Opposing face-down cards are shown as face-down, never
 named; the opponent's hand and library order never appear. A mulligan's state is the one taken
 when the last card of that hand was drawn (the mulligan event fires only after the new hand is
 drawn). A decision still open when the game ends gets `{"unresolved":"game ended"}`.
@@ -103,7 +143,20 @@ Snapshots are taken from the tracker's handlers and obey its rules below (read o
 23 Nov 2026: 90 seed-1 games of three pairings with snapshots are identical to the same games
 played by the driver before snapshots existed, and 40 games with and without them agree record for
 record (`VALIDATION.md`, "Decision snapshots"); the same 90 again after `main2` and `endstep`
-were added, and again after `upkeep` and `draw`.
+were added, and again after `upkeep` and `draw`. The 24 Nov additions (token text, `chosen`, cast
+targets, the spells of this turn and the last, spree costs) were checked against the step B run
+(`runs/probe-b`, old driver): 180 of 180 games of three planning decks' gauntlets identical; the
+snapshots differ only by the new fields and by spree cards (Three Steps Ahead, Lively Dirge) no
+longer counted castable without a payable mode, which also changes those cards' `idleOwn`,
+`idleOpp` and `counter` misplay counts. The round-3 additions (cost changes, the restricted-mana
+split, `thisTurn`, `knownInHand`, the abilities of this turn and the last) were checked the same way
+on the whole step B run (`runs/probe-b3` against `runs/probe-b`): 419 of 420 games identical; the
+snapshots differ from `runs/probe-b2` only by the new fields and by discounted cards (Eddymurk
+Crab, Sapling Nursery, Sunderflock, Momo's Dragons, Hearth Elemental) added to castable lists,
+which adds 71 `main2` / `upkeep` / `draw` / `endstep` decisions and removes none. The one other game
+(Four-Color Control against Orzhov Lifegain, game 6) does not replay even on the old driver without
+snapshots (18, 22 and 16 turns in five runs): some decision in it depends on the clock, so 419 of
+420 is what to expect from that run.
 
 ## Behaviour that matters
 

@@ -1,0 +1,62 @@
+[
+{
+"case": "C067",
+"better": "A",
+"margin": "small",
+"reason": "Hired Claw can attack safely (Biotech's 1 power can't kill it); it adds one more Ingris ping and one more combat damage, and the opponent has little to swing back with."
+},
+{
+"case": "C070",
+"better": "B",
+"margin": "clear",
+"reason": "Opponent is at 7 with one 2/2 that can block; swinging with everything deals 3-4 damage instead of 0-2, and at 23 life losing a Monk costs nothing."
+},
+{
+"case": "C072",
+"better": "B",
+"margin": "clear",
+"reason": "Stir Up Trouble paid by sacrificing Freebooter (which leaves a Treasure) kills the Hydra, the real landfall threat with two Icetills and Passages in the graveyard, and still leaves mana for Biotech and Pursuit; A spends 5 mana on one Icetill."
+},
+{
+"case": "C074",
+"better": "equal",
+"margin": "small",
+"reason": "11 power is attacking a player at 3 and three blockers can't stop lethal, with no tricks in hand; both blocks lose."
+},
+{
+"case": "C075",
+"better": "A",
+"margin": "large",
+"reason": "The opponent has no untapped blockers or mana, so ninjutsu Kaito hits for 5 and can then -2 Dwalin (Kaito is multicolored, so hexproof from monocolored doesn't stop it); B wastes the turn, since Hex can't hit Dwalin."
+},
+{
+"case": "C076",
+"better": "B",
+"margin": "clear",
+"reason": "Final Mercy kills the Haliya engine for 2 mana with Charm mana left over; with 4 mana A can only evoke Deceit, a weak use of the card."
+},
+{
+"case": "C077",
+"better": "B",
+"margin": "small",
+"reason": "Opponent has 1 mana and can't pay 3; countering a 5/4 lifegain flier on an empty board is big, though Cavern (Dragon) mana may have made it uncounterable."
+},
+{
+"case": "C080",
+"better": "equal",
+"margin": "small",
+"reason": "Six 1/1 Monks against an opponent at 5 with every creature tapped, no cards and no mana is lethal either way; Consult only adds overkill."
+},
+{
+"case": "C081",
+"better": "A",
+"margin": "clear",
+"reason": "Opponent has an empty board and no cards in hand; Jace makes tokens and draws on each of their draw steps, while holding does nothing since the rest of the hand is sorceries."
+},
+{
+"case": "C082",
+"better": "B",
+"margin": "clear",
+"reason": "Two lands that make both colors, cheap creatures and two 1-mana removal spells against aggro, in a 23-land deck: a standard keep on the play."
+}
+]

@@ -1,0 +1,62 @@
+[
+{
+"case": "C125",
+"better": "B",
+"margin": "clear",
+"reason": "B's triple block on Haliya kills her and keeps more life, while A throws away a Biotech and the Freebooter for nothing; but B's block of Moseo is illegal because Moseo flies, and even without it B is better."
+},
+{
+"case": "C127",
+"better": "A",
+"margin": "small",
+"reason": "Two lands on the play with six spells that cost one or two mana, all cheap removal or a counter, is a fine keep against a creature deck; mulliganing to six is worse."
+},
+{
+"case": "C129",
+"better": "A",
+"margin": "small",
+"reason": "Winternight Stories draws three and lets you discard a creature for value, which beats evoking Deceit to trade it one for one; the opponent's board is not pressing yet."
+},
+{
+"case": "C137",
+"better": "A",
+"margin": "small",
+"reason": "Casting removal in upkeep before drawing gains nothing because the opponent is tapped out; waiting keeps the same option with more information."
+},
+{
+"case": "C138",
+"better": "A",
+"margin": "small",
+"reason": "Counters do little against an equipment deck that attacks through equip abilities; Jace gives a chump blocker or soaks damage, and draws a card on their draw step."
+},
+{
+"case": "C139",
+"better": "B",
+"margin": "clear",
+"reason": "There is no third land in hand: Elves guarantee three mana next turn (Smaug if a land comes) plus an extra body, while Biotech's Lander costs two mana to use."
+},
+{
+"case": "C140",
+"better": "A",
+"margin": "clear",
+"reason": "With Valley Flamecaller's +1 damage, A's double blocks kill both Hearth Elementals for losses similar to B's, which kills only one."
+},
+{
+"case": "C142",
+"better": "equal",
+"margin": "small",
+"reason": "Both cast Emeritus; B's land drop is a Cavern of Souls that is not in hand and its second cast is unclear, leaving only a minor timing difference."
+},
+{
+"case": "C145",
+"better": "A",
+"margin": "clear",
+"reason": "An untapped Watery Grave plus a first-turn Dream Beavers starts the curve and lets Gloomlake Verge come in with both colours next turn; B does nothing with the turn."
+},
+{
+"case": "C147",
+"better": "B",
+"margin": "clear",
+"reason": "Voice of Victory stops you casting spells on their turn and they have no cards, so held mana is wasted; a second Enduring Curiosity doubles the card draw from combat damage."
+}
+]

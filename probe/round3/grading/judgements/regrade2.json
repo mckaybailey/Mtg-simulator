@@ -1,0 +1,44 @@
+[
+{
+"case": "C039",
+"better": "equal",
+"margin": "small",
+"reason": "Both cast Sleight of Hand and play a land if it finds one; B only names the Island it found, so the two lines are the same."
+},
+{
+"case": "C048",
+"better": "A",
+"margin": "small",
+"reason": "After Day of Judgment, A keeps No More Lies mana up through the opponent's turn and casts Consult at instant speed, while a second Tablet adds little with 8 lands already out."
+},
+{
+"case": "C051",
+"better": "A",
+"margin": "clear",
+"reason": "Casting Harmonizer and Ascension before combat lets the land drops (Fabled Passage, its fetch, Escape Tunnel's unblockable) double an attacker's power; B casts them after combat and wastes every landfall pump, and the opponent's open mana can't counter (Hamlet makes only colorless)."
+},
+{
+"case": "C093",
+"better": "B",
+"margin": "small",
+"reason": "Both stun blockers with Cryomancer, but B also kills a Mightform Harmonizer and uses Emeritus, which matters against an explosive landfall board; A leaves mana idle for a nearly useless Spell Snare."
+},
+{
+"case": "C142",
+"better": "A",
+"margin": "clear",
+"reason": "Emeritus is summoning sick, so casting it before combat gains nothing; A casts it and also uses its extra spell and land drop, getting more cards and mana from the same turn."
+},
+{
+"case": "C157",
+"better": "equal",
+"margin": "small",
+"reason": "Both wipe the board (Marvel is indestructible) and keep plenty of counter mana; Machinations at their end step and Three Steps' card draw are worth about the same."
+},
+{
+"case": "C199",
+"better": "B",
+"margin": "small",
+"reason": "At 4 life, Duress cannot stop a haste dragon, which is the main lethal threat; harmonizing Winternight Stories uses this turn's otherwise idle 5 mana for three cards (discarding Excruciator) to find answers next turn, at the cost of a small chance that Duress takes a lethal Burst Lightning."
+}
+]

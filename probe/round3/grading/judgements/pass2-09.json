@@ -1,0 +1,62 @@
+[
+{
+"case": "C184",
+"better": "B",
+"margin": "large",
+"reason": "Spider-Man copying Deceit bounces Mentor and strips their last spell while staying at 3 life; A drops to 1 life against a burn deck."
+},
+{
+"case": "C188",
+"better": "A",
+"margin": "small",
+"reason": "Day of Judgment next turn kills Saboteur along with the rest, so it is better to save No More Lies for a threat cast after the wipe."
+},
+{
+"case": "C190",
+"better": "A",
+"margin": "small",
+"reason": "Killing both fliers while the opponent is tapped out costs nothing and clears the way for the Dragon; waiting until my turn gains little."
+},
+{
+"case": "C193",
+"better": "A",
+"margin": "clear",
+"reason": "Their blockers are tiny, and blocked Pollinators can be sacrificed to Zealot for 2 Biotech damage each, so attacking with everything pushes much more damage at little risk."
+},
+{
+"case": "C194",
+"better": "B",
+"margin": "small",
+"reason": "Removing Clarion Conqueror now, while they are tapped out, turns Treasures and abilities back on and clears the way for the Dragon; it could also be done on my turn."
+},
+{
+"case": "C198",
+"better": "B",
+"margin": "small",
+"reason": "Attacking gets 4 damage and a card, or a fine trade with Gev (Curiosity comes back as an enchantment); a second Curiosity in hand can be flashed in to block."
+},
+{
+"case": "C199",
+"better": "A",
+"margin": "small",
+"reason": "At 4 life survival comes first: Duress can take the burn spell that would finish me, while tapping out for Winternight does nothing for this turn."
+},
+{
+"case": "C200",
+"better": "B",
+"margin": "large",
+"reason": "Not blocking takes 8 damage at 8 life, which is lethal; blocking keeps me alive at 4."
+},
+{
+"case": "C001",
+"better": "A",
+"margin": "small",
+"reason": "Uses mana that would otherwise go unused to kill Momo, the flier that makes their Dragons cost less; holding Hex for Sarkhan or Voice of Victory is a reasonable alternative."
+},
+{
+"case": "C002",
+"better": "B",
+"margin": "small",
+"reason": "This six-card hand has only two lands, so the six-mana Excruciator is the least castable card; cheap Duress helps more early."
+}
+]

@@ -1,0 +1,62 @@
+[
+{
+"case": "C007",
+"better": "A",
+"margin": "clear",
+"reason": "The 1/1 Cryomancer trades with Enlightened Confidant, a lifegain value engine, and lands in the graveyard where its draw-two ability can be used later; not blocking just takes damage for nothing."
+},
+{
+"case": "C008",
+"better": "A",
+"margin": "small",
+"reason": "Torch the Tower is an instant, so holding it keeps the same exile answer to Forsaken Miner (on their turn or in combat) and leaves room for a better target; casting it at sorcery speed now gains little."
+},
+{
+"case": "C009",
+"better": "B",
+"margin": "large",
+"reason": "Voice of Victory stops you casting spells on the opponent's turn, so holding mana does nothing; exiling Voice (they lose 3) and using all 6 mana on Consult the Star Charts is far better than passing with nothing done."
+},
+{
+"case": "C012",
+"better": "A",
+"margin": "clear",
+"reason": "Countersculpt is castable with the Jace you control and stops the opponent's only threat; with no cards in hand and two loaded Earthbender Ascensions, a resolved Chocobo grows fast, and No More Lies would fail against 10 open mana."
+},
+{
+"case": "C015",
+"better": "A",
+"margin": "clear",
+"reason": "Starcage would exile only a single Llanowar Elves; keeping it for a wider board of cheap creatures and holding up Countersculpt or Three Steps Ahead for the opponent's 4-drop is stronger."
+},
+{
+"case": "C016",
+"better": "B",
+"margin": "clear",
+"reason": "At 7 life against two large Chocobos and a Hydra, keeping three untapped blockers plus an instant Torch for the Hydra matters most; A spends life on Obsessive Pursuit and needs Gene Pollinator's mana, which taps it and loses a blocker."
+},
+{
+"case": "C017",
+"better": "A",
+"margin": "clear",
+"reason": "Stuck on 3 lands with no land in hand and an empty opposing board, digging three cards with Winternight Stories (pitching a spare creature) is worth far more than holding Requiting Hex, which works fine at sorcery speed."
+},
+{
+"case": "C020",
+"better": "B",
+"margin": "small",
+"reason": "Killing Moseo keeps one Enduring Curiosity alive as a creature and removes the recursion engine, at the cost of only 1 more life than trading with Haliya; the position is likely lost either way."
+},
+{
+"case": "C026",
+"better": "B",
+"margin": "clear",
+"reason": "At 4 life facing four attackers next turn, a Superior Spider-Man copy (for example deathtouch Cultivator) as a second blocker gives the only real chance to survive; drawing three with Winternight Stories adds no board presence."
+},
+{
+"case": "C027",
+"better": "A",
+"margin": "clear",
+"reason": "Cryomancer develops a body, filters cards, fills the graveyard for Uldaros and can stun Confidant; evoking Deceit for a small bounce or discard throws away a premium card for little."
+}
+]

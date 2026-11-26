@@ -106,6 +106,11 @@ import forge.game.cost.CostPartMana;
 import forge.game.cost.CostPayLife;
 import forge.game.cost.CostSacrifice;
 import forge.game.cost.CostTap;
+import forge.game.cost.CostAdjustment;
+import forge.game.ability.AbilityUtils;
+import forge.game.mana.ManaCostBeingPaid;
+import forge.game.staticability.StaticAbility;
+import forge.game.staticability.StaticAbilityMode;
 import forge.game.event.GameEventSpellResolved;
 import forge.game.event.GameEventTurnPhase;
 import forge.game.keyword.Keyword;
@@ -818,10 +823,16 @@ public final class ForgeBridge {
             int freeMask;
             final List<AbilityManaPart> restrictedParts = new ArrayList<>();
             final List<Integer> restrictedMasks = new ArrayList<>();
+            /** The source's name and the spending rule of each restricted part (for the snapshots). */
+            String source;
+            final List<String> rules = new ArrayList<>();
 
-            void addRestricted(final AbilityManaPart part, final int mask) {
+            void addRestricted(final AbilityManaPart part, final int mask, final String rule) {
                 restrictedParts.add(part);
                 restrictedMasks.add(mask);
+                if (!rules.contains(rule)) {
+                    rules.add(rule);
+                }
             }
 
             int maskFor(final SpellAbility sa) {
@@ -945,6 +956,9 @@ public final class ForgeBridge {
             if (snaps != null && started && pendingDraw >= 0) {
                 guarded(() -> snapDrawn(event));
             }
+            if (snaps != null && started) {
+                guarded(() -> noteMove(event));
+            }
             if (!started || event.from() == null || event.to() == null) {
                 return;
             }
@@ -960,6 +974,9 @@ public final class ForgeBridge {
 
         private void onCast(final GameEventSpellAbilityCast event) {
             final StackItemView item = event.si();
+            if (snaps != null && item != null && (item.isAbility() || item.isTrigger())) {
+                guarded(() -> noteTurnAbility(item));
+            }
             if (item == null || item.isAbility() || item.isTrigger()) {
                 return;
             }
@@ -1009,6 +1026,9 @@ public final class ForgeBridge {
         private void onResolved(final GameEventSpellResolved event) {
             if (snaps != null && event.spell() != null) {
                 guarded(() -> snapResolved(event.spell().getId(), event.hasFizzled()));
+                if (!event.hasFizzled()) {
+                    guarded(() -> noteReveal(findOnStack(event.spell().getId())));
+                }
             }
             if (event.spell() == null || windows.isEmpty()) {
                 return;
@@ -1140,7 +1160,194 @@ public final class ForgeBridge {
                     return false;
                 }
             }
-            return canPayMana(units, mana, p, sa);
+            if (sa.getApi() == ApiType.Charm && (c.hasKeyword(Keyword.SPREE) || c.hasKeyword(Keyword.TIERED))) {
+                return modeCostPayable(units, mana, p, sa);
+            }
+            return canPayMana(units, adjustedMana(c, sa, mana), p, sa);
+        }
+
+        // Forge's own requirement test and reduction step (CostAdjustment, private): both only read the game.
+        private static final Method COST_REQUIREMENT = costMethod("checkRequirement", SpellAbility.class, StaticAbility.class);
+        private static final Method COST_REDUCE = costMethod("applyReduceCostAbility", StaticAbility.class, SpellAbility.class,
+                ManaCostBeingPaid.class, int.class);
+
+        private static Method costMethod(final String name, final Class<?>... args) {
+            try {
+                final Method m = CostAdjustment.class.getDeclaredMethod(name, args);
+                m.setAccessible(true);
+                return m;
+            } catch (final Throwable t) {
+                System.err.println("mtgsim: tracker: CostAdjustment." + name + " not found; cost changes ignored (" + t + ")");
+                return null;
+            }
+        }
+
+        /**
+         * The mana cost after the cost changes Forge would apply when the spell is cast now, with X = 1:
+         * the spell's own RaiseCost$ / ReduceCost$, and the RaiseCost and ReduceCost static abilities of
+         * cards on the battlefield, the stack and in the command zone, plus the card's own (for "this spell
+         * costs {1} less ..."), checked with Forge's own requirement test (CostAdjustment.checkRequirement).
+         * Mirrors CostAdjustment.adjust without its choices and state changes: left out are reductions the
+         * player chooses the size of (UpTo$), raises that are not pure mana or whose size depends on the
+         * chosen modes or targets (Escalate, Strive; Spree and Tiered are added by modeCostPayable), statics
+         * that depend on the spell's targets (no targets are chosen yet, so ValidTarget$ never matches), set
+         * costs (Trinisphere), face-down casts, and convoke, improvise, delve, emerge, offering and assist.
+         */
+        private ManaCost adjustedMana(final Card c, final SpellAbility sa, final ManaCost printed) {
+            if (COST_REQUIREMENT == null || COST_REDUCE == null || sa.isCastFaceDown()) {
+                return printed;
+            }
+            try {
+                final ManaCostBeingPaid m = new ManaCostBeingPaid(ManaCost.ZERO);
+                int x = 0;
+                for (final ManaCostShard shard : printed) {
+                    if (shard == ManaCostShard.X) {
+                        x++;
+                    } else {
+                        m.increaseShard(shard, 1);
+                    }
+                }
+                m.increaseGenericMana(printed.getGenericCost() + x);
+                final List<Card> sources = new ArrayList<>();
+                for (final ZoneType z : new ZoneType[] {ZoneType.Battlefield, ZoneType.Stack, ZoneType.Command}) {
+                    for (final Card s : game.getCardsIn(z)) {
+                        sources.add(s);
+                    }
+                }
+                if (!sources.contains(c)) {
+                    sources.add(c);
+                }
+                // Raises first, as Forge adds them to the Cost before the mana is paid.
+                if (sa.hasParam("RaiseCost")) {
+                    final String raise = sa.getParam("RaiseCost");
+                    if (sa.hasSVar(raise)) {
+                        m.increaseGenericMana(AbilityUtils.calculateAmount(c, raise, sa));
+                    } else {
+                        addPureMana(m, raise, 1);
+                    }
+                }
+                for (final Card s : sources) {
+                    for (final StaticAbility st : s.getStaticAbilities()) {
+                        if (st.checkMode(StaticAbilityMode.RaiseCost) && sameFace(s, c, st, sa) && meets(sa, st)) {
+                            final int count = raiseCount(st, sa, printed);
+                            if (count > 0) {
+                                addPureMana(m, st.getParamOrDefault("Cost", "1"), count);
+                            }
+                        }
+                    }
+                }
+                int sumGeneric = 0;
+                if (sa.hasParam("ReduceCost")) {
+                    final String cst = sa.getParam("ReduceCost");
+                    final String amt = sa.getParamOrDefault("ReduceAmount", cst);
+                    final int num = AbilityUtils.calculateAmount(c, amt, sa);
+                    if (sa.hasParam("ReduceAmount") && num > 0) {
+                        m.subtractManaCost(new ManaCost(new forge.card.mana.ManaCostParser(String.join(" ", java.util.Collections.nCopies(num, cst)))));
+                    } else {
+                        sumGeneric += num;
+                    }
+                }
+                for (final Card s : sources) {
+                    for (final StaticAbility st : s.getStaticAbilities()) {
+                        if (st.checkMode(StaticAbilityMode.ReduceCost) && !st.hasParam("UpTo") && sameFace(s, c, st, sa)
+                                && meets(sa, st)) {
+                            sumGeneric += (Integer) COST_REDUCE.invoke(null, st, sa, m, sumGeneric);
+                        }
+                    }
+                }
+                m.decreaseGenericMana(sumGeneric);
+                return m.toManaCost();
+            } catch (final Throwable t) {
+                ignored(t);
+                return printed;
+            }
+        }
+
+        /**
+         * The card's own statics apply only to a spell of the face they are on: Forge casts an adventure or the
+         * back of a modal card with the card switched to that face, so Hearth Elemental's discount is not Stoke
+         * Genius's.
+         */
+        private static boolean sameFace(final Card source, final Card c, final StaticAbility st, final SpellAbility sa) {
+            return source != c || st.getCardStateName() == sa.getCardStateName();
+        }
+
+        private static boolean meets(final SpellAbility sa, final StaticAbility st) throws Exception {
+            return (Boolean) COST_REQUIREMENT.invoke(null, sa, st);
+        }
+
+        /** How many times a RaiseCost static adds its Cost$ (CostAdjustment.applyRaiseCostAbility); 0 when left out. */
+        private static int raiseCount(final StaticAbility st, final SpellAbility sa, final ManaCost printed) {
+            if (st.hasParam("ForEachShard")) {
+                final byte atom = ManaAtom.fromName(st.getParam("ForEachShard").toLowerCase());
+                int count = 0;
+                for (final ManaCostShard shard : printed) {
+                    if ((shard.getColorMask() & atom) != 0) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            if (!st.hasParam("Amount")) {
+                return 1;
+            }
+            final String amount = st.getParam("Amount");
+            switch (amount) {
+                case "Escalate": case "Strive": case "Spree": case "Tiered":
+                    return 0;
+                default:
+                    break;
+            }
+            if (amount.matches("\\d+")) {
+                return Integer.parseInt(amount);
+            }
+            if (st.hasParam("Relative")) {
+                return AbilityUtils.calculateAmount(st.getHostCard(), st.hasSVar(amount) ? st.getSVar(amount) : amount, sa);
+            }
+            return AbilityUtils.calculateAmount(st.getHostCard(), amount, st);
+        }
+
+        /** Adds count times a cost that is only mana; a cost with other parts (sacrifice, life ...) is left out. */
+        private static void addPureMana(final ManaCostBeingPaid m, final String cost, final int count) {
+            final Cost parsed = new Cost(cost, false);
+            for (final CostPart part : parsed.getCostParts()) {
+                if (!(part instanceof CostPartMana)) {
+                    return;
+                }
+            }
+            final ManaCost mana = parsed.getTotalMana();
+            if (mana == null) {
+                return;
+            }
+            for (int i = 0; i < count; i++) {
+                m.addManaCost(mana);
+            }
+        }
+
+        /**
+         * Spree and Tiered: the printed cost plus at least one mode's additional cost ("ModeCost$", which Forge
+         * adds as a cost raise when the spell is cast), for a mode whose required targets exist.
+         */
+        private boolean modeCostPayable(final List<Unit> units, final ManaCost base, final Player p, final SpellAbility sa) {
+            final List<AbilitySub> choices = sa.getAdditionalAbilityList("Choices");
+            if (choices == null) {
+                return false;
+            }
+            for (final AbilitySub choice : choices) {
+                ManaCost total = base;
+                for (SpellAbility s = choice; s != null; s = s.getSubAbility()) {
+                    if (s.hasParam("ModeCost")) {
+                        final ManaCost extra = new Cost(s.getParam("ModeCost"), false).getTotalMana();
+                        if (extra != null) {
+                            total = ManaCost.combine(total, extra);
+                        }
+                    }
+                }
+                if (canPayMana(units, adjustedMana(sa.getHostCard(), sa, total), p, sa) && chainTargetsAvailable(choice)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static boolean controlsNamed(final Player p, final String name) {
@@ -1557,6 +1764,7 @@ public final class ForgeBridge {
                 Unit single = null; // a source making one mana: any of its abilities, one use
                 int[] multi = null; // otherwise its biggest ability
                 AbilityManaPart multiRule = null;
+                String multiRuleText = null;
                 for (final SpellAbility ma : c.getManaAbilities()) {
                     final AbilityManaPart part = ma.getManaPart();
                     if (part == null || !freeToActivate(ma, c)) {
@@ -1572,30 +1780,45 @@ public final class ForgeBridge {
                             single = new Unit();
                         }
                         if (restricted) {
-                            single.addRestricted(part, made[0]);
+                            single.addRestricted(part, made[0], spendRule(ma, part));
                         } else {
                             single.freeMask |= made[0];
                         }
                     } else if (multi == null || made.length > multi.length) {
                         multi = made;
                         multiRule = restricted ? part : null;
+                        multiRuleText = restricted ? spendRule(ma, part) : null;
                     }
                 }
                 if (multi != null) {
                     for (final int mask : multi) {
                         final Unit u = new Unit();
+                        u.source = c.isFaceDown() ? "face-down permanent" : nameOf(c);
                         if (multiRule == null) {
                             u.freeMask = mask;
                         } else {
-                            u.addRestricted(multiRule, mask);
+                            u.addRestricted(multiRule, mask, multiRuleText);
                         }
                         units.add(u);
                     }
                 } else if (single != null) {
+                    single.source = c.isFaceDown() ? "face-down permanent" : nameOf(c);
                     units.add(single);
                 }
             }
             return units;
+        }
+
+        /** The ability's "Spend this mana only ..." sentence, else Forge's restriction text. */
+        private static String spendRule(final SpellAbility ma, final AbilityManaPart part) {
+            final String text = ma.getParamOrDefault("SpellDescription", "");
+            final int at = text.indexOf("Spend this mana only");
+            if (at >= 0) {
+                final int end = text.indexOf('.', at);
+                return text.substring(at, end < 0 ? text.length() : end + 1);
+            }
+            final String r = !isEmpty(part.getManaRestrictions()) ? part.getManaRestrictions() : part.getExtraManaRestriction();
+            return "restricted: " + r;
         }
 
         private static boolean isEmpty(final String s) {
@@ -1931,6 +2154,11 @@ public final class ForgeBridge {
             }
             openCounters.clear();
             closeSteps(null);
+            castLastTurn = castThisTurn;
+            castThisTurn = new ArrayList<>();
+            abilitiesLastTurn = abilitiesThisTurn;
+            abilitiesThisTurn = new ArrayList<>();
+            diedThisTurn = new ArrayList<>();
             if (!started) {
                 flushHands(seatOf(event.turnOwner()));
             }
@@ -2007,14 +2235,17 @@ public final class ForgeBridge {
         }
 
         private void snapCast(final int seat, final String name, final SpellAbility sa) {
+            noteTurnCast(seat, sa);
             if (mainSnap != null && mainSnap.choice == null && seat == mainSnap.seat
                     && game.getPhaseHandler().getTurn() == mainTurn) {
                 final PhaseType ph = game.getPhaseHandler().getPhase();
-                mainCasts.add("{\"name\":" + quote(name) + ",\"phase\":" + quote(ph == null ? null : ph.name()) + "}");
+                mainCasts.add("{\"name\":" + quote(name) + ",\"phase\":" + quote(ph == null ? null : ph.name())
+                        + ",\"targets\":" + namesJson(chainTargets(sa, sa.getActivatingPlayer())) + "}");
             }
             for (final Snap st : openSteps) {
                 if (st.seat == seat) {
-                    st.casts.add(name);
+                    st.casts.add("{\"name\":" + quote(name) + ",\"targets\":"
+                            + namesJson(chainTargets(sa, sa.getActivatingPlayer())) + "}");
                 }
             }
             if (openCounters.isEmpty()) {
@@ -2208,7 +2439,7 @@ public final class ForgeBridge {
                 if (phase != null && phase == s.phase) {
                     continue; // a repeated step
                 }
-                s.choice = "{\"cast\":" + namesJson(s.casts) + ",\"lands\":" + namesJson(s.lands) + "}";
+                s.choice = "{\"cast\":[" + String.join(",", s.casts) + "],\"lands\":" + namesJson(s.lands) + "}";
                 openSteps.remove(i);
             }
         }
@@ -2298,6 +2529,194 @@ public final class ForgeBridge {
             return null;
         }
 
+        /** The targets of one ability (not its sub-abilities), as player me sees them. */
+        private static void addTargets(final List<String> out, final SpellAbility sa, final Player me) {
+            if (sa.getTargets() == null) {
+                return;
+            }
+            for (final Card t : sa.getTargets().getTargetCards()) {
+                out.add(t.isFaceDown() && t.getController() != me ? "face-down card" : nameOf(t) + " (" + t.getId() + ")");
+            }
+            for (final SpellAbility t : sa.getTargets().getTargetSpells()) {
+                out.add(t.getHostCard() == null ? "a spell" : "spell " + nameOf(t.getHostCard()));
+            }
+            for (final Player t : sa.getTargets().getTargetPlayers()) {
+                out.add(t == me ? "you" : "opponent");
+            }
+        }
+
+        /** Every target chosen for a spell, its sub-abilities and modes included, as its caster sees them. */
+        private static List<String> chainTargets(final SpellAbility sa, final Player me) {
+            final List<String> out = new ArrayList<>();
+            for (SpellAbility s = sa; s != null; s = s.getSubAbility()) {
+                addTargets(out, s, me);
+            }
+            return out;
+        }
+
+        /** Spells cast this turn and the turn before (seat, name; face-down spells unnamed for the other seat). */
+        private List<Object[]> castThisTurn = new ArrayList<>();
+        private List<Object[]> castLastTurn = new ArrayList<>();
+
+        /** Activated abilities and triggers put on the stack this turn and the turn before: seat, source, face down, kind, text. */
+        private List<Object[]> abilitiesThisTurn = new ArrayList<>();
+        private List<Object[]> abilitiesLastTurn = new ArrayList<>();
+        /** Creatures put into a graveyard from the battlefield this turn: seat of their controller, name, token. */
+        private List<Object[]> diedThisTurn = new ArrayList<>();
+        /** Per seat, ids of cards in another player's hand that this seat has seen (revealed, or returned from a public zone). */
+        private final Map<Integer, Set<Integer>> knownCards = new HashMap<>();
+        /** Most abilities listed per player and turn; the rest are counted. */
+        private static final int MAX_ABILITIES = 25;
+        private static final int MAX_TEXT = 200;
+
+        private void noteTurnAbility(final StackItemView item) {
+            final CardView src = item.getSourceCard();
+            String text = item.getText();
+            if (text != null && text.length() > MAX_TEXT) {
+                text = text.substring(0, MAX_TEXT - 3) + "...";
+            }
+            abilitiesThisTurn.add(new Object[] {seatOf(item.getActivatingPlayer()), src == null ? null : src.getName(),
+                    src != null && src.isFaceDown(), item.isTrigger() ? "trigger" : "ability", text});
+        }
+
+        private static boolean publicZone(final ZoneType z) {
+            return z == ZoneType.Battlefield || z == ZoneType.Graveyard || z == ZoneType.Exile || z == ZoneType.Stack
+                    || z == ZoneType.Command;
+        }
+
+        /** Cards leaving a hand are no longer known; cards entering one from a public zone are known to everyone. */
+        private void noteMove(final GameEventCardChangeZone event) {
+            if (event.card() == null || event.from() == null || event.to() == null) {
+                return;
+            }
+            final int id = event.card().getId();
+            final ZoneType from = event.from().zoneType();
+            final ZoneType to = event.to().zoneType();
+            if (from == ZoneType.Hand) {
+                for (final Set<Integer> known : knownCards.values()) {
+                    known.remove(id);
+                }
+            }
+            if (to == ZoneType.Hand && publicZone(from) && !event.card().isFaceDown()) {
+                final int owner = seatOf(event.to().player());
+                for (final Player p : game.getRegisteredPlayers()) {
+                    final int seat = seatOfPlayer(p);
+                    if (seat >= 0 && seat != owner) {
+                        knownCards.computeIfAbsent(seat, k -> new HashSet<>()).add(id);
+                    }
+                }
+            }
+            if (from == ZoneType.Battlefield && to == ZoneType.Graveyard && event.card().getCurrentState() != null
+                    && event.card().getCurrentState().isCreature()) {
+                diedThisTurn.add(new Object[] {seatOf(event.from().player()), event.card().getName(), event.card().isToken()});
+            }
+        }
+
+        /**
+         * A resolved effect that reveals a player's hand to its controller (a Discard whose Mode$ reveals the hand,
+         * as Duress does, or RevealHand): the cards then in the targeted players' hands become known to the controller.
+         */
+        private void noteReveal(final SpellAbility resolved) {
+            final Player activator = resolved == null ? null : resolved.getActivatingPlayer();
+            if (activator == null) {
+                return;
+            }
+            boolean reveals = false;
+            final Set<Player> players = new HashSet<>();
+            for (SpellAbility s = resolved; s != null; s = s.getSubAbility()) {
+                final ApiType api = s.getApi();
+                if (api == ApiType.RevealHand || (api == ApiType.Discard && s.getParamOrDefault("Mode", "").startsWith("Reveal"))) {
+                    reveals = true;
+                }
+                if (s.usesTargeting()) {
+                    for (final Player t : s.getTargets().getTargetPlayers()) {
+                        players.add(t);
+                    }
+                }
+            }
+            if (!reveals) {
+                return;
+            }
+            final int seat = seatOfPlayer(activator);
+            for (final Player t : players) {
+                if (t == activator) {
+                    continue;
+                }
+                for (final Card c : t.getCardsIn(ZoneType.Hand)) {
+                    knownCards.computeIfAbsent(seat, k -> new HashSet<>()).add(c.getId());
+                }
+            }
+        }
+
+        private String abilitiesJson(final List<Object[]> list, final int seat, final int viewerSeat) {
+            final List<String> out = new ArrayList<>();
+            int more = 0;
+            for (final Object[] a : list) {
+                if ((Integer) a[0] != seat) {
+                    continue;
+                }
+                if (out.size() >= MAX_ABILITIES) {
+                    more++;
+                    continue;
+                }
+                final boolean hidden = (Boolean) a[2] && seat != viewerSeat;
+                out.add("{\"source\":" + quote(hidden ? "face-down permanent" : (String) a[1]) + ",\"kind\":" + quote((String) a[3])
+                        + ",\"text\":" + quote(hidden ? null : abilityText((String) a[4], viewerSeat)) + "}");
+            }
+            return "{\"items\":[" + String.join(",", out) + "],\"more\":" + more + "}";
+        }
+
+        /** Stack text as the viewer reads it: players as you / opponent, Forge's bracketed annotations dropped. */
+        private String abilityText(final String text, final int viewerSeat) {
+            if (text == null) {
+                return null;
+            }
+            String t = text.replaceAll("\\s*\\[[A-Z][A-Za-z ]*: [^\\]]*\\]", "");
+            for (final Player p : game.getRegisteredPlayers()) {
+                if (p.getName() != null && !p.getName().isEmpty()) {
+                    t = t.replace(p.getName(), seatOfPlayer(p) == viewerSeat ? "you" : "opponent");
+                }
+            }
+            return t.trim();
+        }
+
+        /** Turn conditions of one player this turn, all public: Forge's own counters plus the creatures that died. */
+        private String thisTurnJson(final Player p) {
+            final int seat = seatOfPlayer(p);
+            final List<String> died = new ArrayList<>();
+            for (final Object[] d : diedThisTurn) {
+                if ((Integer) d[0] == seat) {
+                    died.add((Boolean) d[2] ? d[1] + " (token)" : (String) d[1]);
+                }
+            }
+            final List<String> sacrificed = new ArrayList<>();
+            for (final Card c : p.getSacrificedThisTurn()) {
+                sacrificed.add(nameOf(c));
+            }
+            final List<String> discarded = new ArrayList<>();
+            for (final Card c : p.getDiscardedThisTurn()) {
+                discarded.add(nameOf(c));
+            }
+            return "{\"crimes\":" + p.getCommittedCrimeThisTurn() + ",\"lifeGained\":" + p.getLifeGainedThisTurn()
+                    + ",\"lifeLost\":" + p.getLifeLostThisTurn() + ",\"cardsDrawn\":" + p.getNumDrawnThisTurn()
+                    + ",\"tokensCreated\":" + p.getNumTokenCreatedThisTurn() + ",\"creaturesDied\":" + namesJson(died)
+                    + ",\"sacrificed\":" + namesJson(sacrificed) + ",\"discarded\":" + namesJson(discarded) + "}";
+        }
+
+        private void noteTurnCast(final int seat, final SpellAbility sa) {
+            castThisTurn.add(new Object[] {seat, nameOf(sa.getHostCard()), sa.getHostCard().isFaceDown()});
+        }
+
+        private String castsJson(final List<Object[]> casts, final int seat, final int viewerSeat) {
+            final List<String> names = new ArrayList<>();
+            for (final Object[] c : casts) {
+                if ((Integer) c[0] == seat) {
+                    names.add((Boolean) c[2] && seat != viewerSeat ? "face-down spell" : (String) c[1]);
+                }
+            }
+            return namesJson(names);
+        }
+
         /** What player p may know: own hand, both battlefields, graveyards, face-up exile, the stack, counts. */
         private String stateJson(final Player me) {
             Player opp = null;
@@ -2315,6 +2734,16 @@ public final class ForgeBridge {
             sb.append(",\"activePlayer\":").append(active == null ? "null" : quote(active == me ? "you" : "opponent"));
             sb.append(",\"you\":").append(playerJson(me, me, true));
             sb.append(",\"opponent\":").append(opp == null ? "null" : playerJson(opp, me, false));
+            final int meSeat = seatOfPlayer(me);
+            final int oppSeat = opp == null ? -2 : seatOfPlayer(opp);
+            sb.append(",\"spellsThisTurn\":{\"you\":").append(castsJson(castThisTurn, meSeat, meSeat))
+                    .append(",\"opponent\":").append(castsJson(castThisTurn, oppSeat, meSeat)).append('}');
+            sb.append(",\"spellsLastTurn\":{\"you\":").append(castsJson(castLastTurn, meSeat, meSeat))
+                    .append(",\"opponent\":").append(castsJson(castLastTurn, oppSeat, meSeat)).append('}');
+            sb.append(",\"abilitiesThisTurn\":{\"you\":").append(abilitiesJson(abilitiesThisTurn, meSeat, meSeat))
+                    .append(",\"opponent\":").append(abilitiesJson(abilitiesThisTurn, oppSeat, meSeat)).append('}');
+            sb.append(",\"abilitiesLastTurn\":{\"you\":").append(abilitiesJson(abilitiesLastTurn, meSeat, meSeat))
+                    .append(",\"opponent\":").append(abilitiesJson(abilitiesLastTurn, oppSeat, meSeat)).append('}');
             sb.append(",\"stack\":[");
             boolean first = true;
             for (final SpellAbilityStackInstance si : game.getStack()) {
@@ -2326,16 +2755,8 @@ public final class ForgeBridge {
                 sb.append(",\"controller\":").append(quote(mine ? "you" : "opponent"));
                 sb.append(",\"kind\":").append(quote(sa == null ? null : sa.isSpell() ? "spell" : sa.isTrigger() ? "trigger" : "ability"));
                 final List<String> targets = new ArrayList<>();
-                if (sa != null && sa.getTargets() != null) {
-                    for (final Card t : sa.getTargets().getTargetCards()) {
-                        targets.add(t.isFaceDown() && t.getController() != me ? "face-down card" : nameOf(t) + " (" + t.getId() + ")");
-                    }
-                    for (final SpellAbility t : sa.getTargets().getTargetSpells()) {
-                        targets.add(t.getHostCard() == null ? "a spell" : "spell " + nameOf(t.getHostCard()));
-                    }
-                    for (final Player t : sa.getTargets().getTargetPlayers()) {
-                        targets.add(t == me ? "you" : "opponent");
-                    }
+                if (sa != null) {
+                    addTargets(targets, sa, me);
                 }
                 sb.append(",\"targets\":").append(namesJson(targets)).append('}');
                 first = false;
@@ -2360,7 +2781,34 @@ public final class ForgeBridge {
             sb.append(",\"handCount\":").append(p.getCardsIn(ZoneType.Hand).size());
             sb.append(",\"library\":").append(p.getCardsIn(ZoneType.Library).size());
             sb.append(",\"landsPlayedThisTurn\":").append(p.getLandsPlayedThisTurn());
-            sb.append(",\"manaOpen\":").append(manaUnits(p).size());
+            sb.append(",\"thisTurn\":").append(thisTurnJson(p));
+            if (!own) {
+                final Set<Integer> known = knownCards.getOrDefault(seatOfPlayer(viewer), Collections.emptySet());
+                final List<String> names = new ArrayList<>();
+                for (final Card c : p.getCardsIn(ZoneType.Hand)) {
+                    if (known.contains(c.getId())) {
+                        names.add(nameOf(c));
+                    }
+                }
+                Collections.sort(names);
+                sb.append(",\"knownInHand\":").append(namesJson(names));
+            }
+            final List<Unit> units = manaUnits(p);
+            sb.append(",\"manaOpen\":").append(units.size());
+            // Mana with a spending rule: units usable only under it, and units whose extra colours need it.
+            int free = 0;
+            final List<String> limits = new ArrayList<>();
+            for (final Unit u : units) {
+                if (u.freeMask != 0) {
+                    free++;
+                }
+                if (!u.rules.isEmpty()) {
+                    limits.add("{\"source\":" + quote(u.source) + ",\"onlyUnderRule\":" + (u.freeMask == 0)
+                            + ",\"rule\":" + quote(String.join(" / ", u.rules)) + "}");
+                }
+            }
+            sb.append(",\"manaOpenFree\":").append(free);
+            sb.append(",\"manaRestricted\":[").append(String.join(",", limits)).append(']');
             sb.append(",\"battlefield\":[");
             boolean first = true;
             for (final Card c : p.getCardsIn(ZoneType.Battlefield)) {
@@ -2414,6 +2862,114 @@ public final class ForgeBridge {
             }
             if (c.isToken()) {
                 sb.append(",\"token\":true");
+                if (!hidden) {
+                    sb.append(",\"text\":").append(quote(tokenText(c)));
+                }
+            }
+            if (!hidden) {
+                final String chosen = chosenJson(c, viewer);
+                if (chosen != null) {
+                    sb.append(",\"chosen\":").append(chosen);
+                }
+            }
+            return sb.append('}').toString();
+        }
+
+        /**
+         * A token's rules text: its script's Oracle text, or else the ability text Forge keeps for display (the card
+         * view's cached copy, so nothing is recomputed); "" for a token with no abilities.
+         */
+        private static String tokenText(final Card c) {
+            final String oracle = c.getOracleText();
+            if (oracle != null && !oracle.trim().isEmpty()) {
+                return oracle.trim();
+            }
+            final CardView.CardStateView state = c.getView().getCurrentState();
+            final String shown = state == null ? null : state.getAbilityText();
+            if (shown == null) {
+                return "";
+            }
+            return shown.replaceAll("<[^>]*>", "").replace("\r\n", "\n").replaceAll("\n{2,}", "\n").trim();
+        }
+
+        /**
+         * The choices made for a permanent (a type, colours, a player, a number, cards, names, a mode, a direction,
+         * odd or even, a sector), or null when there are none. The controller sees its own choices, secret ones
+         * included; for the other player's permanents only the public view is read (a secret choice is unset there
+         * until revealed), and chosen cards only when they are in a public zone.
+         */
+        private static String chosenJson(final Card c, final Player viewer) {
+            final Map<String, String> out = new TreeMap<>();
+            final boolean own = c.getController() == viewer;
+            final CardView v = c.getView();
+            final String type = own ? c.getChosenType() : v.getChosenType();
+            if (type != null && !type.isEmpty()) {
+                out.put("type", quote(type));
+            }
+            final String type2 = own ? c.getChosenType2() : v.getChosenType2();
+            if (type2 != null && !type2.isEmpty()) {
+                out.put("type2", quote(type2));
+            }
+            final List<String> colours = new ArrayList<>();
+            final Iterable<String> cs = own ? c.getChosenColors() : v.getChosenColors();
+            if (cs != null) {
+                for (final String s : cs) {
+                    colours.add(s);
+                }
+            }
+            if (!colours.isEmpty()) {
+                out.put("colors", namesJson(colours));
+            }
+            if (own) {
+                if (c.getChosenPlayer() != null) {
+                    out.put("player", quote(c.getChosenPlayer() == viewer ? "you" : "opponent"));
+                }
+            } else if (v.getChosenPlayer() != null) {
+                out.put("player", quote(v.getChosenPlayer() == viewer.getView() ? "you" : "opponent"));
+            }
+            final String number = own ? (c.getChosenNumber() == null ? null : String.valueOf(c.getChosenNumber()))
+                    : v.getChosenNumber();
+            if (number != null && !number.isEmpty()) {
+                out.put("number", quote(number));
+            }
+            final List<String> cards = new ArrayList<>();
+            for (final Card t : c.getChosenCards()) {
+                final ZoneType z = t.getZone() == null ? null : t.getZone().getZoneType();
+                final boolean visible = !t.isFaceDown() && (z == ZoneType.Battlefield || z == ZoneType.Graveyard
+                        || z == ZoneType.Exile || z == ZoneType.Stack || (z == ZoneType.Hand && t.getOwner() == viewer));
+                if (own || visible) {
+                    cards.add(t.isFaceDown() && t.getController() != viewer ? "face-down card"
+                            : z == ZoneType.Battlefield ? nameOf(t) + " (" + t.getId() + ")" : nameOf(t));
+                }
+            }
+            if (!cards.isEmpty()) {
+                out.put("cards", namesJson(cards));
+            }
+            final List<String> named = own ? c.getNamedCards() : v.getNamedCard();
+            if (named != null && !named.isEmpty()) {
+                out.put("named", namesJson(new ArrayList<>(named)));
+            }
+            final String mode = own ? c.getChosenMode() : v.getChosenMode();
+            if (mode != null && !mode.isEmpty()) {
+                out.put("mode", quote(mode));
+            }
+            final Object dir = own ? c.getChosenDirection() : v.getChosenDirection();
+            if (dir != null) {
+                out.put("direction", quote(String.valueOf(dir)));
+            }
+            final Object evenOdd = own ? c.getChosenEvenOdd() : v.getChosenEvenOdd();
+            if (evenOdd != null) {
+                out.put("evenOdd", quote(String.valueOf(evenOdd)));
+            }
+            if (own && c.getChosenSector() != null) {
+                out.put("sector", quote(c.getChosenSector()));
+            }
+            if (out.isEmpty()) {
+                return null;
+            }
+            final StringBuilder sb = new StringBuilder("{");
+            for (final Map.Entry<String, String> e : out.entrySet()) {
+                sb.append(sb.length() > 1 ? "," : "").append(quote(e.getKey())).append(':').append(e.getValue());
             }
             return sb.append('}').toString();
         }

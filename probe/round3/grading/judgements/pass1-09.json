@@ -1,0 +1,62 @@
+[
+{
+"case": "C169",
+"better": "A",
+"margin": "clear",
+"reason": "Opponent's threats fly, so ground blockers barely help; swinging with both forces Hellkite to block one and puts the opponent at 2-3 instead of 3-7."
+},
+{
+"case": "C172",
+"better": "A",
+"margin": "clear",
+"reason": "Trading a spare 1/1 Illusion for Starscape Cleric, the opponent's main drain engine, is a great deal at 20 life."
+},
+{
+"case": "C176",
+"better": "A",
+"margin": "clear",
+"reason": "Uses all mana: adds Biotech and exiles both recursive Forsaken Miners against an empty hand, and skips paying 2 life at 9 for an untapped Crypt that B never uses."
+},
+{
+"case": "C179",
+"better": "B",
+"margin": "small",
+"reason": "Killing a 3/3 flyer now slows a 6-per-turn air clock, but sacrificing a Treasure likely costs the Misty Mountains 6/6, so it is close."
+},
+{
+"case": "C180",
+"better": "equal",
+"margin": "small",
+"reason": "Opponent is at 62 and neither attack comes close; the three extra Illusion damage versus keeping them home as blockers barely matters."
+},
+{
+"case": "C184",
+"better": "A",
+"margin": "large",
+"reason": "At 3 life against burn, the Deceit copy bounces Mentor and strips their last card at no life cost; B goes to 1 life, where any ping kills."
+},
+{
+"case": "C188",
+"better": "B",
+"margin": "clear",
+"reason": "Day of Judgment next turn kills all three creatures anyway, and No More Lies cannot be held up after it, so countering only spends a card."
+},
+{
+"case": "C190",
+"better": "B",
+"margin": "large",
+"reason": "Bargained Torches exile Smaug and Clarion Conqueror at instant speed, using Treasures that Conqueror locks anyway, and free the 6/6 to swing the opponent from 9 to 3."
+},
+{
+"case": "C193",
+"better": "B",
+"margin": "small",
+"reason": "Against a lifegain deck that wins long, attacking with everyone spreads their small blockers thin and adds damage; their crack-back is weak at 14 life."
+},
+{
+"case": "C194",
+"better": "A",
+"margin": "clear",
+"reason": "An end-step bargained Torch, using a Treasure Conqueror locks anyway, exiles the 3/3 flyer, unlocks the Treasures and clears the way for the 6/6."
+}
+]
